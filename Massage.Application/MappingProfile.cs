@@ -40,6 +40,11 @@ namespace Massage.Application.Mappings
 
             CreateMap<TimeSlot, TimeSlotDto>();
             CreateMap<TimeSlotDto, TimeSlot>();
+
+
+            CreateMap<User, UserDto>();
+            CreateMap<UserPreferences, UserPreferencesDto>();
+            CreateMap<UserPreferencesDto, UserPreferences>();
         }
     }
 

@@ -8,6 +8,8 @@ using Massage.Application.Commands;
 using Massage.Application.Queries;
 using Massage.Application.DTOs;
 using System.Security.Claims;
+using Massage.Application.Commands.ProviderCommands;
+using Massage.Application.Queries.ProviderQueries;
 
 namespace Massage.API.Controllers
 {
@@ -91,18 +93,18 @@ namespace Massage.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
+        //[HttpPost]
         //[Authorize(Roles = "User")]
-        public async Task<ActionResult<Guid>> CreateProvider(CreateProviderCommand command)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var guidUserId))
-                return BadRequest("Invalid user ID");
+        //public async Task<ActionResult<Guid>> CreateProvider(CreateProviderCommand command)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var guidUserId))
+        //        return BadRequest("Invalid user ID");
 
-            command.UserId = guidUserId;
-            var providerId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetProviderById), new { id = providerId }, providerId);
-        }
+        //    command.UserId = guidUserId;
+        //    var providerId = await _mediator.Send(command);
+        //    return CreatedAtAction(nameof(GetProviderById), new { id = providerId }, providerId);
+        //}
 
         [HttpPut("{id}")]
         //[Authorize(Roles = "Provider")]
@@ -148,76 +150,6 @@ namespace Massage.API.Controllers
         public async Task<IActionResult> UpdateProviderSchedule(Guid id, ProviderScheduleDto scheduleDto)
         {
             var command = new UpdateProviderScheduleCommand { ProviderId = id, ScheduleDto = scheduleDto };
-            var result = await _mediator.Send(command);
-
-            if (!result)
-                return NotFound();
-
-            return NoContent();
-        }
-    }
-
-    [ApiController]
-    [Route("api/providers/{providerId}/services")]
-    [Authorize]
-    public class ProviderServicesController : ControllerBase
-    {
-        private readonly IMediator _mediator;
-
-        public ProviderServicesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<ServiceDto>>> GetServicesByProvider(Guid providerId)
-        {
-            var query = new GetServicesByProviderQuery { ProviderId = providerId };
-            var result = await _mediator.Send(query);
-            return Ok(result);
-        }
-
-        [HttpGet("{serviceId}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<ServiceDto>> GetServiceById(Guid providerId, Guid serviceId)
-        {
-            var query = new GetServiceByIdQuery { ServiceId = serviceId };
-            var result = await _mediator.Send(query);
-
-            if (result == null || result.Id != serviceId)
-                return NotFound();
-
-            return Ok(result);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Provider")]
-        public async Task<ActionResult<Guid>> CreateService(Guid providerId, CreateServiceDto serviceDto)
-        {
-            var command = new CreateServiceCommand { ProviderId = providerId, ServiceDto = serviceDto };
-            var serviceId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetServiceById), new { providerId, serviceId }, serviceId);
-        }
-
-        [HttpPut("{serviceId}")]
-        [Authorize(Roles = "Provider")]
-        public async Task<IActionResult> UpdateService(Guid providerId, Guid serviceId, UpdateServiceDto serviceDto)
-        {
-            var command = new UpdateServiceCommand { ServiceId = serviceId, ServiceDto = serviceDto };
-            var result = await _mediator.Send(command);
-
-            if (!result)
-                return NotFound();
-
-            return NoContent();
-        }
-
-        [HttpDelete("{serviceId}")]
-        [Authorize(Roles = "Provider")]
-        public async Task<IActionResult> DeleteService(Guid providerId, Guid serviceId)
-        {
-            var command = new DeleteServiceCommand { ServiceId = serviceId };
             var result = await _mediator.Send(command);
 
             if (!result)

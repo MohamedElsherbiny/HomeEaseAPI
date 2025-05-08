@@ -130,7 +130,7 @@ namespace Massage.Infrastructure.Services
             IQueryable<Provider> query = _dbContext.Providers
                 .Include(p => p.Address)
                 .Include(p => p.Services)
-                .Where(p => p.Status == ProviderStatus.Suspended);
+                .Where(p => p.Status != ProviderStatus.Suspended);
 
             // Filter by service types
             if (serviceTypes != null && serviceTypes.Length > 0)

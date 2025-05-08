@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Massage.Application.Queries.BookingQueries;
+using Massage.Application.Commands.BookingCommands;
 
 namespace Massage.API.Controllers
 {

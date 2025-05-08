@@ -19,17 +19,22 @@ namespace Massage.Infrastructure.Services
 
         public async Task<User> GetUserByIdAsync(Guid userId)
         {
-            var user = await _dbContext.Users.FindAsync(userId);
-            return user == null ? null : new User
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email
-                // Map other properties as needed
-            };
-
+            return await _dbContext.Users.FindAsync(userId);
         }
+
+        //public async Task<User> GetUserByIdAsync(Guid userId)
+        //{
+        //    var user = await _dbContext.Users.FindAsync(userId);
+        //    return user == null ? null : new User
+        //    {
+        //        Id = user.Id,
+        //        FirstName = user.FirstName,
+        //        LastName = user.LastName,
+        //        Email = user.Email
+        //        // Map other properties as needed
+        //    };
+
+        //}
 
         public async Task<IEnumerable<User>> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending)
         {

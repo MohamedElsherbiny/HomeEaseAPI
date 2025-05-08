@@ -1,4 +1,5 @@
 ﻿using Massage.Application.Commands;
+using Massage.Application.Commands.AuthCommands;
 using Massage.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Http;

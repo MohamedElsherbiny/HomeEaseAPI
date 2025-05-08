@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Services;
+using Massage.Application.Commands.UserCommends;
+using Massage.Application.Queries.UserQueries;
 
 namespace Massage.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -24,6 +26,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpGet("me")]
+        [Authorize]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCurrentUser()
         {
@@ -167,7 +170,7 @@ namespace Massage.API.Controllers
 
         // Admin endpoints
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllUsers([FromQuery] GetAllUsersQuery query)
         {
@@ -176,7 +179,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpGet("{userId}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserById(Guid userId)
