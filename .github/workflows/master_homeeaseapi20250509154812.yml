@@ -55,5 +55,5 @@ jobs:
         with:
           app-name: 'HomeEaseAPI20250509154812'
           slot-name: 'Production'
-          package: .
+          package: "${{ env.WORKING_DIRECTORY }}"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C793530CAE014C19BDBF53C959175B5F }}
