@@ -46,10 +46,9 @@ jobs:
     #     app-name: ${{ env.AZURE_WEBAPP_NAME }}
     #     package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
     - name: Deploy to Azure Web App
-      id: deploy-to-webapp
       uses: azure/webapps-deploy@v3
       with:
-        app-name: 'HomeEaseAPI20250509154812'
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
         slot-name: 'Production'
-        package: .
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C793530CAE014C19BDBF53C959175B5F }}
