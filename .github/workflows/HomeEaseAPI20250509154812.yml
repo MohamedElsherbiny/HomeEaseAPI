@@ -40,12 +40,16 @@ jobs:
       with:
         name: webapp
         path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    - name: Azure Login
-      uses: azure/login@v2
+    # - name: Deploy to Azure WebApp
+    #   uses: azure/webapps-deploy@v2
+    #   with:
+    #     app-name: ${{ env.AZURE_WEBAPP_NAME }}
+    #     package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v3
       with:
-        creds: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C793530CAE014C19BDBF53C959175B5F }}
-    - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        app-name: 'HomeEaseAPI20250509154812'
+        slot-name: 'Production'
+        package: .
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C793530CAE014C19BDBF53C959175B5F }}
