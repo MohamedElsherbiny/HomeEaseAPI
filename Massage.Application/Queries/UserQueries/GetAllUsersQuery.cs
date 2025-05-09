@@ -2,20 +2,16 @@
 using Massage.Application.DTOs;
 using Massage.Application.Interfaces.Services;
 using Massage.Application.Queries.UserQueries;
+using Massage.Domain.Common;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Massage.Application.Queries.UserQueries
 {
-    public class GetAllUsersQuery : IRequest<IEnumerable<UserDto>>
+    public class GetAllUsersQuery : IRequest<PaginatedList<UserDto>>
     {
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
-        public string SearchTerm { get; set; }
+        public string? SearchTerm { get; set; }
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
     }
@@ -23,7 +19,7 @@ namespace Massage.Application.Queries.UserQueries
 
 
 // Query Handler
-public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, IEnumerable<UserDto>>
+public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, PaginatedList<UserDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
@@ -34,15 +30,16 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, IEnumer
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = await _userRepository.GetAllAsync(
+        var (users, totalCount) = await _userRepository.GetAllAsync(
             request.Page,
             request.PageSize,
             request.SearchTerm,
             request.SortBy,
             request.SortDescending);
+        var usersToReturn =  _mapper.Map<List<UserDto>>(users);
 
-        return _mapper.Map<IEnumerable<UserDto>>(users);
+        return new PaginatedList<UserDto>(usersToReturn, totalCount, request.Page, request.PageSize);
     }
 }

@@ -12,8 +12,8 @@ namespace Massage.Application.Interfaces
         DbSet<Schedule> Schedules { get; set; }
         DbSet<Booking> Bookings { get; set; }
         DbSet<Review> Reviews { get; set; }
-        public DbSet<Address> Addresses { get; set; }
-
+        DbSet<Address> Addresses { get; set; }
+        DbSet<PaymentInfo> PaymentInfos { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

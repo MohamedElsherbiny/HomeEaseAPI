@@ -11,7 +11,7 @@ namespace Massage.Application.Interfaces.Services
     public interface IUserRepository
     {
         Task<User> GetUserByIdAsync(Guid userId);
-        Task<IEnumerable<User>> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending);
+        Task<(IEnumerable<User> users, int totalCount)> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending);
         void Update(User user);
     }
 }

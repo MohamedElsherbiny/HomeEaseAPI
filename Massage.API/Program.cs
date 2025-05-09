@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Massage.Infrastructure.Data.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +101,12 @@ builder.Services.AddIdentityCore<User>(options =>
 .AddSignInManager()
 .AddDefaultTokenProviders();
 
+builder.Services.AddIdentity<User, IdentityRole<Guid>>() 
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
@@ -130,18 +137,44 @@ builder.Services.AddAuthentication(options =>
 
 
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+    options.AddPolicy("ProviderOnly", policy =>
+        policy.RequireRole("Provider"));
+    options.AddPolicy("UserOnly", policy =>
+        policy.RequireRole("User"));
+});
+
+
 
 var app = builder.Build();
 
 // Use CORS
 app.UseCors(MyAllowSpecificOrigins);
-    
-//}
+
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Seed admin data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        await AdminDataSeeder.SeedAdminUserAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
+
 
 app.Run();

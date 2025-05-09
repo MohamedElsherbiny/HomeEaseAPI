@@ -36,7 +36,7 @@ namespace Massage.Infrastructure.Services
 
         //}
 
-        public async Task<IEnumerable<User>> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending)
+        public async Task<(IEnumerable<User> users, int totalCount)> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending)
         {
             var query = _dbContext.Users.AsQueryable();
 
@@ -52,10 +52,14 @@ namespace Massage.Infrastructure.Services
                     : query.OrderBy(e => EF.Property<object>(e, sortBy));
             }
 
-            return await query
+            int totalCount = await query.CountAsync();
+
+            var paginatedUsers = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            return (paginatedUsers, totalCount);
         }
 
         public void Update(User user)
