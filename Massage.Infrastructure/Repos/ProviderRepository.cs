@@ -39,7 +39,7 @@ namespace Massage.Infrastructure.Services
             var dayOfWeek = appointmentTime.DayOfWeek;
             var timeOfDay = appointmentTime.TimeOfDay;
             var endTime = timeOfDay.Add(TimeSpan.FromMinutes(durationMinutes));
-
+            
             // Check if there's an availability slot for this day and time
             var hasAvailabilitySlot = await _dbContext.AvailabilitySlots
                 .AnyAsync(a => a.ProviderId == providerId &&
