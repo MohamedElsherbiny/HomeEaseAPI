@@ -57,7 +57,9 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
             EmailConfirmed = false,
             ProfileImageUrl = "",
             RefreshToken = "",
-            Role = Massage.Domain.Enums.UserRole.User
+            Role = Massage.Domain.Enums.UserRole.User,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);

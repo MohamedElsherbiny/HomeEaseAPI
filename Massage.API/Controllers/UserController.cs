@@ -8,6 +8,7 @@ using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Services;
 using Massage.Application.Commands.UserCommends;
 using Massage.Application.Queries.UserQueries;
+using Massage.Infrastructure.Services;
 
 namespace Massage.API.Controllers
 {
@@ -167,6 +168,35 @@ namespace Massage.API.Controllers
             await _mediator.Send(command);
             return Ok(new { message = "Account deactivated successfully" });
         }
+
+
+        [HttpPost("activate")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ActivateAccount()
+        {
+            var userId = _currentUserService.UserId;
+            var command = new ActivateUserCommand(userId);
+            await _mediator.Send(command);
+            return Ok(new { message = "Account activated successfully" });
+        }
+
+
+        [HttpPost("status")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAccountStatus()
+        {
+            var userId = _currentUserService.UserId;
+            var command = new GetUserStatusCommand(userId);
+            var status = await _mediator.Send(command);
+
+            return Ok(new
+            {
+                message = "Account status retrieved successfully",
+                status
+            });
+        }
+
+
 
         // Admin endpoints
         [HttpGet]

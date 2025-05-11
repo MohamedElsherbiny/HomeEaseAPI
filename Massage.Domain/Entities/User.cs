@@ -18,7 +18,7 @@ namespace Massage.Domain.Entities
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
         public string ProfileImageUrl { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
         public DateTime? DeactivatedAt { get; set; }
 
         // Navigation properties

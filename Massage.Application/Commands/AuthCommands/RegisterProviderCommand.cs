@@ -69,7 +69,9 @@ public class RegisterProviderCommandHandler : IRequestHandler<RegisterProviderCo
             EmailConfirmed = false,
             Role = Massage.Domain.Enums.UserRole.Provider,
             RefreshToken = "",
-            ProfileImageUrl = ""
+            ProfileImageUrl = "",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
