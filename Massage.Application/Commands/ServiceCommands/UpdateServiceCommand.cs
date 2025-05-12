@@ -49,8 +49,8 @@ public class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceCommand,
         if (request.ServiceDto.DurationMinutes.HasValue)
             service.DurationMinutes = request.ServiceDto.DurationMinutes.Value;
 
-        if (request.ServiceDto.ServiceType != null)
-            service.ServiceType = Enum.Parse<ServiceType>(request.ServiceDto.ServiceType);
+        //if (request.ServiceDto.ServiceType != null)
+        //    service.ServiceType = Enum.Parse<ServiceType>(request.ServiceDto.ServiceType);
 
 
         _serviceRepository.Update(service);

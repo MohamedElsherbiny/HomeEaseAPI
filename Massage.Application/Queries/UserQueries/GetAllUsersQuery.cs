@@ -14,6 +14,8 @@ namespace Massage.Application.Queries.UserQueries
         public string? SearchTerm { get; set; }
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
+
+        public bool? IsActive { get; set; } 
     }
 }
 
@@ -37,7 +39,8 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, Paginat
             request.PageSize,
             request.SearchTerm,
             request.SortBy,
-            request.SortDescending);
+            request.SortDescending,
+            request.IsActive);
         var usersToReturn =  _mapper.Map<List<UserDto>>(users);
 
         return new PaginatedList<UserDto>(usersToReturn, totalCount, request.Page, request.PageSize);

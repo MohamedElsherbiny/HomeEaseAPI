@@ -51,7 +51,7 @@ public class CreateServiceCommandHandler : IRequestHandler<CreateServiceCommand,
             Description = request.ServiceDto.Description,
             Price = request.ServiceDto.Price,
             DurationMinutes = request.ServiceDto.DurationMinutes,
-            ServiceType = Enum.Parse<ServiceType>(request.ServiceDto.ServiceType)
+            //ServiceType = Enum.Parse<ServiceType>(request.ServiceDto.ServiceType)
 
         };
 

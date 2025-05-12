@@ -36,7 +36,7 @@ namespace Massage.Infrastructure.Services
 
         //}
 
-        public async Task<(IEnumerable<User> users, int totalCount)> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending)
+        public async Task<(IEnumerable<User> users, int totalCount)> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending, bool? isActive)
         {
             var query = _dbContext.Users.AsQueryable();
 
@@ -50,6 +50,11 @@ namespace Massage.Infrastructure.Services
                 query = sortDescending
                     ? query.OrderByDescending(e => EF.Property<object>(e, sortBy))
                     : query.OrderBy(e => EF.Property<object>(e, sortBy));
+            }
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(u => u.IsActive == isActive.Value);
             }
 
             int totalCount = await query.CountAsync();

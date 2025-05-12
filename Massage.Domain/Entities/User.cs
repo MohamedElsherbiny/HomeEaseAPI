@@ -20,11 +20,13 @@ namespace Massage.Domain.Entities
         public string ProfileImageUrl { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime? DeactivatedAt { get; set; }
+        //public DateTime? LastLoginAt { get; set; }
 
         // Navigation properties
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<Address> Addresses { get; set; }
         public virtual UserPreferences Preferences { get; set; }
+        
     }
 }

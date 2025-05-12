@@ -134,9 +134,15 @@ namespace Massage.API.Controllers
             [FromQuery] DateTime? endDate,
             [FromQuery] BookingStatus? status)
         {
-            // Implement a dedicated query handler for this
-            // For now we'll return an empty 501 Not Implemented
-            return StatusCode(501);
+            var query = new GetBookingReportsQuery
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                Status = status
+            };
+
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
 
         [HttpGet("reports/providers")]
@@ -144,9 +150,14 @@ namespace Massage.API.Controllers
             [FromQuery] ProviderStatus? status,
             [FromQuery] bool? isActive)
         {
-            // Implement a dedicated query handler for this
-            // For now we'll return an empty 501 Not Implemented
-            return StatusCode(501);
+            var query = new GetProviderReportsQuery
+            {
+                Status = status,
+                IsActive = isActive
+            };
+
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
 
         [HttpGet("reports/users")]
@@ -154,17 +165,22 @@ namespace Massage.API.Controllers
             [FromQuery] UserRole? role,
             [FromQuery] bool? isActive)
         {
-            // Implement a dedicated query handler for this
-            // For now we'll return an empty 501 Not Implemented
-            return StatusCode(501);
+            var query = new GetUserReportsQuery
+            {
+                Role = role,
+                IsActive = isActive
+            };
+
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
 
         [HttpGet("platform-stats")]
         public async Task<ActionResult<PlatformStatsDto>> GetPlatformStats()
         {
-            // Implement a dedicated query handler for this
-            // For now we'll return an empty 501 Not Implemented
-            return StatusCode(501);
+            var query = new GetPlatformStatsQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
     }
 }

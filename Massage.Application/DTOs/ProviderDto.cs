@@ -99,8 +99,8 @@ namespace Massage.Application.DTOs
         [Range(15, 300)]
         public int DurationMinutes { get; set; }
 
-        [Required]
-        public string ServiceType { get; set; }
+        //[Required]
+        //public string ServiceType { get; set; }
     }
 
     public class UpdateServiceDto
