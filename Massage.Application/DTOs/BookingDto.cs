@@ -41,9 +41,9 @@ namespace Massage.Application.DTOs
 
         public string Notes { get; set; }
 
-        public AddressDto Location { get; set; }
+        //public AddressDto Location { get; set; }
 
-        public PaymentInfoDto PaymentInfo { get; set; }
+        //public PaymentInfoDto PaymentInfo { get; set; }
     }
 
     public class UpdateBookingRequestDto

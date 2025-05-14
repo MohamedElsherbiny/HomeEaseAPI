@@ -90,30 +90,33 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                 ServicePrice = service.Price
             };
 
-            // Set location if provided
-            if (request.BookingRequest.Location != null)
-            {
-                booking.Location.Address = new Address
-                {
-                    Street = request.BookingRequest.Location.Street,
-                    City = request.BookingRequest.Location.City,
-                    State = request.BookingRequest.Location.State,
-                    ZipCode = request.BookingRequest.Location.ZipCode,
-                    Country = request.BookingRequest.Location.Country
-                };
-            }
+            //// Set location if provided
+            //if (request.BookingRequest.Location != null)
+            //{
+            //    booking.Location = new Location
+            //    {
+            //        Address = new Address
+            //        {
+            //            Street = request.BookingRequest.Location.Street,
+            //            City = request.BookingRequest.Location.City,
+            //            State = request.BookingRequest.Location.State,
+            //            ZipCode = request.BookingRequest.Location.ZipCode,
+            //            Country = request.BookingRequest.Location.Country
+            //        }
+            //    };
+            //}
 
             // Create initial payment record if payment info is provided
-            if (request.BookingRequest.PaymentInfo != null)
-            {
-                booking.Payment = new PaymentInfo
-                {
-                    Amount = request.BookingRequest.PaymentInfo.Amount,
-                    Currency = request.BookingRequest.PaymentInfo.Currency,
-                    PaymentMethod = request.BookingRequest.PaymentInfo.PaymentMethod,
-                    Status = "Pending"
-                };
-            }
+            //if (request.BookingRequest.PaymentInfo != null)
+            //{
+            //    booking.Payment = new PaymentInfo
+            //    {
+            //        Amount = request.BookingRequest.PaymentInfo.Amount,
+            //        Currency = request.BookingRequest.PaymentInfo.Currency,
+            //        PaymentMethod = request.BookingRequest.PaymentInfo.PaymentMethod,
+            //        Status = "Pending"
+            //    };
+            //}
 
             await _bookingRepository.AddAsync(booking);
             await _bookingRepository.SaveChangesAsync();

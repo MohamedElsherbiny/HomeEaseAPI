@@ -60,14 +60,13 @@ namespace Massage.Application.Queries.AdminQueries
             };
         }
 
-        private async Task<Dictionary<string, int>> GetBookingsPerMonth()
+        private Task<Dictionary<string, int>> GetBookingsPerMonth()
         {
             var startDate = DateTime.UtcNow.AddMonths(-6);
-            var bookings = await _dbContext.Bookings
-                .Where(b => b.CreatedAt >= startDate)
-                .ToListAsync();
 
-            return bookings
+            var result = _dbContext.Bookings
+                .Where(b => b.CreatedAt >= startDate)
+                .AsEnumerable()
                 .GroupBy(b => new { b.CreatedAt.Year, b.CreatedAt.Month })
                 .OrderBy(g => g.Key.Year)
                 .ThenBy(g => g.Key.Month)
@@ -75,26 +74,30 @@ namespace Massage.Application.Queries.AdminQueries
                     g => $"{g.Key.Year}-{g.Key.Month}",
                     g => g.Count()
                 );
+
+            return Task.FromResult(result);
         }
 
-        private async Task<Dictionary<string, decimal>> GetRevenuePerMonth()
+
+        private Task<Dictionary<string, decimal>> GetRevenuePerMonth()
         {
             var startDate = DateTime.UtcNow.AddMonths(-6);
-            var bookings = await _dbContext.Bookings
-                .Where(b => b.CreatedAt >= startDate && b.Status == BookingStatus.Completed)
-                .ToListAsync();
 
-            return await _dbContext.Bookings
-                .Where(b => b.Status == BookingStatus.Completed && b.Payment != null)
+            var result = _dbContext.Bookings
+                .Where(b => b.CreatedAt >= startDate && b.Status == BookingStatus.Completed && b.Payment != null)
+                .Include(b => b.Payment)
+                .AsEnumerable()
                 .GroupBy(b => new { b.CreatedAt.Year, b.CreatedAt.Month })
                 .OrderBy(g => g.Key.Year)
                 .ThenBy(g => g.Key.Month)
-                .ToDictionaryAsync(
+                .ToDictionary(
                     g => $"{g.Key.Year}-{g.Key.Month}",
                     g => g.Sum(b => b.Payment.Amount)
                 );
 
+            return Task.FromResult(result);
         }
+
     }
 
     // Query to get users with filters for admin

@@ -27,42 +27,53 @@ namespace Massage.Infrastructure.Services
 
         public async Task<bool> CheckAvailabilityAsync(Guid providerId, DateTime appointmentTime, int durationMinutes)
         {
-            // Check if the provider exists
-            var provider = await _dbContext.Providers
+            // Step 1: Validate provider exists
+            var providerExists = await _dbContext.Providers
                 .AnyAsync(p => p.Id == providerId);
 
-            if (!provider)
-            {
+            if (!providerExists)
                 return false;
-            }
 
+            // Step 2: Determine appointment time window
             var dayOfWeek = appointmentTime.DayOfWeek;
             var timeOfDay = appointmentTime.TimeOfDay;
-            var endTime = timeOfDay.Add(TimeSpan.FromMinutes(durationMinutes));
-            
-            // Check if there's an availability slot for this day and time
+            var endTimeOfDay = timeOfDay.Add(TimeSpan.FromMinutes(durationMinutes));
+
+            // Step 3: Check for a matching availability slot
             var hasAvailabilitySlot = await _dbContext.AvailabilitySlots
-                .AnyAsync(a => a.ProviderId == providerId &&
-                               ((a.IsRecurring && a.DayOfWeek == dayOfWeek) ||
-                                (!a.IsRecurring && a.SpecificDate.HasValue && a.SpecificDate.Value.Date == appointmentTime.Date)) &&
-                               a.StartTime <= timeOfDay && a.EndTime >= endTime);
+                .AnyAsync(slot =>
+                    slot.ProviderId == providerId &&
+                    (
+                        // Recurring slot (e.g., every Monday 10:00–12:00)
+                        (slot.IsRecurring && slot.DayOfWeek == dayOfWeek) ||
+
+                        // One-time specific date slot
+                        (!slot.IsRecurring &&
+                         slot.SpecificDate.HasValue &&
+                         slot.SpecificDate.Value.Date == appointmentTime.Date)
+                    ) &&
+                    slot.StartTime <= timeOfDay &&
+                    slot.EndTime >= endTimeOfDay
+                );
 
             if (!hasAvailabilitySlot)
-            {
                 return false;
-            }
 
-            // Check if there are any conflicting bookings
+            // Step 4: Check for conflicting bookings at the same time
             var appointmentEndTime = appointmentTime.AddMinutes(durationMinutes);
 
-            var hasConflictingBooking = await _dbContext.Bookings
-                .AnyAsync(b => b.ProviderId == providerId &&
-                               b.Status != BookingStatus.Cancelled &&
-                               b.AppointmentDateTime < appointmentEndTime &&
-                               b.AppointmentDateTime.AddMinutes(b.DurationMinutes) > appointmentTime);
+            var hasConflict = await _dbContext.Bookings
+                .AnyAsync(booking =>
+                    booking.ProviderId == providerId &&
+                    booking.Status != BookingStatus.Cancelled &&
+                    booking.AppointmentDateTime < appointmentEndTime &&
+                    booking.AppointmentDateTime.AddMinutes(booking.DurationMinutes) > appointmentTime
+                );
 
-            return !hasConflictingBooking;
+            // Return true only if no conflict exists
+            return !hasConflict;
         }
+
         public async Task<Provider> GetByIdWithDetailsAsync(Guid id)
         {
             return await _dbContext.Providers

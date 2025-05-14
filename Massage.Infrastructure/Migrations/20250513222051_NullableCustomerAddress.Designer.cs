@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Massage.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250512204206_UpdateUserAndReview")]
-    partial class UpdateUserAndReview
+    [Migration("20250513222051_UpdateCancellationReason2")]
+    partial class UpdateCancellationReason2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,7 +124,6 @@ namespace Massage.Infrastructure.Migrations
                         .HasColumnType("time");
 
                     b.Property<string>("CancellationReason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CancelledAt")
@@ -137,7 +136,6 @@ namespace Massage.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CustomerAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DurationMinutes")
@@ -361,7 +359,7 @@ namespace Massage.Infrastructure.Migrations
                     b.Property<Guid>("ProviderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Rating")
+                    b.Property<decimal?>("Rating")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("UpdatedAt")

@@ -10,7 +10,7 @@ namespace Massage.Domain.Entities
         public Guid ProviderId { get; set; }
         public Guid ServiceId { get; set; }
         public Guid? LocationId { get; set; }
-        public string CustomerAddress { get; set; }
+        public string? CustomerAddress { get; set; }
         public DateTime AppointmentDate { get; set; }
         public TimeSpan AppointmentTime { get; set; }
         public bool IsHomeService { get; set; }
@@ -19,8 +19,7 @@ namespace Massage.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime? ConfirmedAt { get; set; }
         public DateTime? CancelledAt { get; set; }
-        public string CancellationReason { get; set; }
-        public PaymentInfo Payment { get; set; }
+        public string? CancellationReason { get; set; }
         public DateTime AppointmentDateTime { get; set; }
         public int DurationMinutes { get; set; }
         public decimal ServicePrice { get; set; }
@@ -30,6 +29,7 @@ namespace Massage.Domain.Entities
         public virtual Provider Provider { get; set; }
         public virtual Service Service { get; set; }
         public virtual Location Location { get; set; }
-        public virtual Review Review { get; set; } 
+        public virtual Review Review { get; set; }
+        public PaymentInfo Payment { get; set; }
     }
 }
