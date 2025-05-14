@@ -3,7 +3,6 @@ using Massage.Application.Interfaces;
 using Massage.Application.Interfaces.Services;
 using Massage.Domain.Entities;
 using Massage.Domain.Repositories;
-using Massage.Infrastructure;
 using Massage.Infrastructure.Data;
 using Massage.Infrastructure.Repos;
 using Massage.Infrastructure.Services;
@@ -14,6 +13,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Massage.Infrastructure.Data.Seeding;
+using Massage.Application.Middlewares;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
+using Serilog;
+using Serilog.Formatting.Json;
+using OpenTelemetry.Trace;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +97,7 @@ builder.Services.AddScoped<IGeolocationService, GeolocationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddApplicationInsightsTelemetry();
 
 
 builder.Services.AddIdentityCore<User>(options =>
@@ -111,8 +119,47 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddDataProtection();
+// Configure Serilog with explicit async logging
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
+        .Enrich.FromLogContext();
 
-
+    // Check environment to configure the appropriate async sink
+    if (context.HostingEnvironment.IsDevelopment())
+    {
+        // Development: Async console logging with JSON
+        configuration.WriteTo.Async(a => a.Console(
+                formatter: new JsonFormatter(renderMessage: true)),
+            bufferSize: 1000);
+    }
+    else
+    {
+        // Production: Async Application Insights logging (no formatter needed)
+        configuration.WriteTo.Async(a => a.ApplicationInsights(
+                connectionString: context.Configuration["ApplicationInsights:ConnectionString"],
+                telemetryConverter: new TraceTelemetryConverter()),
+            bufferSize: 1000);
+    }
+});
+// Configure OpenTelemetry for tracing and metrics
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("Pensell_Api"))
+    .WithTracing(tracing => tracing
+        .AddHttpClientInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+        .AddAspNetCoreInstrumentation()
+        .AddAzureMonitorTraceExporter(o => o.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"])
+        .AddSource("MyApp.Tracing"))
+    .WithMetrics(metrics => metrics
+        //.AddRuntimeInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddAzureMonitorMetricExporter(o => o.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"])
+        .AddMeter("MyApp.Metrics"));
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -176,5 +223,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();
