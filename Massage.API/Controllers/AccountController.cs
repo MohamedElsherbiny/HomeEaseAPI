@@ -15,12 +15,12 @@ namespace Massage.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     //[Authorize]
-    public class UsersController : ControllerBase
+    public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly ICurrentUserService _currentUserService;
 
-        public UsersController(IMediator mediator, ICurrentUserService currentUserService)
+        public AccountController(IMediator mediator, ICurrentUserService currentUserService)
         {
             _mediator = mediator;
             _currentUserService = currentUserService;
@@ -159,27 +159,6 @@ namespace Massage.API.Controllers
             }
         }
 
-        [HttpPost("deactivate")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> DeactivateAccount()
-        {
-            var userId = _currentUserService.UserId;
-            var command = new DeactivateUserCommand(userId);
-            await _mediator.Send(command);
-            return Ok(new { message = "Account deactivated successfully" });
-        }
-
-
-        [HttpPost("activate")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> ActivateAccount()
-        {
-            var userId = _currentUserService.UserId;
-            var command = new ActivateUserCommand(userId);
-            await _mediator.Send(command);
-            return Ok(new { message = "Account activated successfully" });
-        }
-
 
         [HttpPost("status")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -194,37 +173,6 @@ namespace Massage.API.Controllers
                 message = "Account status retrieved successfully",
                 status
             });
-        }
-
-
-
-        // Admin endpoints
-        [HttpGet]
-        //[Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllUsers([FromQuery] GetAllUsersQuery query)
-        {
-            var result = await _mediator.Send(query);
-            return Ok(result);
-        }
-
-        [HttpGet("{userId}")]
-        //[Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUserById(Guid userId)
-        {
-            var query = new GetUserByIdQuery(userId);
-
-            try
-            {
-                var result = await _mediator.Send(query);
-                return Ok(result);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
         }
     }
 }

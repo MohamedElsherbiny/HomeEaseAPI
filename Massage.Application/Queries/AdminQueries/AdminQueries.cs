@@ -270,13 +270,15 @@ namespace Massage.Application.Queries.AdminQueries
                                 .Sum(),
                             AverageRating = _dbContext.Reviews
                                 .Where(r => r.ProviderId == provider.Id && r.Rating.HasValue)
-                                .Average(r => (double)r.Rating.Value),
+                                .Select(r => (decimal?)r.Rating.Value) 
+                                .Average() ?? 0,  
                             LastActive = _dbContext.Reviews
                                 .Where(r => r.ProviderId == provider.Id)
                                 .OrderByDescending(r => r.UpdatedAt)
                                 .Select(r => r.UpdatedAt)
                                 .FirstOrDefault()
                         };
+
 
             // Apply filters
             if (request.Status.HasValue)
@@ -412,9 +414,18 @@ namespace Massage.Application.Queries.AdminQueries
                 ? paymentsForCompletedBookings.Average(p => p.Amount)
                 : 0;
 
-            var averageRating = await _dbContext.Reviews
+            double averageRating = 0;
+
+            var ratings = await _dbContext.Reviews
                 .Where(r => r.Rating.HasValue)
-                .AverageAsync(r => (double)r.Rating.Value, cancellationToken);
+                .Select(r => r.Rating.Value)
+                .ToListAsync(cancellationToken);
+
+            if (ratings.Any())
+            {
+                averageRating = ratings.Average(r => (double)r);
+            }
+
 
             return new PlatformStatsDto
             {
