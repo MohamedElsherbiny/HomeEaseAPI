@@ -10,7 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		file_list.txt = file_list.txt
-		.github\workflows\HomeEasePublish.yml = .github\workflows\HomeEasePublish.yml
+		.github\workflows\master_homeeaseapi20250509154812.yml = .github\workflows\master_homeeaseapi20250509154812.yml
+		.github\workflows\HomeEasePublish.yml-backup = .github\workflows\HomeEasePublish.yml-backup
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Massage.Infrastructure", "Massage.Infrastructure\Massage.Infrastructure.csproj", "{D7151B22-BCF3-386D-8876-C5E95E3F44EB}"

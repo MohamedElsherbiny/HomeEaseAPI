@@ -1,0 +1,69 @@
+# name: Build and deploy .NET Core application to Web App HomeEaseAPI20250509154812
+
+# on:
+#   push:
+#     branches:
+#       - master
+
+# env:
+#   AZURE_WEBAPP_NAME: HomeEaseAPI20250509154812
+#   CONFIGURATION: Release
+#   DOTNET_CORE_VERSION: 8.0.x
+#   WORKING_DIRECTORY: ./Massage.API
+#   TEST_PROJECT_PATH: ./Massage.Tests
+#   BUILD_OUTPUT_PATH: ./publish
+#   DEPLOY_ARTIFACT_PATH: ./artifact
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Setup .NET SDK
+#         uses: actions/setup-dotnet@v4
+#         with:
+#           dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+
+#       - name: Restore
+#         run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
+
+#       - name: Build
+#         run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
+
+#       - name: Publish
+#         run: |
+#           GIT_HASH=$(git rev-parse --short HEAD)
+#           BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+#           dotnet publish "${{ env.WORKING_DIRECTORY }}" \
+#             --configuration ${{ env.CONFIGURATION }} \
+#             --no-build \
+#             --output "${{ env.BUILD_OUTPUT_PATH }}" \
+#             /p:GitVersion=$GIT_HASH /p:BuildDate=$BUILD_DATE
+
+#       - name: Upload Artifacts
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: webapp
+#           path: ${{ env.BUILD_OUTPUT_PATH }}
+
+#   deploy:
+#     runs-on: ubuntu-latest
+#     needs: build
+
+#     steps:
+#       - name: Download artifact from build job
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: webapp
+#           path: ${{ env.DEPLOY_ARTIFACT_PATH }}
+
+#       - name: Deploy to Azure Web App
+#         uses: azure/webapps-deploy@v3
+#         with:
+#           app-name: ${{ env.AZURE_WEBAPP_NAME }}
+#           slot-name: 'Production'
+#           package: ${{ env.DEPLOY_ARTIFACT_PATH }}
+#           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C793530CAE014C19BDBF53C959175B5F }}
