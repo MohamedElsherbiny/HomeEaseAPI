@@ -69,7 +69,7 @@ namespace Massage.Application.DTOs
         public int ServicesCount { get; set; }
         public int BookingsCount { get; set; }
         public decimal TotalRevenue { get; set; }
-        public double AverageRating { get; set; }
+        public decimal AverageRating { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? LastActive { get; set; }
     }

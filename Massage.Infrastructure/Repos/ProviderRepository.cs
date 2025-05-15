@@ -108,22 +108,43 @@ namespace Massage.Infrastructure.Services
                 .FirstOrDefaultAsync(p => p.UserId == userId);
         }
 
-        public async Task<List<Provider>> GetAllAsync()
+        public async Task<(IEnumerable<Provider> Provider, int totalCount)> GetAllProvidersAsync(
+            int pageNumber,
+            int pageSize,
+            string? searchTerm,
+            string sortBy,
+            bool sortDescending
+        )
         {
-            return await _dbContext.Providers
+            var query = _dbContext.Providers
                 .Include(p => p.Address)
-                .ToListAsync();
-        }
+                .AsQueryable();
 
 
-        public async Task<List<Provider>> GetAllWithPaginationAsync(int pageNumber, int pageSize)
-        {
-            return await _dbContext.Providers
-                .Include(p => p.Address)
-                .OrderByDescending(p => p.Rating)
+            // Search by Name or Email (حسب المتاح)
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(p =>
+                    p.BusinessName.Contains(searchTerm) ||
+                    p.Email.Contains(searchTerm));
+            }
+
+            // Sorting
+            query = sortBy.ToLower() switch
+            {
+                "createdat" => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+                "rating" => sortDescending ? query.OrderByDescending(p => p.Rating) : query.OrderBy(p => p.Rating),
+                _ => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt)
+            };
+
+            var totalCount = await query.CountAsync();
+
+            var paginatedProviders = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            return (paginatedProviders, totalCount);
         }
 
 

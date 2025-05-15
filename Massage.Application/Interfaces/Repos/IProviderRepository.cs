@@ -12,8 +12,8 @@ namespace Massage.Domain.Repositories
         Task<Provider> GetByIdWithDetailsAsync(Guid id);
         Task<Provider> GetByUserIdAsync(Guid userId);
         Task<Provider> GetByUserIdWithDetailsAsync(Guid userId);
-        Task<List<Provider>> GetAllAsync();
-        Task<List<Provider>> GetAllWithPaginationAsync(int pageNumber, int pageSize);
+
+        Task<(IEnumerable<Provider> Provider, int totalCount)> GetAllProvidersAsync(int pageNumber, int pageSize, string? searchTerm, string sortBy, bool sortDescending);
         Task<List<Provider>> SearchProvidersAsync(
             double? latitude,
             double? longitude,

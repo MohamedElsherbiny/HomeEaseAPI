@@ -10,6 +10,7 @@ using Massage.Application.DTOs;
 using System.Security.Claims;
 using Massage.Application.Commands.ProviderCommands;
 using Massage.Application.Queries.ProviderQueries;
+using Massage.Domain.Common;
 
 namespace Massage.API.Controllers
 {
@@ -25,11 +26,12 @@ namespace Massage.API.Controllers
             _mediator = mediator;
         }
 
+
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<List<ProviderDto>>> GetAllProviders([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [ProducesResponseType(typeof(PaginatedList<ProviderDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllProvidersAsync([FromQuery] GetAllProvidersQuery query)
         {
-            var query = new GetAllProvidersQuery { PageNumber = pageNumber, PageSize = pageSize };
             var result = await _mediator.Send(query);
             return Ok(result);
         }
