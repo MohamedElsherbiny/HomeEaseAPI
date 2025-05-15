@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36109.1 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Massage.Domain", ".\Massage.Domain\Massage.Domain.csproj", "{F6C5F982-FAD6-96EA-1AB7-2E894B43FC28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution Folder", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.\.gitattributes = .\.gitattributes
+		.\.gitignore = .\.gitignore
+		.\file_list.txt = .\file_list.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Massage.Infrastructure", ".\Massage.Infrastructure\Massage.Infrastructure.csproj", "{D7151B22-BCF3-386D-8876-C5E95E3F44EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Massage.Application", ".\Massage.Application\Massage.Application.csproj", "{EF229741-4623-D8DB-499E-02F6C5CFDABA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Massage.API", ".\Massage.API\Massage.API.csproj", "{F5873F76-02D4-D0F6-323C-EDC478AB6EC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F6C5F982-FAD6-96EA-1AB7-2E894B43FC28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6C5F982-FAD6-96EA-1AB7-2E894B43FC28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6C5F982-FAD6-96EA-1AB7-2E894B43FC28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6C5F982-FAD6-96EA-1AB7-2E894B43FC28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7151B22-BCF3-386D-8876-C5E95E3F44EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7151B22-BCF3-386D-8876-C5E95E3F44EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7151B22-BCF3-386D-8876-C5E95E3F44EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7151B22-BCF3-386D-8876-C5E95E3F44EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF229741-4623-D8DB-499E-02F6C5CFDABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF229741-4623-D8DB-499E-02F6C5CFDABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF229741-4623-D8DB-499E-02F6C5CFDABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF229741-4623-D8DB-499E-02F6C5CFDABA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5873F76-02D4-D0F6-323C-EDC478AB6EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5873F76-02D4-D0F6-323C-EDC478AB6EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5873F76-02D4-D0F6-323C-EDC478AB6EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5873F76-02D4-D0F6-323C-EDC478AB6EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1E292389-A699-4A64-B985-398C8D44C44A}
+	EndGlobalSection
+EndGlobal
