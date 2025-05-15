@@ -1,4 +1,5 @@
-﻿using Massage.Domain.Exceptions;
+﻿using Massage.Application.Exceptions;
+using Massage.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +29,26 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
             BusinessException => new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
+                exception.Message
+            },
+            BusinessRuleException => new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                exception.Message
+            },
+            ValidationException => new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                exception.Message
+            },
+            NotFoundException => new
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                exception.Message
+            },
+            EntityNotFoundException => new
+            {
+                StatusCode = StatusCodes.Status404NotFound,
                 exception.Message
             },
             UnauthorizedAccessException => new
