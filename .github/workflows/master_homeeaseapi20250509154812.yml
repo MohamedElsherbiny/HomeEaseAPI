@@ -40,10 +40,7 @@ jobs:
             --configuration ${{ env.CONFIGURATION }} \
             --no-build \
             --output "${{ env.BUILD_OUTPUT_PATH }}" \
-            --self-contained true \
-            -r linux-x64 \
-            /p:GitVersion=$GIT_HASH /p:BuildDate=$BUILD_DATE /p:PublishTrimmed=false /p:PublishSingleFile=false
-
+            /p:GitVersion=$GIT_HASH /p:BuildDate=$BUILD_DATE
       - name: Run API to check Reflection errors
         run: dotnet Massage.API.dll
         working-directory: ${{ env.BUILD_OUTPUT_PATH }}

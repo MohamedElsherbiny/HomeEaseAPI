@@ -1,12 +1,7 @@
 ﻿using Massage.Application.DTOs;
 using Massage.Application.Interfaces.Services;
 using Massage.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Massage.Infrastructure.Services
 {

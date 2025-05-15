@@ -4,9 +4,6 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<PreserveCompilationContext>true</PreserveCompilationContext>
-		<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
-		<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 	<PropertyGroup>
 		<SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(GitVersion)</SourceRevisionId>
