@@ -21,6 +21,8 @@ using OpenTelemetry.Trace;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Metrics;
+using Massage.Infrastructure.FileStorage;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +102,20 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 
 
+// Configure Blob Storage
+var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
+var blobConnectionString = blobStorageConfig["ConnectionString"];
+var containerName = blobStorageConfig["ContainerName"];
+
+// Configure file storage
+builder.Services.AddScoped<IFileStorageClient>(sp =>
+    new BlobContainerServiceClient(
+        sp.GetRequiredService<BlobServiceClient>(),
+        containerName
+    )
+);
+
+
 builder.Services.AddIdentityCore<User>(options =>
 {
     // Password options here if needed
@@ -119,6 +135,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddDataProtection();
+
 // Configure Serilog with explicit async logging
 builder.Host.UseSerilog((context, services, configuration) =>
 {
