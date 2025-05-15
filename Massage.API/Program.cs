@@ -1,26 +1,28 @@
+using Azure.Identity;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Massage.Application;
 using Massage.Application.Interfaces;
 using Massage.Application.Interfaces.Services;
+using Massage.Application.Middlewares;
 using Massage.Domain.Entities;
 using Massage.Domain.Repositories;
 using Massage.Infrastructure.Data;
+using Massage.Infrastructure.Data.Seeding;
 using Massage.Infrastructure.Repos;
 using Massage.Infrastructure.Services;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
-using Massage.Infrastructure.Data.Seeding;
-using Massage.Application.Middlewares;
-using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Formatting.Json;
-using OpenTelemetry.Trace;
-using Azure.Monitor.OpenTelemetry.Exporter;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Metrics;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
+using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,10 +34,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") 
+            policy.WithOrigins("http://localhost:5173")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
-                  .AllowCredentials(); 
+                  .AllowCredentials();
         });
 });
 
@@ -46,7 +48,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Massage API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Massage API",
+        Version = "v1",
+        Description = $"Build: {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}"
+    });
 
     // ? JWT Authentication in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -75,8 +82,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddApplication(); 
-builder.Services.AddInfrastructure(builder.Configuration); 
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 
@@ -109,7 +116,7 @@ builder.Services.AddIdentityCore<User>(options =>
 .AddSignInManager()
 .AddDefaultTokenProviders();
 
-builder.Services.AddIdentity<User, IdentityRole<Guid>>() 
+builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
