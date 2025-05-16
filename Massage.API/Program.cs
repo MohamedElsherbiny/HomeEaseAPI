@@ -20,15 +20,12 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Formatting.Json;
-using OpenTelemetry.Trace;
-using Azure.Monitor.OpenTelemetry.Exporter;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Metrics;
-using Massage.Infrastructure.FileStorage;
 using Azure.Storage.Blobs;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 using System.Reflection;
 using System.Text;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,11 +109,12 @@ builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 
-
 // Configure Blob Storage
 var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
 var blobConnectionString = blobStorageConfig["ConnectionString"];
 var containerName = blobStorageConfig["ContainerName"];
+
+builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 
 // Configure file storage
 builder.Services.AddScoped<IFileStorageClient>(sp =>

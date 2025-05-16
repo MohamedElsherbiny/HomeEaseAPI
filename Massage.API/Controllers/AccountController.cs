@@ -1,20 +1,19 @@
 ﻿using Massage.Application.Commands;
 using Massage.Application.DTOs;
-using Massage.Application.Queries;
+using Massage.Application.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Services;
 using Massage.Application.Commands.UserCommends;
 using Massage.Application.Queries.UserQueries;
-using Massage.Infrastructure.Services;
+using Massage.Application.Commands.ProviderCommands;
 
 namespace Massage.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -173,6 +172,83 @@ namespace Massage.API.Controllers
                 message = "Account status retrieved successfully",
                 status
             });
+        }
+
+
+        // Inside the UpdateUserImage method  
+        [HttpPost("{id}/user-profile-image")]
+        public async Task<ActionResult<UpdateUserImageResponse>> UpdateUserImage(Guid id, IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return BadRequest("No image file provided");
+            }
+
+            // Check file size (e.g., max 5MB)  
+            if (image.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest("File size exceeds the limit (5MB)");
+            }
+
+            // Check file type  
+            var extension = Path.GetExtension(image.FileName).ToLower();
+            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
+            {
+                return BadRequest("Only JPG, JPEG, and PNG files are allowed");
+            }
+
+            try
+            {
+                var command = new UpdateUserImageCommand(id, image);
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            catch (UserNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+
+        [HttpPost("{id}/provider-profile-image")]
+        public async Task<ActionResult<UpdateProviderImageResponse>> UpdateProviderImage(Guid id, IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return BadRequest("No image file provided");
+            }
+
+            // Check file size (e.g., max 5MB)
+            if (image.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest("File size exceeds the limit (5MB)");
+            }
+
+            // Check file type
+            var extension = Path.GetExtension(image.FileName).ToLower();
+            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
+            {
+                return BadRequest("Only JPG, JPEG, and PNG files are allowed");
+            }
+
+            try
+            {
+                var command = new UpdateProviderImageCommand(id, image);
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            catch (ProviderNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }

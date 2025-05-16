@@ -14,7 +14,7 @@ namespace Massage.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -27,7 +27,6 @@ namespace Massage.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllUsers([FromQuery] GetAllUsersQuery query)
         {
@@ -36,7 +35,6 @@ namespace Massage.API.Controllers
         }
 
         [HttpGet("{userId}")]
-        //[Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserById(Guid userId)

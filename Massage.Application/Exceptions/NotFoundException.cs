@@ -32,5 +32,15 @@ namespace Massage.Application.Exceptions
         {
         }
     }
+
+    public class UserNotFoundException : Exception
+    {
+        public UserNotFoundException(string message) : base(message) { }
+    }
+
+    public class ProviderNotFoundException : Exception
+    {
+        public ProviderNotFoundException(string message) : base(message) { }
+    }
 }
 

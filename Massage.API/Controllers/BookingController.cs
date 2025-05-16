@@ -16,7 +16,7 @@ namespace Massage.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class BookingsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -62,7 +62,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpGet("provider")]
-        [Authorize(Roles = "Provider")]
+        [Authorize(Policy = "ProviderOnly")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<BookingDto>>> GetProviderBookings(
             [FromQuery] string status = null,

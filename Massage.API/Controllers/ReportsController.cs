@@ -14,7 +14,7 @@ namespace Massage.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AdminOnly")]
     public class ReportsController : ControllerBase
     {
         private readonly IMediator _mediator;
