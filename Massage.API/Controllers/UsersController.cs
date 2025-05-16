@@ -9,7 +9,6 @@ using Massage.Application.Interfaces.Services;
 using Massage.Application.Commands.UserCommends;
 using Massage.Application.Queries.UserQueries;
 using Massage.Infrastructure.Services;
-using Massage.Application.Features.Images;
 
 namespace Massage.API.Controllers
 {

@@ -1,15 +1,13 @@
 ﻿using Massage.Application.Commands;
 using Massage.Application.DTOs;
-using Massage.Application.Queries;
+using Massage.Application.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Services;
 using Massage.Application.Commands.UserCommends;
 using Massage.Application.Queries.UserQueries;
-using Massage.Infrastructure.Services;
-using Massage.Application.Features.Images;
+using Massage.Application.Commands.ProviderCommands;
 
 namespace Massage.API.Controllers
 {
@@ -177,6 +175,7 @@ namespace Massage.API.Controllers
         }
 
 
+        // Inside the UpdateUserImage method  
         [HttpPost("{id}/user-profile-image")]
         public async Task<ActionResult<UpdateUserImageResponse>> UpdateUserImage(Guid id, IFormFile image)
         {
@@ -185,13 +184,13 @@ namespace Massage.API.Controllers
                 return BadRequest("No image file provided");
             }
 
-            // Check file size (e.g., max 5MB)
+            // Check file size (e.g., max 5MB)  
             if (image.Length > 5 * 1024 * 1024)
             {
                 return BadRequest("File size exceeds the limit (5MB)");
             }
 
-            // Check file type
+            // Check file type  
             var extension = Path.GetExtension(image.FileName).ToLower();
             if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
             {

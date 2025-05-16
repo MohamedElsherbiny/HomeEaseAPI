@@ -22,20 +22,6 @@ namespace Massage.Infrastructure.Services
             return await _dbContext.Users.FindAsync(userId);
         }
 
-        //public async Task<User> GetUserByIdAsync(Guid userId)
-        //{
-        //    var user = await _dbContext.Users.FindAsync(userId);
-        //    return user == null ? null : new User
-        //    {
-        //        Id = user.Id,
-        //        FirstName = user.FirstName,
-        //        LastName = user.LastName,
-        //        Email = user.Email
-        //        // Map other properties as needed
-        //    };
-
-        //}
-
         public async Task<(IEnumerable<User> users, int totalCount)> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending, bool? isActive)
         {
             var query = _dbContext.Users.AsQueryable();
@@ -70,6 +56,7 @@ namespace Massage.Infrastructure.Services
         public void Update(User user)
         {
             _dbContext.Users.Update(user);
+            _dbContext.SaveChanges();
         }
     }
 }
