@@ -52,23 +52,22 @@ namespace Massage.API.Controllers
         }
 
 
-        [HttpPost("deactivate")]
+        [HttpPost("deactivate/{id}")]
+        [Authorize(Policy = "AdminOnly")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> DeactivateAccount()
+        public async Task<IActionResult> DeactivateAccount(Guid id)
         {
-            var userId = _currentUserService.UserId;
-            var command = new DeactivateUserCommand(userId);
+            var command = new DeactivateUserCommand(id);
             await _mediator.Send(command);
             return Ok(new { message = "Account deactivated successfully" });
         }
 
-
-        [HttpPost("activate")]
+        [HttpPost("activate/{id}")]
+        [Authorize(Policy = "AdminOnly")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> ActivateAccount()
+        public async Task<IActionResult> ActivateAccount(Guid id)
         {
-            var userId = _currentUserService.UserId;
-            var command = new ActivateUserCommand(userId);
+            var command = new ActivateUserCommand(id);
             await _mediator.Send(command);
             return Ok(new { message = "Account activated successfully" });
         }
