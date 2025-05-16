@@ -5,6 +5,7 @@ using MediatR;
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Massage.Application.Commands.AuthCommands;
+using Massage.Domain.Enums;
 
 namespace Massage.Application.Commands.AuthCommands
 {
@@ -46,7 +47,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDt
         if (!isPasswordValid)
             throw new AuthenticationException("Invalid email or password.");
 
-        var roles = await _userManager.GetRolesAsync(user);
+ 
+        var roles = new List<string> { user.Role.ToString() };
+
 
         var token = _jwtService.GenerateToken(user, roles);
         var refreshToken = _jwtService.GenerateRefreshToken();

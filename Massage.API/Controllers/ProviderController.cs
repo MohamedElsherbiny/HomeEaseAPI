@@ -16,7 +16,7 @@ namespace Massage.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class ProvidersController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -95,21 +95,8 @@ namespace Massage.API.Controllers
             return Ok(result);
         }
 
-        //[HttpPost]
-        //[Authorize(Roles = "User")]
-        //public async Task<ActionResult<Guid>> CreateProvider(CreateProviderCommand command)
-        //{
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var guidUserId))
-        //        return BadRequest("Invalid user ID");
-
-        //    command.UserId = guidUserId;
-        //    var providerId = await _mediator.Send(command);
-        //    return CreatedAtAction(nameof(GetProviderById), new { id = providerId }, providerId);
-        //}
-
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Provider")]
+        [Authorize(Policy = "ProviderOnly")]
         public async Task<IActionResult> UpdateProvider(Guid id, UpdateProviderDto updateDto)
         {
             var command = new UpdateProviderCommand { ProviderId = id, ProviderDto = updateDto };
@@ -122,7 +109,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteProvider(Guid id)
         {
             var command = new DeleteProviderCommand { ProviderId = id };
@@ -135,7 +122,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpPost("{id}/verify")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> VerifyProvider(Guid id)
         {
             var command = new VerifyProviderCommand { ProviderId = id };
@@ -148,7 +135,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpPut("{id}/schedule")]
-        //[Authorize(Roles = "Provider")]
+        [Authorize(Policy = "ProviderOnly")]
         public async Task<IActionResult> UpdateProviderSchedule(Guid id, ProviderScheduleDto scheduleDto)
         {
             var command = new UpdateProviderScheduleCommand { ProviderId = id, ScheduleDto = scheduleDto };

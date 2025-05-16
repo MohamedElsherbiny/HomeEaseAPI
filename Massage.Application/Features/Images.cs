@@ -1,4 +1,4 @@
-﻿// 2. Command and Command Handlers for Image Upload (User & Provider)
+﻿//  Command and Command Handlers for Image Upload (User & Provider)
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Massage.Infrastructure.FileStorage;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Azure.Storage.Blobs;
 using Massage.Domain.Repositories;
 using Massage.Application.Interfaces.Services;
+using System.Text.RegularExpressions;
 
 
 
@@ -89,16 +90,18 @@ namespace Massage.Application.Features.Images
                 throw new ProviderNotFoundException($"Provider {command.ProviderId} not found");
             }
 
-            var extension = Path.GetExtension(command.ProfileImage.FileName).ToLower();
+            // نظف اسم الملف الأصلي وProviderId
+            var safeFileName = SanitizeFileName(command.ProfileImage.FileName);
+            var safeProviderId = SanitizeSegment(provider.Id.ToString());
+
+            // مسار الملف الآمن
+            var blobPath = $"providers/{safeProviderId}/{safeFileName}";
+
             await using var fileStream = command.ProfileImage.OpenReadStream();
-            var profileImageUrl = await _fileStorageClient.StoreFileAsync(
-                fileStream,
-                $"providers/{provider.Id}/{Guid.NewGuid()}{extension}"
-            );
+            var profileImageUrl = await _fileStorageClient.StoreFileAsync(fileStream, blobPath);
 
             provider.ProfileImageUrl = profileImageUrl;
-
-             _repository.Update(provider);
+            _repository.Update(provider);
 
             return new UpdateProviderImageResponse(
                 provider.Id,
@@ -106,6 +109,27 @@ namespace Massage.Application.Features.Images
                 provider.ProfileImageUrl
             );
         }
+
+        // دالة لتنظيف اسم الملف
+        private string SanitizeFileName(string fileName)
+        {
+            var extension = Path.GetExtension(fileName)?.ToLower() ?? ".jpg";
+            var baseName = Path.GetFileNameWithoutExtension(fileName);
+            baseName = Regex.Replace(baseName, @"[^a-zA-Z0-9_\-]", "");
+            if (string.IsNullOrWhiteSpace(baseName))
+            {
+                baseName = "file";
+            }
+
+            return $"{baseName}_{Guid.NewGuid()}{extension}";
+        }
+
+        // دالة لتنظيف ProviderId أو أي جزء من المسار
+        private string SanitizeSegment(string segment)
+        {
+            return Regex.Replace(segment, @"[^a-zA-Z0-9_\-]", "");
+        }
+
     }
 
     public record UpdateProviderImageCommand(
@@ -156,117 +180,14 @@ namespace Massage.Infrastructure.FileStorage
                 throw new ArgumentNullException(nameof(fileStream), "File stream must not be null.");
             }
 
+            Console.WriteLine("Uploading file with name: " + fileName); // للتصحيح لو حصلت مشكلة
+
             await _containerClient.CreateIfNotExistsAsync();
             var blobClient = _containerClient.GetBlobClient(fileName);
             fileStream.Position = 0;
             await blobClient.UploadAsync(fileStream, overwrite: true);
 
             return blobClient.Uri.ToString();
-        }
-    }
-}
-
-// 5. Add API Controller Endpoints for User & Provider Image Upload
-
-namespace Massage.API.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class UsersController : ControllerBase
-    {
-        private readonly IMediator _mediator;
-
-        public UsersController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpPost("{id}/profile-image")]
-        public async Task<ActionResult<UpdateUserImageResponse>> UpdateUserImage(Guid id, IFormFile image)
-        {
-            if (image == null || image.Length == 0)
-            {
-                return BadRequest("No image file provided");
-            }
-
-            // Check file size (e.g., max 5MB)
-            if (image.Length > 5 * 1024 * 1024)
-            {
-                return BadRequest("File size exceeds the limit (5MB)");
-            }
-
-            // Check file type
-            var extension = Path.GetExtension(image.FileName).ToLower();
-            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
-            {
-                return BadRequest("Only JPG, JPEG, and PNG files are allowed");
-            }
-
-            try
-            {
-                var command = new UpdateUserImageCommand(id, image);
-                var result = await _mediator.Send(command);
-                return Ok(result);
-            }
-            catch (UserNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
-    }
-
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class ProvidersController : ControllerBase
-    {
-        private readonly IMediator _mediator;
-
-        public ProvidersController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpPost("{id}/profile-image")]
-        public async Task<ActionResult<UpdateProviderImageResponse>> UpdateProviderImage(Guid id, IFormFile image)
-        {
-            if (image == null || image.Length == 0)
-            {
-                return BadRequest("No image file provided");
-            }
-
-            // Check file size (e.g., max 5MB)
-            if (image.Length > 5 * 1024 * 1024)
-            {
-                return BadRequest("File size exceeds the limit (5MB)");
-            }
-
-            // Check file type
-            var extension = Path.GetExtension(image.FileName).ToLower();
-            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
-            {
-                return BadRequest("Only JPG, JPEG, and PNG files are allowed");
-            }
-
-            try
-            {
-                var command = new UpdateProviderImageCommand(id, image);
-                var result = await _mediator.Send(command);
-                return Ok(result);
-            }
-            catch (ProviderNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
         }
     }
 }
@@ -284,7 +205,7 @@ namespace Massage.API
             services.AddSingleton<IFileStorageClient>(provider =>
                 new BlobContainerServiceClient(
                     provider.GetRequiredService<BlobServiceClient>(),
-                    "massage-images"
+                    "images"
                 )
             );
 

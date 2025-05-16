@@ -9,7 +9,7 @@ namespace Massage.API.Controllers
 {
     [ApiController]
     [Route("api/providers/{providerId}/services")]
-    //[Authorize]
+    [Authorize]
     public class ProviderServicesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -42,7 +42,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Provider")]
+        [Authorize(Policy = "ProviderOnly")]
         public async Task<ActionResult<Guid>> CreateService(Guid providerId, CreateServiceDto serviceDto)
         {
             var command = new CreateServiceCommand { ProviderId = providerId, ServiceDto = serviceDto };
@@ -51,7 +51,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpPut("{serviceId}")]
-        //[Authorize(Roles = "Provider")]
+        [Authorize(Policy = "ProviderOnly")]
         public async Task<IActionResult> UpdateService(Guid providerId, Guid serviceId, UpdateServiceDto serviceDto)
         {
             var command = new UpdateServiceCommand { ServiceId = serviceId, ServiceDto = serviceDto };
@@ -64,7 +64,7 @@ namespace Massage.API.Controllers
         }
 
         [HttpDelete("{serviceId}")]
-        //[Authorize(Roles = "Provider")]
+        [Authorize(Policy = "ProviderOnly")]
         public async Task<IActionResult> DeleteService(Guid providerId, Guid serviceId)
         {
             var command = new DeleteServiceCommand { ServiceId = serviceId };
