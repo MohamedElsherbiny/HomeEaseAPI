@@ -1,5 +1,4 @@
 ﻿using Massage.Application.Commands.AdminCommands;
-using Massage.Application.Commands.ProviderCommands;
 using Massage.Application.Queries.AdminQueries;
 using Massage.Application.Queries.BookingQueries;
 using Massage.Application.Queries.ProviderQueries;
@@ -13,18 +12,46 @@ using Microsoft.AspNetCore.Mvc;
 namespace Massage.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/admin")]
     [Authorize(Policy = "AdminOnly")]
-    public class ReportsController : ControllerBase
+    public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public ReportsController(IMediator mediator)
+        public AdminController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
+        // Admin Management Endpoints
 
+        // 1. Create new admin
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateAdmin([FromBody] CreateAdminCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        // 2. Delete admin by ID
+        [HttpDelete("{adminId}")]
+        public async Task<IActionResult> DeleteAdmin(Guid adminId)
+        {
+            var result = await _mediator.Send(new DeleteAdminCommand(adminId));
+            return result ? Ok("Admin deleted successfully.") : BadRequest("Failed to delete admin.");
+        }
+
+        // 3. Get all admins
+        [HttpGet("list")]
+        public async Task<IActionResult> GetAllAdmins()
+        {
+            var result = await _mediator.Send(new GetAllAdminsQuery());
+            return Ok(result);
+        }
+
+        // Report Endpoints
+
+        // 4. Get booking statistics
         [HttpGet("bookings/statistics")]
         public async Task<ActionResult> GetBookingStatistics()
         {
@@ -33,7 +60,7 @@ namespace Massage.API.Controllers
             return Ok(result);
         }
 
-
+        // 5. Get dashboard stats
         [HttpGet("dashboard")]
         public async Task<ActionResult<AdminDashboardStatsDto>> GetDashboardStats()
         {
@@ -42,8 +69,7 @@ namespace Massage.API.Controllers
             return Ok(result);
         }
 
-
-
+        // 6. Get booking reports
         [HttpGet("bookings")]
         public async Task<ActionResult<IEnumerable<AdminBookingReportDto>>> GetBookingReports(
             [FromQuery] DateTime? startDate,
@@ -61,6 +87,7 @@ namespace Massage.API.Controllers
             return Ok(result);
         }
 
+        // 7. Get provider reports
         [HttpGet("providers")]
         public async Task<ActionResult<IEnumerable<AdminProviderReportDto>>> GetProviderReports(
             [FromQuery] ProviderStatus? status,
@@ -76,6 +103,7 @@ namespace Massage.API.Controllers
             return Ok(result);
         }
 
+        // 8. Get user reports
         [HttpGet("users")]
         public async Task<ActionResult<IEnumerable<AdminUserReportDto>>> GetUserReports(
             [FromQuery] UserRole? role,
@@ -91,6 +119,7 @@ namespace Massage.API.Controllers
             return Ok(result);
         }
 
+        // 9. Get platform stats
         [HttpGet("platform-stats")]
         public async Task<ActionResult<PlatformStatsDto>> GetPlatformStats()
         {
@@ -100,7 +129,3 @@ namespace Massage.API.Controllers
         }
     }
 }
-
-
-
-
