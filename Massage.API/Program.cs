@@ -107,22 +107,27 @@ builder.Services.AddScoped<IGeolocationService, GeolocationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 
 // Configure Blob Storage
 var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
 var blobConnectionString = blobStorageConfig["ConnectionString"];
-var containerName = blobStorageConfig["ContainerName"];
+//var containerName = blobStorageConfig["ContainerName"];
 
 builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 
 // Configure file storage
-builder.Services.AddScoped<IFileStorageClient>(sp =>
-    new BlobContainerServiceClient(
-        sp.GetRequiredService<BlobServiceClient>(),
-        containerName
-    )
-);
+//builder.Services.AddScoped<IFileStorageClient>(sp =>
+//    new BlobContainerServiceClient(
+//        sp.GetRequiredService<BlobServiceClient>(),
+//        containerName
+//    )
+//);
+// Register BlobServiceClient
+
+// Register IFileStorageClientFactory
+builder.Services.AddSingleton<IFileStorageClientFactory, FileStorageClientFactory>();
 
 
 builder.Services.AddIdentityCore<User>(options =>
@@ -222,7 +227,7 @@ builder.Services.AddAuthorization(options =>
 
 
 
-var app = builder.Build();
+ var app = builder.Build();
 
 // Use CORS
 app.UseCors(MyAllowSpecificOrigins);

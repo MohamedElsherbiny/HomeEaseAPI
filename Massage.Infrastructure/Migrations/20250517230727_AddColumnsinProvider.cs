@@ -1,14 +1,13 @@
 ﻿using System;
+using Massage.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Massage.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AddColumnsinProvider : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
@@ -28,10 +27,10 @@ namespace Massage.Infrastructure.Migrations
                 name: "UpdatedAt",
                 table: "Providers",
                 type: "datetime2",
-                nullable: true);
+                nullable: false,
+                defaultValueSql: "GETUTCDATE()");
         }
-
-        /// <inheritdoc />
+       
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -45,6 +44,7 @@ namespace Massage.Infrastructure.Migrations
             migrationBuilder.DropColumn(
                 name: "UpdatedAt",
                 table: "Providers");
+
         }
     }
 }

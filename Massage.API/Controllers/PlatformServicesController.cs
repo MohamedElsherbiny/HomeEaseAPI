@@ -1,5 +1,7 @@
-﻿using Massage.Application.Commands.PlatformService;
+﻿using Massage.Application.Commands;
+using Massage.Application.Commands.PlatformService;
 using Massage.Application.DTOs;
+using Massage.Application.Exceptions;
 using Massage.Application.Queries.PlatformService;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +64,43 @@ namespace Massage.API.Controllers
             var success = await _mediator.Send(new DeletePlatformServiceCommand { Id = id });
             if (!success) return NotFound();
             return Ok();
+        }
+
+        [HttpPost("{id}/Platform-service-image")]
+        public async Task<ActionResult<UpdateBasePlatformServiceImageResponse>> UpdatePlatformServiceImage(Guid id, IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return BadRequest("No image file provided");
+            }
+
+            // Check file size (max 5MB)
+            if (image.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest("File size exceeds the limit (5MB)");
+            }
+
+            // Check file type
+            var extension = Path.GetExtension(image.FileName).ToLower();
+            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
+            {
+                return BadRequest("Only JPG, JPEG, and PNG files are allowed");
+            }
+
+            try
+            {
+                var command = new UpdateBasePlatformServiceImageCommand(id, image);
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }
