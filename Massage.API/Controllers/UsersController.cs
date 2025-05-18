@@ -51,25 +51,34 @@ namespace Massage.API.Controllers
             }
         }
 
-
-        [HttpPost("deactivate/{id}")]
-        [Authorize(Policy = "AdminOnly")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> DeactivateAccount(Guid id)
+        //  Activate user or provider
+        public enum EntityType
         {
-            var command = new DeactivateUserCommand(id);
-            await _mediator.Send(command);
-            return Ok(new { message = "Account deactivated successfully" });
+            User,
+            Provider
         }
 
-        [HttpPost("activate/{id}")]
-        [Authorize(Policy = "AdminOnly")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> ActivateAccount(Guid id)
+        [HttpPost("activate/{id}/{entityType}")]
+        public async Task<IActionResult> Activate(Guid id, string entityType)
         {
-            var command = new ActivateUserCommand(id);
-            await _mediator.Send(command);
-            return Ok(new { message = "Account activated successfully" });
+            if (!Enum.TryParse<Massage.Application.Commands.UserCommends.EntityType>(entityType, true, out var parsedEntityType))
+                return BadRequest("Invalid entity type. Use 'User' or 'Provider'.");
+
+            var command = new ActivateCommand(id, parsedEntityType);
+            var result = await _mediator.Send(command);
+            return result ? Ok("Activation successful.") : BadRequest("Failed to activate.");
+        }
+
+        // 5. Deactivate user or provider
+        [HttpPost("deactivate/{id}/{entityType}")]
+        public async Task<IActionResult> Deactivate(Guid id, string entityType)
+        {
+            if (!Enum.TryParse<Massage.Application.Commands.UserCommends.EntityType>(entityType, true, out var parsedEntityType))
+                return BadRequest("Invalid entity type. Use 'User' or 'Provider'.");
+
+            var command = new DeactivateCommand(id, parsedEntityType);
+            var result = await _mediator.Send(command);
+            return result ? Ok("Deactivation successful.") : BadRequest("Failed to deactivate.");
         }
 
     }

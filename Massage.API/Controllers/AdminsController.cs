@@ -35,11 +35,26 @@ namespace Massage.API.Controllers
             return result ? Ok("Admin deleted successfully.") : BadRequest("Failed to delete admin.");
         }
 
-        // 3. Get all admins
+        // 3. Get all admins with pagination
         [HttpGet("list")]
-        public async Task<IActionResult> GetAllAdmins()
+        public async Task<IActionResult> GetAllAdmins(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] string sortBy = "CreatedAt",
+            [FromQuery] bool sortDescending = true,
+            [FromQuery] bool? isActive = null)
         {
-            var result = await _mediator.Send(new GetAllAdminsQuery());
+            var query = new GetAllAdminsQuery
+            {
+                Page = page,
+                PageSize = pageSize,
+                SearchTerm = searchTerm,
+                SortBy = sortBy,
+                SortDescending = sortDescending,
+                IsActive = isActive
+            };
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
     }

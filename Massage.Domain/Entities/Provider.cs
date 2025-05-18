@@ -14,11 +14,15 @@ namespace Massage.Domain.Entities
         public decimal Rating { get; set; }
         public ProviderStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? DeactivatedAt { get; set; }
+        public bool IsActive { get; set; } = true;
         public DateTime? VerifiedAt { get; set; }
         public string ProfileImageUrl { get; set; }
         public Guid? AddressId { get; set; }
         public string Email { get; set; }
         public string BusinessAddress { get; set; }
+
 
         // Navigation properties
         public virtual User User { get; set; }

@@ -26,7 +26,8 @@ namespace Massage.Infrastructure.Data
         public DbSet<UserPreferences> UserPreferences { get; set; }
         public DbSet<PaymentInfo> PaymentInfos { get; set; }
         public DbSet<AvailabilitySlots> AvailabilitySlots { get; set; }
- 
+        public DbSet<BasePlatformService> BasePlatformService { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,42 +1,48 @@
-﻿using Massage.Application.DTOs;
+﻿using AutoMapper;
+using Massage.Application.DTOs;
 using Massage.Application.Interfaces.Services;
+using Massage.Domain.Common;
 using Massage.Domain.Enums;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Massage.Application.Queries.AdminQueries
 {
-    // Query to get all Admins
-    public class GetAllAdminsQuery : IRequest<IEnumerable<UserDto>> { }
+    // Query to get all Admins with pagination
+    public class GetAllAdminsQuery : IRequest<PaginatedList<UserDto>>
+    {
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public string? SearchTerm { get; set; }
+        public string SortBy { get; set; } = "CreatedAt";
+        public bool SortDescending { get; set; } = true;
+        public bool? IsActive { get; set; }
+    }
 
-    public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, IEnumerable<UserDto>>
+    public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, PaginatedList<UserDto>>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public GetAllAdminsQueryHandler(IUserRepository userRepository)
+        public GetAllAdminsQueryHandler(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UserDto>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedList<UserDto>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
         {
-            var (users, _) = await _userRepository.GetAllAsync(1, 1000, "", "", false, null);
-            return users
-                .Where(u => u.Role == UserRole.Admin)
-                .Select(u => new UserDto
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    PhoneNumber = u.PhoneNumber,
-                    Role = u.Role.ToString(),
-                    ProfileImageUrl = u.ProfileImageUrl
-                });
+            var (users, totalCount) = await _userRepository.GetAllAsync(
+                request.Page,
+                request.PageSize,
+                request.SearchTerm,
+                request.SortBy,
+                request.SortDescending,
+                request.IsActive);
+
+            var adminUsers = users.Where(u => u.Role == UserRole.Admin).ToList();
+            var adminUsersDto = _mapper.Map<List<UserDto>>(adminUsers);
+
+            return new PaginatedList<UserDto>(adminUsersDto, totalCount, request.Page, request.PageSize);
         }
     }
 }

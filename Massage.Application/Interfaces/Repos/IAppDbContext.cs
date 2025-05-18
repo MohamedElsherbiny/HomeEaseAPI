@@ -14,6 +14,7 @@ namespace Massage.Application.Interfaces
         DbSet<Review> Reviews { get; set; }
         DbSet<Address> Addresses { get; set; }
         DbSet<PaymentInfo> PaymentInfos { get; set; }
+        DbSet<BasePlatformService> BasePlatformService { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

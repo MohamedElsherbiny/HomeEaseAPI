@@ -1,6 +1,7 @@
 ﻿using Massage.Application.Commands.UserCommends;
 using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Services;
+using Massage.Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,45 +11,76 @@ using System.Threading.Tasks;
 
 namespace Massage.Application.Commands.UserCommends
 {
-    public class DeactivateUserCommand : IRequest<bool>
+    public enum EntityType
     {
-        public Guid UserId { get; set; }
+        User,
+        Provider
+    }
 
-        public DeactivateUserCommand(Guid userId)
+    public class DeactivateCommand : IRequest<bool>
+    {
+        public Guid Id { get; }
+        public EntityType EntityType { get; }
+
+        public DeactivateCommand(Guid id, EntityType entityType)
         {
-            UserId = userId;
+            Id = id;
+            EntityType = entityType;
         }
     }
 }
 
 
 // Command Handler
-public class DeactivateUserCommandHandler : IRequestHandler<DeactivateUserCommand, bool>
+public class DeactivateCommandHandler : IRequestHandler<DeactivateCommand, bool>
 {
     private readonly IUserRepository _userRepository;
+    private readonly IProviderRepository _providerRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public DeactivateUserCommandHandler(
+    public DeactivateCommandHandler(
         IUserRepository userRepository,
+        IProviderRepository providerRepository,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
+        _providerRepository = providerRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeactivateCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetUserByIdAsync(request.UserId);
-        if (user == null)
-            throw new NotFoundException($"User with ID {request.UserId} not found.");
+        switch (request.EntityType)
+        {
+            case EntityType.User:
+                var user = await _userRepository.GetUserByIdAsync(request.Id);
+                if (user == null)
+                    throw new NotFoundException($"User with ID {request.Id} not found.");
 
-        user.IsActive = false;
-        user.UpdatedAt = DateTime.UtcNow;
-        user.DeactivatedAt = DateTime.UtcNow;
+                user.IsActive = false;
+                user.UpdatedAt = DateTime.UtcNow;
+                user.DeactivatedAt = DateTime.UtcNow;
 
-        _userRepository.Update(user);
+                _userRepository.Update(user);
+                break;
+
+            case EntityType.Provider:
+                var provider = await _providerRepository.GetByIdAsync(request.Id);
+                if (provider == null)
+                    throw new NotFoundException($"Provider with ID {request.Id} not found.");
+
+                provider.IsActive = false;
+                provider.UpdatedAt = DateTime.UtcNow;
+                provider.DeactivatedAt = DateTime.UtcNow;
+
+                _providerRepository.Update(provider);
+                break;
+
+            default:
+                throw new BadRequestException("Invalid entity type.");
+        }
+
         await _unitOfWork.SaveChangesAsync();
-
         return true;
     }
 }

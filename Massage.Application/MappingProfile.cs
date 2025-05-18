@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Massage.Application.DTOs;
+using Massage.Application.Queries.PlatformService;
 using Massage.Domain.Entities;
 
 namespace Massage.Application.Mappings
@@ -45,6 +46,10 @@ namespace Massage.Application.Mappings
             CreateMap<User, UserDto>();
             CreateMap<UserPreferences, UserPreferencesDto>();
             CreateMap<UserPreferencesDto, UserPreferences>();
+
+            CreateMap<User, UserDto>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
+            CreateMap<BasePlatformService, BasePlatformServiceDto>();
         }
     }
 
