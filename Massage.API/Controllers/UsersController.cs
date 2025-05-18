@@ -51,8 +51,8 @@ namespace Massage.API.Controllers
             }
         }
 
-        // Activate user
-        [HttpPost("users/activate/{id}")]
+
+        [HttpPost("activate/{id}")]
         public async Task<IActionResult> ActivateUser(Guid id)
         {
             var command = new ActivateUserCommand(id);
@@ -60,7 +60,6 @@ namespace Massage.API.Controllers
             return result ? Ok("User activation successful.") : BadRequest("Failed to activate user.");
         }
 
-        // Deactivate user
         [HttpPost("users/deactivate/{id}")]
         public async Task<IActionResult> DeactivateUser(Guid id)
         {
@@ -69,7 +68,7 @@ namespace Massage.API.Controllers
             return result ? Ok("User deactivation successful.") : BadRequest("Failed to deactivate user.");
         }
 
-        //  Activate provider
+
         [HttpPost("providers/activate/{id}")]
         public async Task<IActionResult> ActivateProvider(Guid id)
         {
@@ -78,7 +77,7 @@ namespace Massage.API.Controllers
             return result ? Ok("Provider activation successful.") : BadRequest("Failed to activate provider.");
         }
 
-        //  Deactivate provider
+
         [HttpPost("providers/deactivate/{id}")]
         public async Task<IActionResult> DeactivateProvider(Guid id)
         {
