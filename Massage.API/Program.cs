@@ -105,19 +105,12 @@ builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRe
 builder.Services.AddApplicationInsightsTelemetry();
 
 
+// Configure Blob Storage
 var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
 var blobConnectionString = blobStorageConfig["ConnectionString"];
-//var containerName = blobStorageConfig["ContainerName"];
 
 builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
-
-
-builder.Services.AddScoped<IFileStorageClient>(sp =>
-    new BlobContainerServiceClient(
-        sp.GetRequiredService<BlobServiceClient>(),
-        containerName
-    )
-);
+builder.Services.AddSingleton<IFileStorageClientFactory, FileStorageClientFactory>();
 
 
 builder.Services.AddIdentityCore<User>(options =>
