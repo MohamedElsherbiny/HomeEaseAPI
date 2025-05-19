@@ -1,4 +1,3 @@
-using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using Massage.Application;
 using Massage.Application.Interfaces;
@@ -24,8 +23,6 @@ using Azure.Storage.Blobs;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 using System.Reflection;
 using System.Text;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
-
 
 var builder = WebApplication.CreateBuilder(args);
 

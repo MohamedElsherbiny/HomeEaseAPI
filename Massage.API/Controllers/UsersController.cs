@@ -51,34 +51,21 @@ namespace Massage.API.Controllers
             }
         }
 
-        //  Activate user or provider
-        public enum EntityType
+
+        [HttpPost("activate/{id}")]
+        public async Task<IActionResult> ActivateUser(Guid id)
         {
-            User,
-            Provider
+            var command = new ActivateUserCommand(id);
+            var result = await _mediator.Send(command);
+            return result ? Ok("User activation successful.") : BadRequest("Failed to activate user.");
         }
 
-        [HttpPost("activate/{id}/{entityType}")]
-        public async Task<IActionResult> Activate(Guid id, string entityType)
+        [HttpPost("deactivate/{id}")]
+        public async Task<IActionResult> DeactivateUser(Guid id)
         {
-            if (!Enum.TryParse<Massage.Application.Commands.UserCommends.EntityType>(entityType, true, out var parsedEntityType))
-                return BadRequest("Invalid entity type. Use 'User' or 'Provider'.");
-
-            var command = new ActivateCommand(id, parsedEntityType);
+            var command = new DeactivateUserCommand(id);
             var result = await _mediator.Send(command);
-            return result ? Ok("Activation successful.") : BadRequest("Failed to activate.");
-        }
-
-        // 5. Deactivate user or provider
-        [HttpPost("deactivate/{id}/{entityType}")]
-        public async Task<IActionResult> Deactivate(Guid id, string entityType)
-        {
-            if (!Enum.TryParse<Massage.Application.Commands.UserCommends.EntityType>(entityType, true, out var parsedEntityType))
-                return BadRequest("Invalid entity type. Use 'User' or 'Provider'.");
-
-            var command = new DeactivateCommand(id, parsedEntityType);
-            var result = await _mediator.Send(command);
-            return result ? Ok("Deactivation successful.") : BadRequest("Failed to deactivate.");
+            return result ? Ok("User deactivation successful.") : BadRequest("Failed to deactivate user.");
         }
 
     }
