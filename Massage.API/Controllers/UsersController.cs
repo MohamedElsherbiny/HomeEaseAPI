@@ -50,5 +50,23 @@ namespace Massage.API.Controllers
                 return NotFound(new { message = ex.Message });
             }
         }
+
+
+        [HttpPost("activate/{id}")]
+        public async Task<IActionResult> ActivateUser(Guid id)
+        {
+            var command = new ActivateUserCommand(id);
+            var result = await _mediator.Send(command);
+            return result ? Ok("User activation successful.") : BadRequest("Failed to activate user.");
+        }
+
+        [HttpPost("deactivate/{id}")]
+        public async Task<IActionResult> DeactivateUser(Guid id)
+        {
+            var command = new DeactivateUserCommand(id);
+            var result = await _mediator.Send(command);
+            return result ? Ok("User deactivation successful.") : BadRequest("Failed to deactivate user.");
+        }
+
     }
 }
