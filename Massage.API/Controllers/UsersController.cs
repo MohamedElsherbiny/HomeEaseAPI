@@ -60,30 +60,12 @@ namespace Massage.API.Controllers
             return result ? Ok("User activation successful.") : BadRequest("Failed to activate user.");
         }
 
-        [HttpPost("users/deactivate/{id}")]
+        [HttpPost("deactivate/{id}")]
         public async Task<IActionResult> DeactivateUser(Guid id)
         {
             var command = new DeactivateUserCommand(id);
             var result = await _mediator.Send(command);
             return result ? Ok("User deactivation successful.") : BadRequest("Failed to deactivate user.");
-        }
-
-
-        [HttpPost("providers/activate/{id}")]
-        public async Task<IActionResult> ActivateProvider(Guid id)
-        {
-            var command = new ActivateProviderCommand(id);
-            var result = await _mediator.Send(command);
-            return result ? Ok("Provider activation successful.") : BadRequest("Failed to activate provider.");
-        }
-
-
-        [HttpPost("providers/deactivate/{id}")]
-        public async Task<IActionResult> DeactivateProvider(Guid id)
-        {
-            var command = new DeactivateProviderCommand(id);
-            var result = await _mediator.Send(command);
-            return result ? Ok("Provider deactivation successful.") : BadRequest("Failed to deactivate provider.");
         }
 
     }

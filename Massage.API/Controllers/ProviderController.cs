@@ -1,16 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MediatR;
-using Massage.Application.Commands;
-using Massage.Application.Queries;
 using Massage.Application.DTOs;
 using System.Security.Claims;
 using Massage.Application.Commands.ProviderCommands;
 using Massage.Application.Queries.ProviderQueries;
 using Massage.Domain.Common;
+using Massage.Application.Commands.UserCommends;
 
 namespace Massage.API.Controllers
 {
@@ -145,6 +141,23 @@ namespace Massage.API.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        [HttpPost("activate/{id}")]
+        public async Task<IActionResult> ActivateProvider(Guid id)
+        {
+            var command = new ActivateProviderCommand(id);
+            var result = await _mediator.Send(command);
+            return result ? Ok("Provider activation successful.") : BadRequest("Failed to activate provider.");
+        }
+
+
+        [HttpPost("deactivate/{id}")]
+        public async Task<IActionResult> DeactivateProvider(Guid id)
+        {
+            var command = new DeactivateProviderCommand(id);
+            var result = await _mediator.Send(command);
+            return result ? Ok("Provider deactivation successful.") : BadRequest("Failed to deactivate provider.");
         }
     }
 }
