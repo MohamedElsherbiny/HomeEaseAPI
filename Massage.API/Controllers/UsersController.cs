@@ -50,36 +50,5 @@ namespace Massage.API.Controllers
                 return NotFound(new { message = ex.Message });
             }
         }
-
-        //  Activate user or provider
-        public enum EntityType
-        {
-            User,
-            Provider
-        }
-
-        [HttpPost("activate/{id}/{entityType}")]
-        public async Task<IActionResult> Activate(Guid id, string entityType)
-        {
-            if (!Enum.TryParse<Massage.Application.Commands.UserCommends.EntityType>(entityType, true, out var parsedEntityType))
-                return BadRequest("Invalid entity type. Use 'User' or 'Provider'.");
-
-            var command = new ActivateCommand(id, parsedEntityType);
-            var result = await _mediator.Send(command);
-            return result ? Ok("Activation successful.") : BadRequest("Failed to activate.");
-        }
-
-        // 5. Deactivate user or provider
-        [HttpPost("deactivate/{id}/{entityType}")]
-        public async Task<IActionResult> Deactivate(Guid id, string entityType)
-        {
-            if (!Enum.TryParse<Massage.Application.Commands.UserCommends.EntityType>(entityType, true, out var parsedEntityType))
-                return BadRequest("Invalid entity type. Use 'User' or 'Provider'.");
-
-            var command = new DeactivateCommand(id, parsedEntityType);
-            var result = await _mediator.Send(command);
-            return result ? Ok("Deactivation successful.") : BadRequest("Failed to deactivate.");
-        }
-
     }
 }

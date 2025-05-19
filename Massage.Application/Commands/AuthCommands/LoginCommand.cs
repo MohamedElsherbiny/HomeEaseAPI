@@ -1,10 +1,14 @@
 ﻿using Massage.Application.DTOs;
 using Massage.Application.Interfaces.Services;
 using Massage.Domain.Entities;
+using Massage.Domain.Repositories;
 using MediatR;
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Massage.Application.Commands.AuthCommands;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Data;
 using Massage.Domain.Enums;
 
 namespace Massage.Application.Commands.AuthCommands
@@ -20,63 +24,78 @@ namespace Massage.Application.Commands.AuthCommands
             Password = dto.Password;
         }
     }
-}
 
-
-// Command Handler
-public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDto>
-{
-    private readonly IUserRepository _userService;
-    private readonly IJwtService _jwtService;
-    private readonly UserManager<User> _userManager;
-
-    public LoginCommandHandler(IUserRepository userService, IJwtService jwtService, UserManager<User> userManager)
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDto>
     {
-        _userService = userService;
-        _jwtService = jwtService;
-        _userManager = userManager;
-    }
+        private readonly IUserRepository _userService;
+        private readonly IProviderRepository _providerRepository;
+        private readonly IJwtService _jwtService;
+        private readonly UserManager<User> _userManager;
 
-    public async Task<LoginResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
-    {
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user == null)
-            throw new AuthenticationException("Invalid email or password.");
-
-        var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-        if (!isPasswordValid)
-            throw new AuthenticationException("Invalid email or password.");
-
- 
-        var roles = new List<string> { user.Role.ToString() };
-
-
-        var token = _jwtService.GenerateToken(user, roles);
-        var refreshToken = _jwtService.GenerateRefreshToken();
-
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-        await _userManager.UpdateAsync(user);
-
-        var userDto = new UserDto
+        public LoginCommandHandler(
+            IUserRepository userService,
+            IProviderRepository providerRepository,
+            IJwtService jwtService,
+            UserManager<User> userManager)
         {
-            Id = user.Id,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PhoneNumber = user.PhoneNumber,
-            Role = user.Role.ToString(),
-            ProfileImageUrl = user.ProfileImageUrl,
-            CreatedAt = user.CreatedAt,
-            LastLoginAt = user.UpdatedAt
-        };
+            _userService = userService;
+            _providerRepository = providerRepository;
+            _jwtService = jwtService;
+            _userManager = userManager;
+        }
 
-        return new LoginResponseDto
+        public async Task<LoginResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            Token = token.Token,
-            RefreshToken = refreshToken,
-            Expiration = token.Expiration,
-            User = userDto
-        };
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+                throw new AuthenticationException("Invalid email or password.");
+
+            if (!user.IsActive)
+                throw new AuthenticationException("Account is deactivated. Please contact support.");
+
+
+            if (user.Role == UserRole.Provider)
+            {
+                var provider = await _providerRepository.GetByUserIdAsync(user.Id);
+                if (provider == null)
+                    throw new AuthenticationException("Provider profile not found.");
+                if (!provider.IsActive)
+                    throw new AuthenticationException("Provider account is deactivated. Please contact support.");
+            }
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+            if (!isPasswordValid)
+                throw new AuthenticationException("Invalid email or password.");
+
+            var roles = new List<string> { user.Role.ToString() };
+
+            var token = _jwtService.GenerateToken(user, roles);
+            var refreshToken = _jwtService.GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _userManager.UpdateAsync(user);
+
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Role = user.Role.ToString(),
+                ProfileImageUrl = user.ProfileImageUrl,
+                CreatedAt = user.CreatedAt,
+                LastLoginAt = user.UpdatedAt
+            };
+
+            return new LoginResponseDto
+            {
+                Token = token.Token,
+                RefreshToken = refreshToken,
+                Expiration = token.Expiration,
+                User = userDto
+            };
+        }
     }
 }
