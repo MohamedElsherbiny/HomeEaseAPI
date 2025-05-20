@@ -101,7 +101,6 @@ builder.Services.AddScoped<IGeolocationService, GeolocationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 
 
@@ -110,7 +109,7 @@ var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
 var blobConnectionString = blobStorageConfig["ConnectionString"];
 
 builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
-builder.Services.AddSingleton<IFileStorageClientFactory, FileStorageClientFactory>();
+
 
 
 builder.Services.AddIdentityCore<User>(options =>
