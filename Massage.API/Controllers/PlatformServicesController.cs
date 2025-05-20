@@ -65,5 +65,35 @@ namespace Massage.API.Controllers
             if (!success) return NotFound();
             return Ok();
         }
+
+        [HttpPatch("{id}/activate")]
+        public async Task<IActionResult> ActivateService(Guid id)
+        {
+            try
+            {
+                var command = new ActivatePlatformServiceCommand { Id = id };
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/deactivate")]
+        public async Task<IActionResult> DeactivateService(Guid id)
+        {
+            try
+            {
+                var command = new DeactivatePlatformServiceCommand { Id = id };
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }
