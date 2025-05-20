@@ -28,7 +28,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-// Add CORS
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
@@ -41,10 +41,8 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -55,7 +53,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = $"Build: {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}"
     });
 
-    // ? JWT Authentication in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -106,20 +103,13 @@ builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 
+
 // Configure Blob Storage
 var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
 var blobConnectionString = blobStorageConfig["ConnectionString"];
-var containerName = blobStorageConfig["ContainerName"];
 
 builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 
-// Configure file storage
-builder.Services.AddScoped<IFileStorageClient>(sp =>
-    new BlobContainerServiceClient(
-        sp.GetRequiredService<BlobServiceClient>(),
-        containerName
-    )
-);
 
 
 builder.Services.AddIdentityCore<User>(options =>
@@ -142,7 +132,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddDataProtection();
 
-// Configure Serilog with explicit async logging
+
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration
@@ -152,24 +142,23 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
         .Enrich.FromLogContext();
 
-    // Check environment to configure the appropriate async sink
     if (context.HostingEnvironment.IsDevelopment())
     {
-        // Development: Async console logging with JSON
+        
         configuration.WriteTo.Async(a => a.Console(
                 formatter: new JsonFormatter(renderMessage: true)),
             bufferSize: 1000);
     }
     else
     {
-        // Production: Async Application Insights logging (no formatter needed)
+        
         configuration.WriteTo.Async(a => a.ApplicationInsights(
                 connectionString: context.Configuration["ApplicationInsights:ConnectionString"],
                 telemetryConverter: new TraceTelemetryConverter()),
             bufferSize: 1000);
     }
 });
-// Configure OpenTelemetry for tracing and metrics
+
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource.AddService("Pensell_Api"))
     .WithTracing(tracing => tracing
@@ -179,7 +168,7 @@ builder.Services.AddOpenTelemetry()
         .AddAzureMonitorTraceExporter(o => o.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"])
         .AddSource("MyApp.Tracing"))
     .WithMetrics(metrics => metrics
-        //.AddRuntimeInstrumentation()
+        
         .AddHttpClientInstrumentation()
         .AddAzureMonitorMetricExporter(o => o.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"])
         .AddMeter("MyApp.Metrics"));
@@ -219,9 +208,9 @@ builder.Services.AddAuthorization(options =>
 
 
 
-var app = builder.Build();
+ var app = builder.Build();
 
-// Use CORS
+
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseSwagger();
@@ -231,7 +220,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Seed admin data
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

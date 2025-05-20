@@ -1,4 +1,4 @@
-﻿using Massage.Application.Commands.UserCommends;
+﻿using Massage.Application.Commands.ProviderCommands;
 using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Services;
 using Massage.Domain.Repositories;
@@ -9,41 +9,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Massage.Application.Commands.UserCommends
+namespace Massage.Application.Commands.ProviderCommands
 {
-    public class ActivateProviderCommand : IRequest<bool>
+    public class DeactivateProviderCommand : IRequest<bool>
     {
         public Guid ProviderId { get; }
 
-        public ActivateProviderCommand(Guid providerId)
+        public DeactivateProviderCommand(Guid providerId)
         {
             ProviderId = providerId;
         }
     }
 }
 
-
 // Command Handler
-public class ActivateProviderCommandHandler : IRequestHandler<ActivateProviderCommand, bool>
+public class DeactivateProviderCommandHandler : IRequestHandler<DeactivateProviderCommand, bool>
 {
     private readonly IProviderRepository _providerRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ActivateProviderCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork)
+    public DeactivateProviderCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork)
     {
         _providerRepository = providerRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> Handle(ActivateProviderCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeactivateProviderCommand request, CancellationToken cancellationToken)
     {
         var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
         if (provider == null)
             throw new NotFoundException($"Provider with ID {request.ProviderId} not found.");
 
-        provider.IsActive = true;
+        provider.IsActive = false;
         provider.UpdatedAt = DateTime.UtcNow;
-        provider.DeactivatedAt = null;
+        provider.DeactivatedAt = DateTime.UtcNow;
 
         _providerRepository.Update(provider);
         await _unitOfWork.SaveChangesAsync();

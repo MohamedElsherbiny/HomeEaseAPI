@@ -4,6 +4,8 @@ using Massage.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Massage.Application.Commands.UserCommends;
+using Massage.Application.Commands.ProviderCommands;
 
 namespace Massage.API.Controllers
 {
