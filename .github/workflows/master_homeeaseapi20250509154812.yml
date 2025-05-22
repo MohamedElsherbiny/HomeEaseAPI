@@ -9,7 +9,7 @@ env:
   AZURE_WEBAPP_NAME: HomeEaseAPI20250509154812
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
-  WORKING_DIRECTORY: ./Massage.API
+  WORKING_DIRECTORY: ./HomeEase.API
   BUILD_OUTPUT_PATH: ./publish
   DEPLOY_ARTIFACT_PATH: ./artifact
 
@@ -43,7 +43,7 @@ jobs:
             /p:GitVersion=$GIT_HASH /p:BuildDate=$BUILD_DATE
 
       # - name: Run API to check Reflection errors
-      #   run: dotnet Massage.API.dll
+      #   run: dotnet HomeEase.API.dll
       #   working-directory: ${{ env.BUILD_OUTPUT_PATH }}
       #   continue-on-error: true
 
