@@ -1,44 +1,28 @@
 ﻿using MediatR;
-using Massage.Domain.Entities;
-using Massage.Application.Commands.UserCommends;
-using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Services;
+using Massage.Domain.Exceptions;
 
-namespace Massage.Application.Commands.UserCommends
+namespace Massage.Application.Commands.UserCommends;
+public class GetUserStatusCommand(Guid userId) : IRequest<UserStatusDto>
 {
-    public class GetUserStatusCommand : IRequest<UserStatusDto>
-    {
-        public Guid UserId { get; }
-
-        public GetUserStatusCommand(Guid userId)
-        {
-            UserId = userId;
-        }
-    }
-
-    public class UserStatusDto
-    {
-        public bool IsActive { get; set; }
-        public DateTime? DeactivatedAt { get; set; }
-    }
+    public Guid UserId { get; } = userId;
 }
 
-
-// Command Handler
-public class GetUserStatusCommandHandler : IRequestHandler<GetUserStatusCommand, UserStatusDto>
+public class UserStatusDto
 {
-    private readonly IUserRepository _userRepository;
+    public bool IsActive { get; set; }
+    public DateTime? DeactivatedAt { get; set; }
+}
 
-    public GetUserStatusCommandHandler(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
-
+public class GetUserStatusCommandHandler(IUserRepository _userRepository) : IRequestHandler<GetUserStatusCommand, UserStatusDto>
+{
     public async Task<UserStatusDto> Handle(GetUserStatusCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetUserByIdAsync(request.UserId);
         if (user == null)
-            throw new NotFoundException($"User with ID {request.UserId} not found.");
+        {
+            throw new BusinessException($"User with ID {request.UserId} not found.");
+        }
 
         return new UserStatusDto
         {

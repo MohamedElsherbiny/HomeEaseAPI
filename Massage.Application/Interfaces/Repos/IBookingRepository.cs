@@ -8,7 +8,7 @@ namespace Massage.Application.Interfaces.Repos
 {
     public interface IBookingRepository
     {
-        Task<Booking> GetByIdAsync(Guid id);
+        Task<Booking?> GetByIdAsync(Guid id);
         Task<Booking> GetByIdWithDetailsAsync(Guid id);
         Task<List<Booking>> GetUserBookingsAsync(Guid userId, string status, DateTime? fromDate, DateTime? toDate, int page, int pageSize);
         Task<List<Booking>> GetProviderBookingsAsync(Guid providerId, string status, DateTime? fromDate, DateTime? toDate, int page, int pageSize);

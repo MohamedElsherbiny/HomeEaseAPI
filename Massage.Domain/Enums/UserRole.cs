@@ -1,9 +1,8 @@
-﻿namespace Massage.Domain.Enums
+﻿namespace Massage.Domain.Enums;
+
+public enum UserRole
 {
-    public enum UserRole
-    {
-        User = 0,
-        Provider = 1,
-        Admin = 2
-    }
+    User = 0,
+    Provider = 1,
+    Admin = 2
 }

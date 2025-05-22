@@ -6,7 +6,6 @@ using Massage.Application.Middlewares;
 using Massage.Domain.Entities;
 using Massage.Domain.Repositories;
 using Massage.Infrastructure.Data;
-using Massage.Infrastructure.Data.Seeding;
 using Massage.Infrastructure.Repos;
 using Massage.Infrastructure.Services;
 using MediatR;
@@ -23,6 +22,7 @@ using Azure.Storage.Blobs;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 using System.Reflection;
 using System.Text;
+using Massage.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,8 +83,6 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-
-
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProviderService, ProviderService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -102,7 +100,6 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
-
 
 // Configure Blob Storage
 var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
@@ -144,14 +141,14 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
     if (context.HostingEnvironment.IsDevelopment())
     {
-        
+
         configuration.WriteTo.Async(a => a.Console(
                 formatter: new JsonFormatter(renderMessage: true)),
             bufferSize: 1000);
     }
     else
     {
-        
+
         configuration.WriteTo.Async(a => a.ApplicationInsights(
                 connectionString: context.Configuration["ApplicationInsights:ConnectionString"],
                 telemetryConverter: new TraceTelemetryConverter()),
@@ -168,7 +165,7 @@ builder.Services.AddOpenTelemetry()
         .AddAzureMonitorTraceExporter(o => o.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"])
         .AddSource("MyApp.Tracing"))
     .WithMetrics(metrics => metrics
-        
+
         .AddHttpClientInstrumentation()
         .AddAzureMonitorMetricExporter(o => o.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"])
         .AddMeter("MyApp.Metrics"));
@@ -196,20 +193,15 @@ builder.Services.AddAuthentication(options =>
 
 
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Admin"));
-    options.AddPolicy("ProviderOnly", policy =>
-        policy.RequireRole("Provider"));
-    options.AddPolicy("UserOnly", policy =>
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"))
+    .AddPolicy("ProviderOnly", policy =>
+        policy.RequireRole("Provider"))
+    .AddPolicy("UserOnly", policy =>
         policy.RequireRole("User"));
-});
 
-
-
- var app = builder.Build();
-
+var app = builder.Build();
 
 app.UseCors(MyAllowSpecificOrigins);
 

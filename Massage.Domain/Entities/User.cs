@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using Massage.Domain.Entities;
-using Massage.Domain.Enums;
+﻿using Massage.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
+namespace Massage.Domain.Entities;
 
-namespace Massage.Domain.Entities
+public class User : IdentityUser<Guid> 
 {
-    public class User : IdentityUser<Guid> 
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public UserRole Role { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public string RefreshToken { get; set; }
-        public DateTime RefreshTokenExpiryTime { get; set; }
-        public string ProfileImageUrl { get; set; }
-        public bool IsActive { get; set; } = true;
-        public DateTime? DeactivatedAt { get; set; }
-        //public DateTime? LastLoginAt { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public UserRole Role { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public string RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiryTime { get; set; }
+    public string ProfileImageUrl { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime? DeactivatedAt { get; set; }
 
-        // Navigation properties
-        public virtual ICollection<Booking> Bookings { get; set; }
-        public virtual ICollection<Review> Reviews { get; set; }
-        public virtual ICollection<Address> Addresses { get; set; }
-        public virtual UserPreferences Preferences { get; set; }
-        
-    }
+    public virtual ICollection<Booking> Bookings { get; set; }
+    public virtual ICollection<Review> Reviews { get; set; }
+    public virtual ICollection<Address> Addresses { get; set; }
+    public virtual UserPreferences Preferences { get; set; }
+    
 }

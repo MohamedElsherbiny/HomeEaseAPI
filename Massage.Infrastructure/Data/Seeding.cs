@@ -3,68 +3,65 @@ using Massage.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
-namespace Massage.Infrastructure.Data.Seeding
+namespace Massage.Infrastructure.Data;
+
+public class AdminDataSeeder
 {
-    public class AdminDataSeeder
+    public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
     {
-        public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
+        using var scope = serviceProvider.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AdminDataSeeder>>();
+
+        try
         {
-            using var scope = serviceProvider.CreateScope();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<AdminDataSeeder>>();
-
-            try
+            var existingAdmin = await userManager.FindByEmailAsync("admin1@massageapp.com");
+            if (existingAdmin == null)
             {
-                var existingAdmin = await userManager.FindByEmailAsync("admin1@massageapp.com");
-                if (existingAdmin == null)
+                logger.LogInformation("No admin user found. Creating default admin user.");
+
+                var adminUser = new User
                 {
-                    logger.LogInformation("No admin user found. Creating default admin user.");
+                    UserName = "admin1@massageapp.com",
+                    Email = "admin1@massageapp.com",
+                    FirstName = "System",
+                    LastName = "Administrator",
+                    Role = UserRole.Admin,
+                    PhoneNumber = "+1234567890",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    ProfileImageUrl = "",
+                    RefreshToken = ""
+                };
 
-                    var adminUser = new User
-                    {
-                        UserName = "admin1@massageapp.com",
-                        Email = "admin1@massageapp.com",
-                        FirstName = "System",
-                        LastName = "Administrator",
-                        Role = UserRole.Admin,
-                        PhoneNumber = "+1234567890",
-                        IsActive = true,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        ProfileImageUrl = "",
-                        RefreshToken = ""
-                    };
+                var result = await userManager.CreateAsync(adminUser, "Admin@123");
 
-                    var result = await userManager.CreateAsync(adminUser, "Admin@123");
+                if (result.Succeeded)
+                {
+                    // Add role as Identity role if needed
+                    //await userManager.AddToRoleAsync(adminUser, UserRole.Admin.ToString());
 
-                    if (result.Succeeded)
-                    {
-                        // Add role as Identity role if needed
-                        //await userManager.AddToRoleAsync(adminUser, UserRole.Admin.ToString());
-
-                        logger.LogInformation("Default admin user created successfully.");
-                    }
-                    else
-                    {
-                        foreach (var error in result.Errors)
-                        {
-                            logger.LogError($"Error creating admin user: {error.Description}");
-                        }
-                    }
+                    logger.LogInformation("Default admin user created successfully.");
                 }
                 else
                 {
-                    logger.LogInformation("Admin user already exists. Skipping seed.");
+                    foreach (var error in result.Errors)
+                    {
+                        logger.LogError($"Error creating admin user: {error.Description}");
+                    }
                 }
             }
-            catch (Exception ex)
+            else
             {
-                logger.LogError(ex, "An error occurred while seeding the admin user.");
-                throw;
+                logger.LogInformation("Admin user already exists. Skipping seed.");
             }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while seeding the admin user.");
+            throw;
         }
     }
 }

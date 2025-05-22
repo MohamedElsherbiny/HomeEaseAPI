@@ -1,24 +1,13 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Massage.Application.Interfaces.Services;
 using Massage.Infrastructure.Data;
 
 namespace Massage.Infrastructure.Services
 {
-    public class EmailService : IEmailService
+    public class EmailService(AppDbContext _context, IConfiguration _configuration) : IEmailService
     {
-        private readonly AppDbContext _context;
-        private readonly IConfiguration _configuration;
-
-        public EmailService(AppDbContext context, IConfiguration configuration)
-        {
-            _context = context;
-            _configuration = configuration;
-        }
-
         public async Task SendPasswordResetEmailAsync(string email, string token)
         {
             try

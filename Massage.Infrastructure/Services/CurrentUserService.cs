@@ -2,32 +2,24 @@
 using Microsoft.AspNetCore.Http;
 using Massage.Application.Interfaces.Services;
 
-namespace Massage.Infrastructure.Services
+namespace Massage.Infrastructure.Services;
+
+public class CurrentUserService(IHttpContextAccessor _httpContextAccessor) : ICurrentUserService
 {
-    public class CurrentUserService : ICurrentUserService
+    public Guid UserId
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+        get
         {
-            _httpContextAccessor = httpContextAccessor;
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return userId != null ? Guid.Parse(userId) : Guid.Empty;
         }
+    }
 
-        public Guid UserId
+    public string UserRole
+    {
+        get
         {
-            get
-            {
-                var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                return userId != null ? Guid.Parse(userId) : Guid.Empty;
-            }
-        }
-
-        public string UserRole
-        {
-            get
-            {
-                return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
-            }
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
         }
     }
 }

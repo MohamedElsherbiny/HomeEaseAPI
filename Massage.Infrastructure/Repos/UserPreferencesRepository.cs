@@ -5,15 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Massage.Infrastructure.Repos
 {
-    public class UserPreferencesRepository : IUserPreferencesRepository
+    public class UserPreferencesRepository(AppDbContext _dbContext) : IUserPreferencesRepository
     {
-        private readonly AppDbContext _dbContext;
-
-        public UserPreferencesRepository(AppDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
         public async Task<UserPreferences> GetByUserIdAsync(Guid userId)
         {
             return await _dbContext.UserPreferences.FirstOrDefaultAsync(p => p.UserId == userId);

@@ -1,10 +1,9 @@
-﻿namespace Massage.Domain.Enums
+﻿namespace Massage.Domain.Enums;
+
+public enum ProviderStatus
 {
-    public enum ProviderStatus
-    {
-        Pending = 0,
-        Approved = 1,
-        Suspended = 2,
-        Rejected = 3
-    }
+    Pending = 0,
+    Approved = 1,
+    Suspended = 2,
+    Rejected = 3
 }

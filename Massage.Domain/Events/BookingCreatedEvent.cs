@@ -1,15 +1,8 @@
-﻿using System;
-using Massage.Domain.Entities;
+﻿using Massage.Domain.Entities;
 
-namespace Massage.Domain.Events
+namespace Massage.Domain.Events;
+
+public class BookingCreatedEvent(Booking booking)
 {
-    public class BookingCreatedEvent
-    {
-        public Booking Booking { get; }
-
-        public BookingCreatedEvent(Booking booking)
-        {
-            Booking = booking;
-        }
-    }
+    public Booking Booking { get; } = booking;
 }

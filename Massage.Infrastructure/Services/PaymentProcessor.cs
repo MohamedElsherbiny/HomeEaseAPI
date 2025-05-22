@@ -1,66 +1,49 @@
 ﻿using Massage.Application.Interfaces.Repos;
 using Massage.Domain.Entities;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Massage.Infrastructure.Services
+namespace Massage.Infrastructure.Services;
+
+public class PaymentProcessor(ILogger<PaymentProcessor> _logger) : IPaymentProcessor
 {
-    public class PaymentProcessor : IPaymentProcessor
+
+    public async Task<PaymentResult> ProcessPaymentAsync(Guid bookingId, decimal amount, string currency, string paymentMethod, string transactionId = null)
     {
-        private readonly ILogger<PaymentProcessor> _logger;
-        private readonly PaymentSettings _settings;
-
-        public PaymentProcessor(
-            ILogger<PaymentProcessor> logger,
-            IOptions<PaymentSettings> settings)
+        try
         {
-            _logger = logger;
-            _settings = settings.Value;
+            _logger.LogInformation($"Processing payment for booking {bookingId}. Amount: {amount} {currency}");
+
+            // In a real implementation, this would integrate with Stripe
+            // or another payment processor. For demonstration, we'll
+            // simulate a successful payment.
+
+            // Simulate API call delay
+            await Task.Delay(500);
+
+            // In production code, you would:
+            // 1. Create a payment intent with Stripe
+            // 2. Charge the payment method
+            // 3. Handle success/failure
+
+            var result = new PaymentResult
+            {
+                IsSuccessful = true,
+                TransactionId = transactionId ?? Guid.NewGuid().ToString(),
+                Timestamp = DateTime.UtcNow
+            };
+
+            _logger.LogInformation($"Payment processed successfully. Transaction ID: {result.TransactionId}");
+            return result;
         }
-
-        public async Task<PaymentResult> ProcessPaymentAsync(Guid bookingId, decimal amount, string currency, string paymentMethod, string transactionId = null)
+        catch (Exception ex)
         {
-            try
+            _logger.LogError(ex, $"Payment processing failed for booking {bookingId}");
+            return new PaymentResult
             {
-                _logger.LogInformation($"Processing payment for booking {bookingId}. Amount: {amount} {currency}");
-
-                // In a real implementation, this would integrate with Stripe
-                // or another payment processor. For demonstration, we'll
-                // simulate a successful payment.
-
-                // Simulate API call delay
-                await Task.Delay(500);
-
-                // In production code, you would:
-                // 1. Create a payment intent with Stripe
-                // 2. Charge the payment method
-                // 3. Handle success/failure
-
-                var result = new PaymentResult
-                {
-                    IsSuccessful = true,
-                    TransactionId = transactionId ?? Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.UtcNow
-                };
-
-                _logger.LogInformation($"Payment processed successfully. Transaction ID: {result.TransactionId}");
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Payment processing failed for booking {bookingId}");
-                return new PaymentResult
-                {
-                    IsSuccessful = false,
-                    ErrorMessage = ex.Message,
-                    Timestamp = DateTime.UtcNow
-                };
-            }
+                IsSuccessful = false,
+                ErrorMessage = ex.Message,
+                Timestamp = DateTime.UtcNow
+            };
         }
     }
 }

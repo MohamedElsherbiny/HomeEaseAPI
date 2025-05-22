@@ -1,30 +1,16 @@
 ﻿using AutoMapper;
 using Massage.Application.DTOs;
-using Massage.Application.Exceptions;
 using Massage.Application.Interfaces;
-using Massage.Application.Queries.UserQueries;
+using Massage.Domain.Exceptions;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Massage.Application.Queries.UserQueries
+namespace Massage.Application.Queries.UserQueries;
+
+public class GetUserPreferencesQuery(Guid userId) : IRequest<UserPreferencesDto>
 {
-    public class GetUserPreferencesQuery : IRequest<UserPreferencesDto>
-    {
-        public Guid UserId { get; set; }
-
-        public GetUserPreferencesQuery(Guid userId)
-        {
-            UserId = userId;
-        }
-    }
+    public Guid UserId { get; set; } = userId;
 }
 
-
-// Query Handler
 public class GetUserPreferencesQueryHandler : IRequestHandler<GetUserPreferencesQuery, UserPreferencesDto>
 {
     private readonly IUserPreferencesRepository _preferencesRepository;
@@ -40,7 +26,9 @@ public class GetUserPreferencesQueryHandler : IRequestHandler<GetUserPreferences
     {
         var preferences = await _preferencesRepository.GetByUserIdAsync(request.UserId);
         if (preferences == null)
-            throw new NotFoundException($"Preferences for user {request.UserId} not found.");
+        {
+            throw new BusinessException($"Preferences for user {request.UserId} not found.");
+        }
 
         return _mapper.Map<UserPreferencesDto>(preferences);
     }

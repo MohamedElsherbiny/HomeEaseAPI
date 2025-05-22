@@ -1,50 +1,30 @@
-﻿using Massage.Application.Commands.BookingCommands;
-using Massage.Application.DTOs;
-using Massage.Application.Exceptions;
+﻿using Massage.Application.DTOs;
 using Massage.Application.Interfaces.Repos;
 using Massage.Domain.Entities;
+using Massage.Domain.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Massage.Application.Commands.BookingCommands
+namespace Massage.Application.Commands.BookingCommands;
+
+public class ProcessBookingPaymentCommand : IRequest<bool>
 {
-    public class ProcessBookingPaymentCommand : IRequest<bool>
-    {
-        public Guid BookingId { get; set; }
-        public PaymentInfoDto PaymentInfo { get; set; }
-    }
+    public Guid BookingId { get; set; }
+    public PaymentInfoDto PaymentInfo { get; set; }
 }
 
-
-// COMMAND HANDLER
-public class ProcessBookingPaymentCommandHandler : IRequestHandler<ProcessBookingPaymentCommand, bool>
+public class ProcessBookingPaymentCommandHandler(
+    IBookingRepository _bookingRepository,
+    IPaymentProcessor _paymentProcessor,
+    ILogger<ProcessBookingPaymentCommandHandler> _logger) : IRequestHandler<ProcessBookingPaymentCommand, bool>
 {
-    private readonly IBookingRepository _bookingRepository;
-    private readonly IPaymentProcessor _paymentProcessor;
-    private readonly ILogger<ProcessBookingPaymentCommandHandler> _logger;
-
-    public ProcessBookingPaymentCommandHandler(
-        IBookingRepository bookingRepository,
-        IPaymentProcessor paymentProcessor,
-        ILogger<ProcessBookingPaymentCommandHandler> logger)
-    {
-        _bookingRepository = bookingRepository;
-        _paymentProcessor = paymentProcessor;
-        _logger = logger;
-    }
-
     public async Task<bool> Handle(ProcessBookingPaymentCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var booking = await _bookingRepository.GetByIdAsync(request.BookingId);
             if (booking == null)
-                throw new EntityNotFoundException("Booking not found");
+                throw new BusinessException("Booking not found");
 
             // Ensure booking has a payment record
             if (booking.Payment == null)

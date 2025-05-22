@@ -1,61 +1,48 @@
 ﻿using Massage.Application.Commands.BookingCommands;
 using Massage.Application.DTOs;
-using Massage.Application.Exceptions;
 using Massage.Application.Interfaces.Repos;
 using Massage.Domain.Entities;
 using Massage.Domain.Enums;
+using Massage.Domain.Exceptions;
 using Massage.Domain.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Massage.Application.Commands.BookingCommands
+namespace Massage.Application.Commands.BookingCommands;
+
+public class UpdateBookingCommand : IRequest<bool>
 {
-    public class UpdateBookingCommand : IRequest<bool>
-    {
-        public Guid BookingId { get; set; }
-        public Guid UserId { get; set; }
-        public UpdateBookingRequestDto UpdateRequest { get; set; }
-    }
+    public Guid BookingId { get; set; }
+    public Guid UserId { get; set; }
+    public UpdateBookingRequestDto UpdateRequest { get; set; }
 }
 
-
-// COMMAND HANDLER
-public class UpdateBookingCommandHandler : IRequestHandler<UpdateBookingCommand, bool>
+public class UpdateBookingCommandHandler(
+    IBookingRepository _bookingRepository,
+    IServiceRepository _serviceRepository,
+    ILogger<UpdateBookingCommandHandler> _logger) : IRequestHandler<UpdateBookingCommand, bool>
 {
-    private readonly IBookingRepository _bookingRepository;
-    private readonly IServiceRepository _serviceRepository;
-    private readonly ILogger<UpdateBookingCommandHandler> _logger;
-
-    public UpdateBookingCommandHandler(
-        IBookingRepository bookingRepository,
-        IServiceRepository serviceRepository,
-        ILogger<UpdateBookingCommandHandler> logger)
-    {
-        _bookingRepository = bookingRepository;
-        _serviceRepository = serviceRepository;
-        _logger = logger;
-    }
-
     public async Task<bool> Handle(UpdateBookingCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var booking = await _bookingRepository.GetByIdAsync(request.BookingId);
             if (booking == null)
-                throw new EntityNotFoundException("Booking not found");
+            {
+                throw new BusinessException("Booking not found");
+            }
 
             // Validate that the user owns this booking
             if (booking.UserId != request.UserId)
+            {
                 throw new UnauthorizedAccessException("You are not authorized to update this booking");
+            }
 
             // Validate that the booking can be updated (not completed or cancelled)
             if (booking.Status == BookingStatus.Completed || booking.Status == BookingStatus.Cancelled)
-                throw new BusinessRuleException("Cannot update a completed or cancelled booking");
+            {
+                throw new BusinessException("Cannot update a completed or cancelled booking");
+            }
 
             // Update appointment date/time if provided
             if (request.UpdateRequest.AppointmentDateTime.HasValue)
@@ -69,7 +56,7 @@ public class UpdateBookingCommandHandler : IRequestHandler<UpdateBookingCommand,
                     booking.Id); // Exclude current booking from availability check
 
                 if (!isAvailable)
-                    throw new BusinessRuleException("Provider is not available at the selected time");
+                    throw new BusinessException("Provider is not available at the selected time");
 
                 booking.AppointmentDateTime = request.UpdateRequest.AppointmentDateTime.Value;
             }

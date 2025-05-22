@@ -7,38 +7,36 @@ using Massage.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using Massage.Domain.Entities;
 using Massage.Infrastructure.Data;
 
-namespace Massage.Application
+namespace Massage.Infrastructure;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
-        {
-            // ✅ Corrected DbContext registration
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
-                options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection"),
-                    sql => sql.UseNetTopologySuite()));
+        // ✅ Corrected DbContext registration
+        services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            options.UseSqlServer(
+                configuration.GetConnectionString("DefaultConnection"),
+                sql => sql.UseNetTopologySuite()));
 
-            // ✅ Repositories
-            services.AddScoped<IProviderRepository, ProviderRepository>();
-            services.AddScoped<IServiceRepository, ServiceRepository>();
-            services.AddScoped<IBookingRepository, BookingRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+        // ✅ Repositories
+        services.AddScoped<IProviderRepository, ProviderRepository>();
+        services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddScoped<IBookingRepository, BookingRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // ✅ Domain/Infra services
-            services.AddScoped<INotificationService, NotificationService>();
-            services.AddScoped<IPaymentProcessor, PaymentProcessor>();
+        // ✅ Domain/Infra services
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IPaymentProcessor, PaymentProcessor>();
 
-            // ✅ Configuration bindings
-            services.Configure<NotificationSettings>(configuration.GetSection("NotificationSettings"));
-            services.Configure<PaymentSettings>(configuration.GetSection("PaymentSettings"));
+        // ✅ Configuration bindings
+        services.Configure<NotificationSettings>(configuration.GetSection("NotificationSettings"));
+        services.Configure<PaymentSettings>(configuration.GetSection("PaymentSettings"));
 
-            return services;
-        }
+        return services;
     }
 }

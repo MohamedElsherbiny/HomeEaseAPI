@@ -1,21 +1,17 @@
-﻿using System;
+﻿namespace Massage.Domain.Entities;
 
-namespace Massage.Domain.Entities
+public class Review
 {
-    public class Review
-    {
-        public Guid Id { get; set; }
-        public Guid BookingId { get; set; }
-        public Guid UserId { get; set; }
-        public Guid ProviderId { get; set; }
-        public decimal? Rating { get; set; }
-        public string Comment { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+    public Guid Id { get; set; }
+    public Guid BookingId { get; set; }
+    public Guid UserId { get; set; }
+    public Guid ProviderId { get; set; }
+    public decimal? Rating { get; set; }
+    public string Comment { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
-        // Navigation properties
-        public virtual Booking Booking { get; set; }
-        public virtual User User { get; set; }
-        public virtual Provider Provider { get; set; }
-    }
+    public virtual Booking Booking { get; set; }
+    public virtual User User { get; set; }
+    public virtual Provider Provider { get; set; }
 }

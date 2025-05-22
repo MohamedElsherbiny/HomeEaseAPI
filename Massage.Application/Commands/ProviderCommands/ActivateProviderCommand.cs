@@ -1,52 +1,32 @@
-﻿using Massage.Application.Commands.ProviderCommands;
-using Massage.Application.Exceptions;
-using Massage.Application.Interfaces.Services;
+﻿using Massage.Application.Interfaces.Services;
+using Massage.Domain.Exceptions;
 using Massage.Domain.Repositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Massage.Application.Commands.ProviderCommands
+namespace Massage.Application.Commands.ProviderCommands;
+
+public class ActivateProviderCommand(Guid providerId) : IRequest<bool>
 {
-    public class ActivateProviderCommand : IRequest<bool>
-    {
-        public Guid ProviderId { get; }
-
-        public ActivateProviderCommand(Guid providerId)
-        {
-            ProviderId = providerId;
-        }
-    }
+    public Guid ProviderId { get; } = providerId;
 }
 
-
-// Command Handler
-public class ActivateProviderCommandHandler : IRequestHandler<ActivateProviderCommand, bool>
+public class ActivateProviderCommandHandler(IProviderRepository _providerRepository, IUnitOfWork _unitOfWork) : IRequestHandler<ActivateProviderCommand, bool>
 {
-    private readonly IProviderRepository _providerRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public ActivateProviderCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork)
-    {
-        _providerRepository = providerRepository;
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<bool> Handle(ActivateProviderCommand request, CancellationToken cancellationToken)
     {
         var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
-        if (provider == null)
-            throw new NotFoundException($"Provider with ID {request.ProviderId} not found.");
+        if (provider is null)
+        {
+            throw new BusinessException($"Provider with ID {request.ProviderId} not found.");
+        }
 
         provider.IsActive = true;
         provider.UpdatedAt = DateTime.UtcNow;
         provider.DeactivatedAt = null;
 
         _providerRepository.Update(provider);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return true;
     }
 }

@@ -1,52 +1,28 @@
-﻿using Massage.Application.Commands.BookingCommands;
-using Massage.Application.DTOs;
-using Massage.Application.Exceptions;
+﻿using Massage.Application.DTOs;
 using Massage.Application.Interfaces.Repos;
 using Massage.Application.Interfaces.Services;
 using Massage.Domain.Entities;
 using Massage.Domain.Enums;
+using Massage.Domain.Exceptions;
 using Massage.Domain.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Massage.Application.Commands.BookingCommands
+namespace Massage.Application.Commands.BookingCommands;
+
+public class CreateBookingCommand : IRequest<Guid>
 {
-    public class CreateBookingCommand : IRequest<Guid>
-    {
-        public CreateBookingRequestDto BookingRequest { get; set; }
-        public Guid UserId { get; set; }
-    }
+    public CreateBookingRequestDto BookingRequest { get; set; }
+    public Guid UserId { get; set; }
 }
 
-
-// COMMAND HANDLER
-public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, Guid>
+public class CreateBookingCommandHandler(
+    IBookingRepository _bookingRepository,
+    IUserRepository _userRepository,
+    IProviderRepository _providerRepository,
+    IServiceRepository _serviceRepository,
+    ILogger<CreateBookingCommandHandler> _logger) : IRequestHandler<CreateBookingCommand, Guid>
 {
-    private readonly IBookingRepository _bookingRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly IProviderRepository _providerRepository;
-    private readonly IServiceRepository _serviceRepository;
-    private readonly ILogger<CreateBookingCommandHandler> _logger;
-
-    public CreateBookingCommandHandler(
-        IBookingRepository bookingRepository,
-        IUserRepository userRepository,
-        IProviderRepository providerRepository,
-        IServiceRepository serviceRepository,
-        ILogger<CreateBookingCommandHandler> logger)
-    {
-        _bookingRepository = bookingRepository;
-        _userRepository = userRepository;
-        _providerRepository = providerRepository;
-        _serviceRepository = serviceRepository;
-        _logger = logger;
-    }
-
     public async Task<Guid> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
     {
         try
@@ -54,17 +30,23 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
             // Validate that the user exists
             var user = await _userRepository.GetUserByIdAsync(request.UserId);
             if (user == null)
-                throw new EntityNotFoundException("User not found");
+            {
+                throw new BusinessException("User not found");
+            }
 
             // Validate that the provider exists
             var provider = await _providerRepository.GetByIdAsync(request.BookingRequest.ProviderId);
             if (provider == null)
-                throw new EntityNotFoundException("Provider not found");
+            {
+                throw new BusinessException("Provider not found");
+            }
 
             // Validate that the service exists and belongs to the provider
             var service = await _serviceRepository.GetByIdAsync(request.BookingRequest.ServiceId);
             if (service == null || service.ProviderId != request.BookingRequest.ProviderId)
-                throw new EntityNotFoundException("Service not found or does not belong to the provider");
+            {
+                throw new BusinessException("Service not found or does not belong to the provider");
+            }
 
             // Check provider availability
             var isAvailable = await _providerRepository.CheckAvailabilityAsync(
@@ -73,7 +55,9 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                 service.DurationMinutes);
 
             if (!isAvailable)
-                throw new BusinessRuleException("Provider is not available at the selected time");
+            {
+                throw new BusinessException("Provider is not available at the selected time");
+            }
 
             // Create new booking
             var booking = new Booking

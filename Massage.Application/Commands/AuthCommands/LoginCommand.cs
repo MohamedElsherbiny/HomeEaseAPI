@@ -5,10 +5,6 @@ using Massage.Domain.Repositories;
 using MediatR;
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Data;
 using Massage.Domain.Enums;
 
 namespace Massage.Application.Commands.AuthCommands
@@ -25,42 +21,35 @@ namespace Massage.Application.Commands.AuthCommands
         }
     }
 
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDto>
+    public class LoginCommandHandler(IProviderRepository _providerRepository, IJwtService _jwtService, UserManager<User> _userManager)
+        : IRequestHandler<LoginCommand, LoginResponseDto>
     {
-        private readonly IUserRepository _userService;
-        private readonly IProviderRepository _providerRepository;
-        private readonly IJwtService _jwtService;
-        private readonly UserManager<User> _userManager;
-
-        public LoginCommandHandler(
-            IUserRepository userService,
-            IProviderRepository providerRepository,
-            IJwtService jwtService,
-            UserManager<User> userManager)
-        {
-            _userService = userService;
-            _providerRepository = providerRepository;
-            _jwtService = jwtService;
-            _userManager = userManager;
-        }
 
         public async Task<LoginResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
+            {
                 throw new AuthenticationException("Invalid email or password.");
+            }
 
             if (!user.IsActive)
+            {
                 throw new AuthenticationException("Account is deactivated. Please contact support.");
-
+            }
 
             if (user.Role == UserRole.Provider)
             {
                 var provider = await _providerRepository.GetByUserIdAsync(user.Id);
                 if (provider == null)
+                {
                     throw new AuthenticationException("Provider profile not found.");
+                }
+
                 if (!provider.IsActive)
+                {
                     throw new AuthenticationException("Provider account is deactivated. Please contact support.");
+                }
             }
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);

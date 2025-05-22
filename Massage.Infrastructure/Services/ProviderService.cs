@@ -2,41 +2,29 @@
 using Massage.Domain.Entities;
 using Massage.Domain.Enums;
 using Massage.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Massage.Infrastructure.Services
+namespace Massage.Infrastructure.Services;
+
+public class ProviderService(AppDbContext _context) : IProviderService
 {
-    public class ProviderService : IProviderService
+    public async Task CreateProviderProfile(Guid userId, string businessName, string businessAddress, string Email, string description, string profileImageUrl, string[] serviceTypes)
     {
-        private readonly AppDbContext _context;
-
-        public ProviderService(AppDbContext context)
+        var provider = new Provider
         {
-            _context = context;
-        }
+            Id = userId,
+            UserId = userId,
+            Email = Email,
+            BusinessName = businessName,
+            BusinessAddress = businessAddress,
+            Description = description,
+            ProfileImageUrl = profileImageUrl,
+            ServiceTypes = serviceTypes.ToList(),
+            Status = ProviderStatus.Pending,
+            Rating = 0
+        };
 
-        public async Task CreateProviderProfile(Guid userId, string businessName, string businessAddress, string Email, string description, string profileImageUrl, string[] serviceTypes)
-        {
-            var provider = new Provider
-            {
-                Id = userId,
-                UserId = userId,     
-                Email = Email,
-                BusinessName = businessName,
-                BusinessAddress = businessAddress,
-                Description = description,
-                ProfileImageUrl = profileImageUrl,
-                ServiceTypes = serviceTypes.ToList(),
-                Status = ProviderStatus.Pending,
-                Rating = 0
-            };
+        _context.Providers.Add(provider);
 
-            _context.Providers.Add(provider);
-            await _context.SaveChangesAsync();
-        }
+        await _context.SaveChangesAsync();
     }
 }

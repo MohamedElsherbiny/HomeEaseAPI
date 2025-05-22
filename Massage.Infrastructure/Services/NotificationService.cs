@@ -1,9 +1,5 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Massage.Application.Interfaces.Repos;
 using Massage.Application.Interfaces.Services;
 using Massage.Domain.Entities;
 using Massage.Domain.Repositories;
@@ -13,28 +9,12 @@ using Microsoft.Extensions.Options;
 
 namespace Massage.Infrastructure.Services
 {
-    public class NotificationService : INotificationService
+    public class NotificationService(
+        ILogger<NotificationService> _logger,
+        IUserRepository _userRepository,
+        IProviderRepository _providerRepository,
+        IOptions<NotificationSettings> _settings) : INotificationService
     {
-        private readonly ILogger<NotificationService> _logger;
-        private readonly AppDbContext _context;
-        private readonly IUserRepository _userRepository;
-        private readonly IProviderRepository _providerRepository;
-        private readonly NotificationSettings _settings;
-
-        public NotificationService(
-            AppDbContext context,
-            ILogger<NotificationService> logger,
-            IUserRepository userRepository,
-            IProviderRepository providerRepository,
-            IOptions<NotificationSettings> settings)
-        {
-            _context = context;
-            _logger = logger;
-            _userRepository = userRepository;
-            _providerRepository = providerRepository;
-            _settings = settings.Value;
-        }
-
         public async Task SendNotificationAsync(int userId, string title, string message)
         {
             _logger.LogInformation($"Notification to user {userId}: {title} - {message}");
@@ -149,7 +129,7 @@ namespace Massage.Infrastructure.Services
         private async Task CallEmailServiceApi(EmailModel emailModel)
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_settings.ApiKey}");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_settings.Value.ApiKey}");
 
             var content = new StringContent(
                 JsonSerializer.Serialize(new
@@ -157,12 +137,12 @@ namespace Massage.Infrastructure.Services
                     to = emailModel.To,
                     subject = emailModel.Subject,
                     text = emailModel.Body,
-                    from = _settings.FromEmail
+                    from = _settings.Value.FromEmail
                 }),
                 Encoding.UTF8,
                 "application/json");
 
-            var response = await client.PostAsync(_settings.ApiEndpoint, content);
+            var response = await client.PostAsync(_settings.Value.ApiEndpoint, content);
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception($"Email service returned {response.StatusCode}");
