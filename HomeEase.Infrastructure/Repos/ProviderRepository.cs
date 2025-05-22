@@ -70,6 +70,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
     {
         return await _dbContext.Providers
             .Include(p => p.Address)
+            .Include(p => p.User) // <-- Include User
             .Include(p => p.Schedule)
                 .ThenInclude(s => s.RegularHours)
             .Include(p => p.Schedule)
@@ -79,6 +80,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.Services)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
+
 
     public async Task<Provider> GetByUserIdAsync(Guid userId)
     {
@@ -110,10 +112,10 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
     {
         var query = _dbContext.Providers
             .Include(p => p.Address)
+            .Include(p => p.User) 
             .AsQueryable();
 
-
-        // Search by Name or Email (حسب المتاح)
+        // Search by Name or Email 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             query = query.Where(p =>

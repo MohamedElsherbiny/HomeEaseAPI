@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HomeEase.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,8 +19,12 @@ namespace HomeEase.Application.DTOs
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? VerifiedAt { get; set; }
+        public UserDto User { get; set; }
+
+        // Navigation properties
         public ProviderScheduleDto Schedule { get; set; }
         public List<ServiceDto> Services { get; set; }
+
     }
 
     public class ProviderSearchResultDto
