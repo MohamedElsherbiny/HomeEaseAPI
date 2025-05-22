@@ -64,10 +64,14 @@ jobs:
           name: webapp
           path: ${{ env.DEPLOY_ARTIFACT_PATH }}
 
+      - name: Zip artifact for deployment
+        run: zip -r deploy.zip ./*
+        working-directory: ${{ env.DEPLOY_ARTIFACT_PATH }}
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
-          package: ${{ env.DEPLOY_ARTIFACT_PATH }}
+          package: ${{ env.DEPLOY_ARTIFACT_PATH }}/deploy.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A3F0BCFA45094252BA9F0ADC68A2D517 }}
