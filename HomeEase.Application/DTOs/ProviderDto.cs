@@ -9,6 +9,7 @@ namespace HomeEase.Application.DTOs
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
+        public bool IsActive { get; set; } = true;
         public string BusinessName { get; set; }
         public string Description { get; set; }
         public string ProfileImageUrl { get; set; }
