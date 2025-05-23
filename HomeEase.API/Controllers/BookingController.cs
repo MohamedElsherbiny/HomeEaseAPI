@@ -163,7 +163,7 @@ public class BookingsController(IMediator _mediator) : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("{id}/payment")]
+    [HttpPost("payment/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

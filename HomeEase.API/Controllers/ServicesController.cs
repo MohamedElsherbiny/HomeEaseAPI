@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HomeEase.API.Controllers;
 
 [ApiController]
-[Route("api/providers/{providerId}/services")]
+[Route("api/providers/services/{providerId}")]
 [Authorize]
 public class ProviderServicesController(IMediator _mediator) : ControllerBase
 {

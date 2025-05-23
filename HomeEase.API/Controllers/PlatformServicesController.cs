@@ -56,7 +56,7 @@ public class PlatformServicesController(IMediator _mediator) : ControllerBase
         return Ok();
     }
 
-    [HttpPatch("{id}/activate")]
+    [HttpPatch("activate/{id}")]
     public async Task<IActionResult> ActivateService(Guid id)
     {
         var command = new ActivatePlatformServiceCommand { Id = id };
@@ -65,7 +65,7 @@ public class PlatformServicesController(IMediator _mediator) : ControllerBase
         return Ok(result);
     }
 
-    [HttpPatch("{id}/deactivate")]
+    [HttpPatch("deactivate/{id}")]
     public async Task<IActionResult> DeactivateService(Guid id)
     {
         var result = await _mediator.Send(new DeactivatePlatformServiceCommand { Id = id });

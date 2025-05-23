@@ -108,7 +108,7 @@ public class ProvidersController(IMediator _mediator) : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{id}/verify")]
+    [HttpPost("verify/{id}")]
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> VerifyProvider(Guid id)
     {
@@ -121,7 +121,7 @@ public class ProvidersController(IMediator _mediator) : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{id}/schedule")]
+    [HttpPut("schedule/{id}")]
     [Authorize(Policy = "ProviderOnly")]
     public async Task<IActionResult> UpdateProviderSchedule(Guid id, ProviderScheduleDto scheduleDto)
     {
