@@ -134,7 +134,7 @@ public class ProvidersController(IMediator _mediator) : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("activate/{id}")]
+    [HttpPatch("activate/{id}")]
     public async Task<IActionResult> ActivateProvider(Guid id)
     {
         var command = new ActivateProviderCommand(id);
@@ -143,7 +143,7 @@ public class ProvidersController(IMediator _mediator) : ControllerBase
     }
 
 
-    [HttpPost("deactivate/{id}")]
+    [HttpPatch("deactivate/{id}")]
     public async Task<IActionResult> DeactivateProvider(Guid id)
     {
         var command = new DeactivateProviderCommand(id);

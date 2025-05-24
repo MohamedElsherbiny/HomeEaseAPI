@@ -29,7 +29,7 @@ public class UsersController(IMediator _mediator) : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("activate/{id}")]
+    [HttpPatch("activate/{id}")]
     public async Task<IActionResult> ActivateUser(Guid id)
     {
         var command = new ActivateUserCommand(id);
@@ -37,7 +37,7 @@ public class UsersController(IMediator _mediator) : ControllerBase
         return result ? Ok("User activation successful.") : BadRequest("Failed to activate user.");
     }
 
-    [HttpPost("deactivate/{id}")]
+    [HttpPatch("deactivate/{id}")]
     public async Task<IActionResult> DeactivateUser(Guid id)
     {
         var command = new DeactivateUserCommand(id);
