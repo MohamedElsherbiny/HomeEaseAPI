@@ -2,13 +2,9 @@
 using HomeEase.Application.DTOs;
 using HomeEase.Application.Queries.ProviderQueries;
 using HomeEase.Domain.Common;
+using HomeEase.Domain.Enums;
 using HomeEase.Domain.Repositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeEase.Application.Queries.ProviderQueries
 {
@@ -19,7 +15,7 @@ namespace HomeEase.Application.Queries.ProviderQueries
         public string? SearchTerm { get; set; }
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
-
+        public EnumExportFormat ExportFormat { get; set; } = EnumExportFormat.Excel;
     }
 }
 
