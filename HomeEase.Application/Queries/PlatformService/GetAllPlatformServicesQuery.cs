@@ -2,12 +2,9 @@
 using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces;
 using HomeEase.Domain.Common;
+using HomeEase.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace HomeEase.Application.Queries.PlatformService
 {
@@ -18,19 +15,11 @@ namespace HomeEase.Application.Queries.PlatformService
         public string? SearchTerm { get; set; }
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
+        public EnumExportFormat ExportFormat { get; set; } = EnumExportFormat.Excel;
     }
 
-    public class GetAllPlatformServicesHandler : IRequestHandler<GetAllPlatformServicesQuery, PaginatedList<BasePlatformServiceDto>>
+    public class GetAllPlatformServicesHandler(IAppDbContext _context, IMapper _mapper) : IRequestHandler<GetAllPlatformServicesQuery, PaginatedList<BasePlatformServiceDto>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMapper _mapper;
-
-        public GetAllPlatformServicesHandler(IAppDbContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
         public async Task<PaginatedList<BasePlatformServiceDto>> Handle(GetAllPlatformServicesQuery request, CancellationToken cancellationToken)
         {
             var query = _context.BasePlatformService.AsQueryable();
@@ -42,18 +31,12 @@ namespace HomeEase.Application.Queries.PlatformService
             }
 
             // Apply sorting
-            switch (request.SortBy.ToLower())
+            query = request.SortBy.ToLower() switch
             {
-                case "name":
-                    query = request.SortDescending ? query.OrderByDescending(s => s.Name) : query.OrderBy(s => s.Name);
-                    break;
-                case "createdat":
-                    query = request.SortDescending ? query.OrderByDescending(s => s.CreatedAt) : query.OrderBy(s => s.CreatedAt);
-                    break;
-                default:
-                    query = request.SortDescending ? query.OrderByDescending(s => s.CreatedAt) : query.OrderBy(s => s.CreatedAt);
-                    break;
-            }
+                "name" => request.SortDescending ? query.OrderByDescending(s => s.Name) : query.OrderBy(s => s.Name),
+                "createdat" => request.SortDescending ? query.OrderByDescending(s => s.CreatedAt) : query.OrderBy(s => s.CreatedAt),
+                _ => request.SortDescending ? query.OrderByDescending(s => s.CreatedAt) : query.OrderBy(s => s.CreatedAt),
+            };
 
             // Get total count before pagination
             var totalCount = await query.CountAsync(cancellationToken);

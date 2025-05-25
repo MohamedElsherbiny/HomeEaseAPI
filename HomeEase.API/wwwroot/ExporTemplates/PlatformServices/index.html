@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com" />
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          rel="stylesheet" />
+    <title>PDF :: Template</title>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#006c35",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body,
+        html {
+            font-family: "IBM Plex Sans Arabic", "Inter", "sans-serif";
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        table {
+            width: 100%;
+        }
+
+            table td,
+            table th {
+                text-align: start;
+                padding: 1rem 0.75rem;
+                font-weight: 500;
+            }
+
+            table thead th {
+                font-weight: 600;
+            }
+
+            table th,
+            table tbody tr:nth-child(even) td {
+                background-color: #f2f4f8;
+            }
+
+        .header {
+            position: relative;
+            height: 5rem;
+            width: 100%;
+            background-color: #006c35;
+            margin-bottom: 1rem;
+        }
+
+            .header::before {
+                position: absolute;
+                right: 0px;
+                left: 0px;
+                bottom: 0px;
+                z-index: 10;
+                height: 0.5rem;
+                width: 100%;
+                content: "";
+                background-color: #006c35;
+            }
+
+            .header::after {
+                position: absolute;
+                right: 0px;
+                left: 0px;
+                bottom: 0px;
+                height: 1.5rem;
+                width: 100%;
+                content: "";
+                background-color: #ffffff;
+            }
+
+        .logo {
+            position: absolute;
+            top: 0px;
+            left: 1.5rem;
+            z-index: 10;
+            display: flex;
+            height: 5rem;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        [dir="rtl"] .logo {
+            left: auto;
+            right: 1.5rem;
+        }
+
+        .logo img {
+            object-fit: contain;
+            -o-object-fit: contain;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+            margin-top: calc(1.5rem /* 24px */ * calc(1 - 0));
+            margin-bottom: calc(1.5rem /* 24px */ * 0);
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="space-y-6">
+            <div class="header">
+
+            </div>
+
+            <div class="p-6">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الإسم</th>
+                            <th>الحالة</th>
+                            <th>تاريخ الإنشاء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {transactions}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
