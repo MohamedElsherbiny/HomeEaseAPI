@@ -2,11 +2,9 @@
 using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.PlatformService;
-using HomeEase.Application.Queries.UserQueries;
 using HomeEase.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
