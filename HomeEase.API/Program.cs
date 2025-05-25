@@ -1,10 +1,14 @@
 using Azure.Monitor.OpenTelemetry.Exporter;
+using Azure.Storage.Blobs;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using HomeEase.Application;
 using HomeEase.Application.Interfaces;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Middlewares;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Repositories;
+using HomeEase.Infrastructure;
 using HomeEase.Infrastructure.Data;
 using HomeEase.Infrastructure.Repos;
 using HomeEase.Infrastructure.Services;
@@ -18,11 +22,9 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Formatting.Json;
-using Azure.Storage.Blobs;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 using System.Reflection;
 using System.Text;
-using HomeEase.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -128,6 +130,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddDataProtection();
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 
 builder.Host.UseSerilog((context, services, configuration) =>

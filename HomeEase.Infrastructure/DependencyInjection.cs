@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using HomeEase.Domain.Entities;
 using HomeEase.Infrastructure.Data;
+using HomeEase.Infrastructure.Services.Export;
 
 namespace HomeEase.Infrastructure;
 
@@ -36,6 +37,19 @@ public static class DependencyInjection
         // ✅ Configuration bindings
         services.Configure<NotificationSettings>(configuration.GetSection("NotificationSettings"));
         services.Configure<PaymentSettings>(configuration.GetSection("PaymentSettings"));
+        services.AddScoped<IDataExportService, DataExportService>();
+
+        services.AddTransient<ExportExcelHtmlAgilityPackClosedXMLService>();
+        services.AddTransient<ExportExcelAngleSharpClosedXMLService>();
+        services.AddTransient<Func<EnumExportExcelType, IExportExcelService>>(provider => key =>
+        {
+            return key switch
+            {
+                EnumExportExcelType.HtmlAgilityPack => provider.GetRequiredService<ExportExcelHtmlAgilityPackClosedXMLService>(),
+                EnumExportExcelType.AngleSharpClosedXML => provider.GetRequiredService<ExportExcelAngleSharpClosedXMLService>(),
+                _ => throw new ArgumentException($"Unknown key: {key}")
+            };
+        });
 
         return services;
     }

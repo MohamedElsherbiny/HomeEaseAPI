@@ -3,6 +3,7 @@ using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.UserQueries;
 using HomeEase.Domain.Common;
+using HomeEase.Domain.Enums;
 using MediatR;
 
 namespace HomeEase.Application.Queries.UserQueries
@@ -14,6 +15,7 @@ namespace HomeEase.Application.Queries.UserQueries
         public string? SearchTerm { get; set; }
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
+        public EnumExportFormat ExportFormat { get; set; } = EnumExportFormat.Excel;
 
         public bool? IsActive { get; set; } 
     }

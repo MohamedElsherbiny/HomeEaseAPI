@@ -16,7 +16,7 @@ namespace HomeEase.Application
 
             // Register AutoMapper (Application layer)
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddAutoMapper(typeof(HomeEase.Application.Mappings.BookingMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(Mappings.BookingMappingProfile).Assembly);
             return services;
         }
     }

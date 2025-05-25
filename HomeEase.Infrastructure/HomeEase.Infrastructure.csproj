@@ -1,30 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="BCrypt" Version="1.0.0" />
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.15" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="8.0.15" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.15">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
-    <PackageReference Include="sib_api_v3_sdk" Version="4.0.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AngleSharp" Version="1.2.0" />
+		<PackageReference Include="ClosedXML" Version="0.104.2" />
+		<PackageReference Include="DinkToPdf" Version="1.0.8" />
+		<PackageReference Include="DinkToPdfCopyDependencies" Version="1.0.8" />
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+		<PackageReference Include="BCrypt" Version="1.0.0" />
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.15" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="8.0.15" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.15">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NetTopologySuite" Version="2.6.0" />
+		<PackageReference Include="sib_api_v3_sdk" Version="4.0.2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\HomeEase.Application\HomeEase.Application.csproj" />
-    <ProjectReference Include="..\HomeEase.Domain\HomeEase.Domain.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\HomeEase.Application\HomeEase.Application.csproj" />
+		<ProjectReference Include="..\HomeEase.Domain\HomeEase.Domain.csproj" />
+	</ItemGroup>
 
 </Project>
