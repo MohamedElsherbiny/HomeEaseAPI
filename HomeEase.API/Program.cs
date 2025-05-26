@@ -105,6 +105,8 @@ builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository > ();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+
 
 // Configure Blob Storage
 var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
