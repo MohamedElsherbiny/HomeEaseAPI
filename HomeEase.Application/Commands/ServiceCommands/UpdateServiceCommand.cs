@@ -1,5 +1,6 @@
 ﻿using HomeEase.Application.Commands.ServiceCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Enums;
 using HomeEase.Domain.Repositories;
@@ -23,11 +24,16 @@ namespace HomeEase.Application.Commands.ServiceCommands
 public class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceCommand, bool>
 {
     private readonly IServiceRepository _serviceRepository;
+    private readonly IBasePlatformServiceRepository _basePlatformServiceRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateServiceCommandHandler(IServiceRepository serviceRepository, IUnitOfWork unitOfWork)
+    public UpdateServiceCommandHandler(
+        IServiceRepository serviceRepository,
+        IBasePlatformServiceRepository basePlatformServiceRepository,
+        IUnitOfWork unitOfWork)
     {
         _serviceRepository = serviceRepository;
+        _basePlatformServiceRepository = basePlatformServiceRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -37,11 +43,18 @@ public class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceCommand,
         if (service == null)
             return false;
 
+        // Validate BasePlatformService exists and is active
+        var basePlatformService = await _basePlatformServiceRepository.GetByIdAsync(request.ServiceDto.BasePlatformServiceId);
+        if (basePlatformService == null || !basePlatformService.IsActive)
+            throw new ApplicationException($"BasePlatformService with ID {request.ServiceDto.BasePlatformServiceId} not found or inactive");
+
         if (request.ServiceDto.Name != null)
             service.Name = request.ServiceDto.Name;
 
         if (request.ServiceDto.Description != null)
             service.Description = request.ServiceDto.Description;
+
+        service.BasePlatformServiceId = request.ServiceDto.BasePlatformServiceId;
 
         if (request.ServiceDto.Price.HasValue)
             service.Price = request.ServiceDto.Price.Value;
@@ -49,9 +62,8 @@ public class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceCommand,
         if (request.ServiceDto.DurationMinutes.HasValue)
             service.DurationMinutes = request.ServiceDto.DurationMinutes.Value;
 
-        //if (request.ServiceDto.ServiceType != null)
-        //    service.ServiceType = Enum.Parse<ServiceType>(request.ServiceDto.ServiceType);
 
+        service.UpdatedAt = DateTime.UtcNow;
 
         _serviceRepository.Update(service);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

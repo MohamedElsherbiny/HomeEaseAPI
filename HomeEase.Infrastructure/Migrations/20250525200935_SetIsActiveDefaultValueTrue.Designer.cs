@@ -4,6 +4,7 @@ using HomeEase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeEase.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250525200935_SetIsActiveDefaultValueTrue")]
+    partial class SetIsActiveDefaultValueTrue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -453,9 +456,6 @@ namespace HomeEase.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BasePlatformServiceId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -490,8 +490,6 @@ namespace HomeEase.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BasePlatformServiceId");
 
                     b.HasIndex("ProviderId");
 
@@ -1005,19 +1003,11 @@ namespace HomeEase.Infrastructure.Migrations
 
             modelBuilder.Entity("HomeEase.Domain.Entities.Service", b =>
                 {
-                    b.HasOne("HomeEase.Domain.Entities.BasePlatformService", "BasePlatformService")
-                        .WithMany()
-                        .HasForeignKey("BasePlatformServiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("HomeEase.Domain.Entities.Provider", "Provider")
                         .WithMany("Services")
                         .HasForeignKey("ProviderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("BasePlatformService");
 
                     b.Navigation("Provider");
                 });

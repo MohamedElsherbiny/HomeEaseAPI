@@ -23,6 +23,7 @@ public class PlatformServicesController(IMediator _mediator, IWebHostEnvironment
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllPlatformServices([FromQuery] GetAllPlatformServicesQuery query)
     {
         var result = await _mediator.Send(query);

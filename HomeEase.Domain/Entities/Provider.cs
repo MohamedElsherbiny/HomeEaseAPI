@@ -12,7 +12,7 @@ public class Provider
     public decimal Rating { get; set; }
     public ProviderStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? DeactivatedAt { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? VerifiedAt { get; set; }

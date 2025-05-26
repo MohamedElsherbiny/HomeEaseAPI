@@ -10,9 +10,9 @@ namespace HomeEase.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
           
-            migrationBuilder.DropColumn(
-                name: "IsActive",
-                table: "BasePlatformService");
+            //migrationBuilder.DropColumn(
+            //    name: "IsActive",
+            //    table: "BasePlatformService");
 
             
             migrationBuilder.AddColumn<bool>(

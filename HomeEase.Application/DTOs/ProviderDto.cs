@@ -79,42 +79,4 @@ namespace HomeEase.Application.DTOs
         public string[] ServiceTypes { get; set; }
         public AddressDto Address { get; set; }
     }
-
-    public class ServiceDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public decimal Price { get; set; }
-        public int DurationMinutes { get; set; }
-        public string ServiceType { get; set; }
-    }
-
-    public class CreateServiceDto
-    {
-        [Required]
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        [Required]
-        [Range(0.01, 10000)]
-        public decimal Price { get; set; }
-
-        [Required]
-        [Range(15, 300)]
-        public int DurationMinutes { get; set; }
-
-        //[Required]
-        //public string ServiceType { get; set; }
-    }
-
-    public class UpdateServiceDto
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public decimal? Price { get; set; }
-        public int? DurationMinutes { get; set; }
-        public string ServiceType { get; set; }
-    }
 }
