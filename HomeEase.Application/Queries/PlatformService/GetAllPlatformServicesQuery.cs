@@ -33,7 +33,7 @@ namespace HomeEase.Application.Queries.PlatformService
 
         public async Task<PaginatedList<BasePlatformServiceDto>> Handle(GetAllPlatformServicesQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.BasePlatformService.AsQueryable();
+            var query = _context.BasePlatformService.AsQueryable().Where(s => s.IsActive);
 
             // Apply search term filter
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))

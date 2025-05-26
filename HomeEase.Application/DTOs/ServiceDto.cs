@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HomeEase.Application.DTOs
+{
+    public class ServiceDto
+    {
+        public Guid Id { get; set; }
+        public Guid ProviderId { get; set; }
+        public Guid BasePlatformServiceId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public int DurationMinutes { get; set; }
+        public string ServiceType { get; set; }
+        public bool IsActive { get; set; } = true;
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+    }
+
+    public class CreateServiceDto
+    {
+        public Guid BasePlatformServiceId { get; set; }
+        [Required]
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        [Required]
+        [Range(0.01, 10000)]
+        public decimal Price { get; set; }
+
+        [Required]
+        [Range(15, 300)]
+        public int DurationMinutes { get; set; }
+
+        //[Required]
+        //public string ServiceType { get; set; }
+    }
+
+    public class UpdateServiceDto
+    {
+        public Guid BasePlatformServiceId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal? Price { get; set; }
+        public int? DurationMinutes { get; set; }
+        public string ServiceType { get; set; }
+    }
+}

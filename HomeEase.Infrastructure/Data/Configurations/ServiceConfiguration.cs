@@ -19,6 +19,11 @@ namespace HomeEase.Infrastructure.Data.Configurations
                   .WithMany(p => p.Services)
                   .HasForeignKey(s => s.ProviderId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(s => s.BasePlatformService)
+                  .WithMany() 
+                  .HasForeignKey(s => s.BasePlatformServiceId)
+                  .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

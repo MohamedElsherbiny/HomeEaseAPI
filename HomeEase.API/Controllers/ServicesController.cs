@@ -68,4 +68,36 @@ public class ProviderServicesController(IMediator _mediator) : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPatch("activate/{serviceId}")]
+    [Authorize(Policy = "ProviderOnly")]
+    public async Task<ActionResult<ServiceDto>> ActivateService(Guid providerId, Guid serviceId)
+    {
+        try
+        {
+            var command = new ActivateServiceCommand { ProviderId = providerId, ServiceId = serviceId };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPatch("deactivate/{serviceId}")]
+    [Authorize(Policy = "ProviderOnly")]
+    public async Task<ActionResult<ServiceDto>> DeactivateService(Guid providerId, Guid serviceId)
+    {
+        try
+        {
+            var command = new DeactivateServiceCommand { ProviderId = providerId, ServiceId = serviceId };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }

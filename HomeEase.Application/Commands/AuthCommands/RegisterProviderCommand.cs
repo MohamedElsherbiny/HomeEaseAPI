@@ -91,7 +91,10 @@ public class RegisterProviderCommandHandler : IRequestHandler<RegisterProviderCo
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber,
             Role = user.Role.ToString(),
-            ProfileImageUrl = ""
+            ProfileImageUrl = "",
+            IsActive = user.IsActive,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         return userDto;

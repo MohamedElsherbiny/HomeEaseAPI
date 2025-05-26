@@ -74,7 +74,8 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber,
             Role = user.Role.ToString(),
-            ProfileImageUrl = user.ProfileImageUrl
+            ProfileImageUrl = user.ProfileImageUrl,
+            IsActive = user.IsActive
         };
 
         return userDto;
