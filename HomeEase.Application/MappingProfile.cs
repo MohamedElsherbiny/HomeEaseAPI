@@ -52,6 +52,11 @@ namespace HomeEase.Application.Mappings
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
 
             CreateMap<BasePlatformService, BasePlatformServiceDto>();
+
+            CreateMap<Review, ReviewDto>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"));
+            CreateMap<CreateReviewDto, Review>();
+            CreateMap<UpdateReviewDto, Review>();
         }
     }
 
