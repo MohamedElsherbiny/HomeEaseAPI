@@ -16,6 +16,7 @@ namespace HomeEase.Application.Queries.AdminQueries
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
         public bool? IsActive { get; set; }
+        public EnumExportFormat ExportFormat { get; set; } = EnumExportFormat.Excel;
     }
 
     public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, PaginatedList<UserDto>>
