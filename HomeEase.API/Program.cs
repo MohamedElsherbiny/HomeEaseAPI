@@ -38,11 +38,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins("http://localhost:5173", "https://salmon-desert-09cf3c000.6.azurestaticapps.net")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials()
-                  .WithExposedHeaders("Content-Disposition"); ;
+                  .WithExposedHeaders("Content-Disposition");
         });
 });
 
@@ -105,7 +105,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
-builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository > ();
+builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 
