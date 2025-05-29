@@ -163,22 +163,6 @@ public class BookingsController(IMediator _mediator) : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("payment/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> ProcessPayment(Guid id, [FromBody] PaymentInfoDto paymentInfo)
-    {
-        var command = new ProcessBookingPaymentCommand
-        {
-            BookingId = id,
-            PaymentInfo = paymentInfo
-        };
-
-        var result = await _mediator.Send(command);
-        return Ok(result);
-    }
-
     private Guid GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

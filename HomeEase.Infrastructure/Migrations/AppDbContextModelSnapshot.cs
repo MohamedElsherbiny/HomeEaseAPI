@@ -142,14 +142,12 @@ namespace HomeEase.Infrastructure.Migrations
                     b.Property<DateTime>("AppointmentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("AppointmentDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<TimeSpan>("AppointmentTime")
                         .HasColumnType("time");
 
                     b.Property<string>("CancellationReason")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("CancelledAt")
                         .HasColumnType("datetime2");
@@ -158,10 +156,19 @@ namespace HomeEase.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("USD");
 
                     b.Property<string>("CustomerAddress")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
@@ -173,7 +180,6 @@ namespace HomeEase.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -186,8 +192,12 @@ namespace HomeEase.Infrastructure.Migrations
                     b.Property<decimal>("ServicePrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -281,8 +291,7 @@ namespace HomeEase.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookingId")
-                        .IsUnique();
+                    b.HasIndex("BookingId");
 
                     b.ToTable("PaymentInfos");
                 });
@@ -879,8 +888,7 @@ namespace HomeEase.Infrastructure.Migrations
                 {
                     b.HasOne("HomeEase.Domain.Entities.Location", "Location")
                         .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("LocationId");
 
                     b.HasOne("HomeEase.Domain.Entities.Provider", "Provider")
                         .WithMany("Bookings")
@@ -889,7 +897,7 @@ namespace HomeEase.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("HomeEase.Domain.Entities.Service", "Service")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -930,11 +938,13 @@ namespace HomeEase.Infrastructure.Migrations
 
             modelBuilder.Entity("HomeEase.Domain.Entities.PaymentInfo", b =>
                 {
-                    b.HasOne("HomeEase.Domain.Entities.Booking", null)
-                        .WithOne("Payment")
-                        .HasForeignKey("HomeEase.Domain.Entities.PaymentInfo", "BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("HomeEase.Domain.Entities.Booking", "Booking")
+                        .WithMany("Payments")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("HomeEase.Domain.Entities.Provider", b =>
@@ -970,7 +980,7 @@ namespace HomeEase.Infrastructure.Migrations
                     b.HasOne("HomeEase.Domain.Entities.Booking", "Booking")
                         .WithOne("Review")
                         .HasForeignKey("HomeEase.Domain.Entities.Review", "BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HomeEase.Domain.Entities.Provider", "Provider")
@@ -1124,11 +1134,9 @@ namespace HomeEase.Infrastructure.Migrations
 
             modelBuilder.Entity("HomeEase.Domain.Entities.Booking", b =>
                 {
-                    b.Navigation("Payment")
-                        .IsRequired();
+                    b.Navigation("Payments");
 
-                    b.Navigation("Review")
-                        .IsRequired();
+                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("HomeEase.Domain.Entities.Provider", b =>
@@ -1149,6 +1157,11 @@ namespace HomeEase.Infrastructure.Migrations
                     b.Navigation("RegularHours");
 
                     b.Navigation("SpecialDates");
+                });
+
+            modelBuilder.Entity("HomeEase.Domain.Entities.Service", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("HomeEase.Domain.Entities.User", b =>

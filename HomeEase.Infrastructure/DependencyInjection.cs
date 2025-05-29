@@ -32,7 +32,7 @@ public static class DependencyInjection
 
         // ✅ Domain/Infra services
         services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IPaymentProcessor, PaymentProcessor>();
+        
 
         // ✅ Configuration bindings
         services.Configure<NotificationSettings>(configuration.GetSection("NotificationSettings"));

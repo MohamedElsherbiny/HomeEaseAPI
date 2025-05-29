@@ -22,7 +22,7 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.Provider)
             .Include(b => b.Service)
             .Include(b => b.Location)
-            .Include(b => b.Payment)
+            .Include(b => b.Payments)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
@@ -32,7 +32,7 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.Provider)
             .Include(b => b.Service)
             .Include(b => b.Location)
-            .Include(b => b.Payment)
+            .Include(b => b.Payments)
             .Where(b => b.UserId == userId);
 
         if (!string.IsNullOrEmpty(status))
@@ -66,7 +66,7 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.User)
             .Include(b => b.Service)
             .Include(b => b.Location)
-            .Include(b => b.Payment)
+            .Include(b => b.Payments)
             .Where(b => b.ProviderId == providerId);
 
         if (!string.IsNullOrEmpty(status))
@@ -98,7 +98,7 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
     {
         var query = _context.Bookings
             .Include(b => b.Service)
-            .Include(b => b.Payment)
+            .Include(b => b.Payments)
             .Where(b => b.ProviderId == providerId);
 
         if (fromDate.HasValue)
@@ -119,8 +119,8 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             CompletedBookings = bookings.Count(b => b.Status == BookingStatus.Completed),
             CancelledBookings = bookings.Count(b => b.Status == BookingStatus.Cancelled),
             TotalRevenue = bookings
-                .Where(b => b.Status == BookingStatus.Completed && b.Payment != null && b.Payment.Status == "Completed")
-                .Sum(b => b.Payment.Amount),
+                .Where(b => b.Status == BookingStatus.Completed && b.Payments != null && b.Payments.Any(p => p.Status == "Completed"))
+                .Sum(b => b.Payments.Where(p => p.Status == "Completed").Sum(p => p.Amount)),
             BookingsByService = bookings
                 .GroupBy(b => b.Service.Name)
                 .ToDictionary(g => g.Key, g => g.Count()),

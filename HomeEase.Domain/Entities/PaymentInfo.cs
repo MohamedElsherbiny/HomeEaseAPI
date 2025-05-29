@@ -10,6 +10,7 @@ public class PaymentInfo
     public string PaymentMethod { get; set; }
     public string TransactionId { get; set; }
     public DateTime? ProcessedAt { get; set; }
+    public virtual Booking Booking { get; set; } = null!;
 }
 
 public class PaymentResult
