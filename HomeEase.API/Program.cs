@@ -106,7 +106,9 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository > ();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-
+builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("PaymentSettings"));
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentInfoRepository, PaymentInfoRepository>();
 
 // Configure Blob Storage
 var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");

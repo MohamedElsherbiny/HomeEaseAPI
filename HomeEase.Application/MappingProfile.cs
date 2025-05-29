@@ -3,7 +3,7 @@ using HomeEase.Application.DTOs;
 using HomeEase.Application.Queries.PlatformService;
 using HomeEase.Domain.Entities;
 
-namespace HomeEase.Application.Mappings
+namespace HomeEase.Application
 {
     public class MappingProfile : Profile
     {
@@ -70,7 +70,9 @@ namespace HomeEase.Application.Mappings
                 .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.Name));
 
             CreateMap<PaymentInfo, PaymentInfoDto>();
-            CreateMap<PaymentInfoDto, PaymentInfo>();
+            CreateMap<CreatePaymentDto, PaymentInfo>();
+            CreateMap<UpdatePaymentDto, PaymentInfo>();
+            CreateMap<PaymentResult, PaymentResultDto>();
         }
     }
 }

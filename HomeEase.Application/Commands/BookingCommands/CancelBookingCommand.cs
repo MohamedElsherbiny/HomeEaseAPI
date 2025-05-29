@@ -59,9 +59,12 @@ public class CancelBookingCommandHandler(
             booking.CancelledAt = DateTime.UtcNow;
             booking.CancellationReason = request.CancellationRequest.CancellationReason;
 
-            if (booking.Payment != null)
+            if (booking.Payments != null && booking.Payments.Any())
             {
-                booking.Payment.Status = cancellationFeeApplies ? "Partial Refund" : "Refunded";
+                foreach (var payment in booking.Payments)
+                {
+                    payment.Status = cancellationFeeApplies ? "Partial Refund" : "Refunded";
+                }
             }
 
             await _bookingRepository.UpdateAsync(booking);
