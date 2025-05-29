@@ -82,15 +82,15 @@ namespace HomeEase.Application.Queries.AdminQueries
             var startDate = DateTime.UtcNow.AddMonths(-6);
 
             var result = _dbContext.Bookings
-                .Where(b => b.CreatedAt >= startDate && b.Status == BookingStatus.Completed && b.Payment != null)
-                .Include(b => b.Payment)
+                .Where(b => b.CreatedAt >= startDate && b.Status == BookingStatus.Completed && b.Payments.Any())
+                .Include(b => b.Payments)
                 .AsEnumerable()
                 .GroupBy(b => new { b.CreatedAt.Year, b.CreatedAt.Month })
                 .OrderBy(g => g.Key.Year)
                 .ThenBy(g => g.Key.Month)
                 .ToDictionary(
                     g => $"{g.Key.Year}-{g.Key.Month}",
-                    g => g.Sum(b => b.Payment.Amount)
+                    g => g.Sum(b => b.Payments.Sum(p => p.Amount))
                 );
 
             return Task.FromResult(result);

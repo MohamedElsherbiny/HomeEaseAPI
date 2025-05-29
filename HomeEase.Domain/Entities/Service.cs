@@ -17,4 +17,7 @@ public class Service
     public Guid BasePlatformServiceId { get; set; }
     public virtual Provider Provider { get; set; }
     public virtual BasePlatformService BasePlatformService { get; set; }
+
+    public virtual ICollection<Booking> Bookings { get; set; }
+
 }
