@@ -25,7 +25,7 @@ using Serilog.Formatting.Json;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 using System.Reflection;
 using System.Text;
-using HomeEase.Infrastructure;
+
 using HomeEase.Application.Interfaces.Repos;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,10 +38,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "https://salmon-desert-09cf3c000.6.azurestaticapps.net")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
+            policy
+            .WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "https://salmon-desert-09cf3c000.6.azurestaticapps.net")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .WithExposedHeaders("Content-Disposition");
         });
 });
 
@@ -104,7 +109,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
-builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository > ();
+builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 
