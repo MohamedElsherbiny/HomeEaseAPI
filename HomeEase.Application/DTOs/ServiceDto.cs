@@ -28,7 +28,9 @@ namespace HomeEase.Application.DTOs
         [Required]
         public string Name { get; set; }
 
+        public string NameAr { get; set; }
         public string Description { get; set; }
+        public string DescriptionAr { get; set; }
 
         [Required]
         [Range(0.01, 10000)]

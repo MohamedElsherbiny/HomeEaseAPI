@@ -32,18 +32,27 @@ namespace HomeEase.Application.Queries.AdminQueries
 
         public async Task<PaginatedList<UserDto>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
         {
-            var (users, totalCount) = await _userRepository.GetAllAsync(
-                request.Page,
-                request.PageSize,
+            var (users, _) = await _userRepository.GetAllAsync(
+                1, 
+                int.MaxValue, 
                 request.SearchTerm,
                 request.SortBy,
                 request.SortDescending,
                 request.IsActive);
 
+            
             var adminUsers = users.Where(u => u.Role == UserRole.Admin).ToList();
-            var adminUsersDto = _mapper.Map<List<UserDto>>(adminUsers);
+
+            var totalCount = adminUsers.Count;
+            var paginatedAdmins = adminUsers
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var adminUsersDto = _mapper.Map<List<UserDto>>(paginatedAdmins);
 
             return new PaginatedList<UserDto>(adminUsersDto, totalCount, request.Page, request.PageSize);
         }
+
     }
 }

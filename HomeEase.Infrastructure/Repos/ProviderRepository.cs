@@ -112,18 +112,24 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
     {
         var query = _dbContext.Providers
             .Include(p => p.Address)
-            .Include(p => p.User) 
+            .Include(p => p.User)
+            .Where(p => p.User.Role == UserRole.Provider) 
             .AsQueryable();
 
-        // Search by Name or Email 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
+            string lowerSearch = searchTerm.ToLower();
+
             query = query.Where(p =>
-                p.BusinessName.Contains(searchTerm) ||
-                p.Email.Contains(searchTerm));
+                p.BusinessName.ToLower().Contains(lowerSearch) ||
+                p.Email.ToLower().Contains(lowerSearch) ||
+                p.User.FirstName.ToLower().Contains(lowerSearch) ||
+                p.User.LastName.ToLower().Contains(lowerSearch) ||
+                p.User.Email.ToLower().Contains(lowerSearch) ||
+                p.User.PhoneNumber.ToLower().Contains(lowerSearch)
+            );
         }
 
-        // Sorting
         query = sortBy.ToLower() switch
         {
             "createdat" => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
@@ -140,6 +146,8 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
 
         return (paginatedProviders, totalCount);
     }
+
+
 
 
     public async Task<List<Provider>> SearchProvidersAsync(

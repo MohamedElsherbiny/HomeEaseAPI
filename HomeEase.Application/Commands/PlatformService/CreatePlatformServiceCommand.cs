@@ -1,19 +1,15 @@
 ﻿using HomeEase.Application.Interfaces;
 using MediatR;
 using HomeEase.Domain.Entities;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeEase.Application.Commands.PlatformService
 {
     public class CreatePlatformServiceCommand : IRequest<Guid>
     {
         public string Name { get; set; }
+        public string NameAr { get; set; }
         public string ImageUrl { get; set; }
     }
-
 
     public class CreatePlatformServiceHandler : IRequestHandler<CreatePlatformServiceCommand, Guid>
     {
@@ -29,6 +25,7 @@ namespace HomeEase.Application.Commands.PlatformService
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
+                NameAr = request.NameAr,
                 ImageUrl = request.ImageUrl
             };
 

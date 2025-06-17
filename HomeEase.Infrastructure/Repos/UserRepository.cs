@@ -12,13 +12,25 @@ public class UserRepository(AppDbContext _dbContext) : IUserRepository
         return await _dbContext.Users.FindAsync(userId);
     }
 
-    public async Task<(IEnumerable<User> users, int totalCount)> GetAllAsync(int page, int pageSize, string searchTerm, string sortBy, bool sortDescending, bool? isActive)
+    public async Task<(IEnumerable<User> users, int totalCount)> GetAllAsync(
+        int page,
+        int pageSize,
+        string searchTerm,
+        string sortBy,
+        bool sortDescending,
+        bool? isActive)
     {
         var query = _dbContext.Users.AsQueryable();
 
         if (!string.IsNullOrEmpty(searchTerm))
         {
-            query = query.Where(u => u.FirstName.Contains(searchTerm));
+            string lowerSearchTerm = searchTerm.ToLower();
+
+            query = query.Where(u =>
+                u.FirstName.ToLower().Contains(lowerSearchTerm) ||
+                u.LastName.ToLower().Contains(lowerSearchTerm) ||
+                u.Email.ToLower().Contains(lowerSearchTerm) ||
+                u.PhoneNumber.ToLower().Contains(lowerSearchTerm));
         }
 
         if (!string.IsNullOrEmpty(sortBy))
@@ -42,6 +54,8 @@ public class UserRepository(AppDbContext _dbContext) : IUserRepository
 
         return (paginatedUsers, totalCount);
     }
+
+
 
     public void Update(User user)
     {

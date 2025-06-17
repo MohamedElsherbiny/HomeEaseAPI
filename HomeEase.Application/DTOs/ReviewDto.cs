@@ -21,6 +21,7 @@ namespace HomeEase.Application.DTOs
         public Guid BookingId { get; set; }
         public decimal? Rating { get; set; }
         public string Comment { get; set; }
+        public string CommentAr { get; set; }
     }
 
     public class UpdateReviewDto
