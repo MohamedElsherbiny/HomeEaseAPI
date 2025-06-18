@@ -54,12 +54,16 @@ namespace HomeEase.Infrastructure.Data.Configurations
                 .HasForeignKey(b => b.ProviderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Relationship with ProviderSchedule (one-to-one)
             entity.HasOne(p => p.Schedule)
                 .WithOne(s => s.Provider)
                 .HasForeignKey<ProviderSchedule>(s => s.ProviderId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
+
+            entity.HasMany(p => p.Images)
+                .WithOne(pi => pi.Provider)
+                .HasForeignKey(pi => pi.ProviderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 

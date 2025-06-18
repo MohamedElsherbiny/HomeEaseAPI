@@ -21,6 +21,7 @@ namespace HomeEase.Application.Interfaces
         DbSet<PaymentInfo> PaymentInfos { get; set; }
         DbSet<AvailabilitySlots> AvailabilitySlots { get; set; }
         DbSet<BasePlatformService> BasePlatformService { get; set; }
+         DbSet<ProviderImage> ProviderImages { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     }

@@ -107,13 +107,20 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
         int pageSize,
         string? searchTerm,
         string sortBy,
-        bool sortDescending
+        bool sortDescending,
+        decimal? minPrice,
+        decimal? maxPrice,
+        string? city,
+        bool? isHomeServiceAvailable,
+        bool? isCenterServiceAvailable,
+        decimal? minAverageServiceRating
     )
     {
         var query = _dbContext.Providers
             .Include(p => p.Address)
             .Include(p => p.User)
-            .Where(p => p.User.Role == UserRole.Provider) 
+            .Include(p => p.Services)
+            .Where(p => p.User.Role == UserRole.Provider)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -130,10 +137,43 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             );
         }
 
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Services.Any(s => s.Price >= minPrice.Value));
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Services.Any(s => s.Price <= maxPrice.Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(city))
+        {
+            query = query.Where(p => p.Address.City.ToLower().Contains(city.ToLower()));
+        }
+
+        if (isHomeServiceAvailable.HasValue)
+        {
+            query = query.Where(p => p.Services.Any(s => s.IsAvailableAtHome == isHomeServiceAvailable.Value));
+        }
+
+        if (isCenterServiceAvailable.HasValue)
+        {
+            query = query.Where(p => p.Services.Any(s => s.IsAvailableAtCenter == isCenterServiceAvailable.Value));
+        }
+
+
+      
+        if (minAverageServiceRating.HasValue)
+        {
+            query = query.Where(p => p.Services.Any() && p.Services.Average(s => s.Rating) >= minAverageServiceRating.Value);
+        }
+
+        // Sorting
         query = sortBy.ToLower() switch
         {
             "createdat" => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
-            "rating" => sortDescending ? query.OrderByDescending(p => p.Rating) : query.OrderBy(p => p.Rating),
+            "rating" => sortDescending ? query.OrderByDescending(p => p.Services.Any() ? p.Services.Average(s => s.Rating) : 0) : query.OrderBy(p => p.Services.Any() ? p.Services.Average(s => s.Rating) : 0),
             _ => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt)
         };
 
@@ -146,6 +186,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
 
         return (paginatedProviders, totalCount);
     }
+
 
 
 

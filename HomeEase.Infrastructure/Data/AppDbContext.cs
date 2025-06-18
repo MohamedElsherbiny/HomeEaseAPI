@@ -24,6 +24,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<PaymentInfo> PaymentInfos { get; set; }
     public DbSet<AvailabilitySlots> AvailabilitySlots { get; set; }
     public DbSet<BasePlatformService> BasePlatformService { get; set; }
+    public DbSet<ProviderImage> ProviderImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

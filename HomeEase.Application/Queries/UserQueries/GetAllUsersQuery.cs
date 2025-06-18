@@ -36,15 +36,27 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, Paginat
 
     public async Task<PaginatedList<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
-        var (users, totalCount) = await _userRepository.GetAllAsync(
-            request.Page,
-            request.PageSize,
+        var (users, _) = await _userRepository.GetAllAsync(
+            1,
+            int.MaxValue,
             request.SearchTerm,
             request.SortBy,
             request.SortDescending,
             request.IsActive);
-        var usersToReturn =  _mapper.Map<List<UserDto>>(users);
 
-        return new PaginatedList<UserDto>(usersToReturn, totalCount, request.Page, request.PageSize);
+        var userRoleUsers = users.Where(u => u.Role == UserRole.User).ToList();
+
+        var totalCount = userRoleUsers.Count;
+
+        var paginatedUsers = userRoleUsers
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToList();
+
+        var userDtos = _mapper.Map<List<UserDto>>(paginatedUsers);
+
+        return new PaginatedList<UserDto>(userDtos, totalCount, request.Page, request.PageSize);
     }
+
+
 }

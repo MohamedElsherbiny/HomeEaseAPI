@@ -16,7 +16,16 @@ namespace HomeEase.Application.Queries.ProviderQueries
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
         public EnumExportFormat ExportFormat { get; set; } = EnumExportFormat.Excel;
+
+      
+        public decimal? MinPrice { get; set; }
+        public decimal? MaxPrice { get; set; }
+        public string? City { get; set; }
+        public bool? IsHomeServiceAvailable { get; set; }
+        public bool? IsCenterServiceAvailable { get; set; }
+        public decimal? MinAverageServiceRating { get; set; }
     }
+
 }
 
 // Query Handler
@@ -38,10 +47,18 @@ public class GetAllProvidersQueryHandler : IRequestHandler<GetAllProvidersQuery,
             request.PageSize,
             request.SearchTerm,
             request.SortBy,
-            request.SortDescending);
+            request.SortDescending,
+            request.MinPrice,
+            request.MaxPrice,
+            request.City,
+            request.IsHomeServiceAvailable,
+            request.IsCenterServiceAvailable,
+            request.MinAverageServiceRating
+        );
 
         var mappedProviders = _mapper.Map<List<ProviderDto>>(providers);
 
         return new PaginatedList<ProviderDto>(mappedProviders, totalCount, request.PageNumber, request.PageSize);
     }
+
 }

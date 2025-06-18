@@ -20,6 +20,7 @@ namespace HomeEase.Application.DTOs
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? VerifiedAt { get; set; }
+        public decimal? StartingPrice { get; set; }
         public UserDto User { get; set; }
 
         // Navigation properties

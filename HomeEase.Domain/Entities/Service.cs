@@ -13,10 +13,13 @@ public class Service
     public ServiceType ServiceType { get; set; }
     public int DurationMinutes { get; set; }
     public decimal Price { get; set; }
+    public decimal Rating { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public Guid BasePlatformServiceId { get; set; }
     public virtual Provider Provider { get; set; }
     public virtual BasePlatformService BasePlatformService { get; set; }
+    public bool IsAvailableAtCenter { get; set; }
+    public bool IsAvailableAtHome { get; set; }
 }

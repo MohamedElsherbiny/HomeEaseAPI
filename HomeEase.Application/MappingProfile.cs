@@ -14,7 +14,12 @@ namespace HomeEase.Application.Mappings
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Schedule, opt => opt.MapFrom(src => src.Schedule))
                 .ForMember(dest => dest.Services, opt => opt.MapFrom(src => src.Services))
-                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User));
+                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+                .ForMember(dest => dest.StartingPrice, opt =>
+                    opt.MapFrom(src => src.Services != null && src.Services.Any()
+                        ? src.Services.Min(s => s.Price)
+                        : (decimal?)null));
+
 
             CreateMap<Provider, ProviderSearchResultDto>()
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
