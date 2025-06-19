@@ -19,6 +19,6 @@ public class User : IdentityUser<Guid>
     public virtual ICollection<Booking> Bookings { get; set; }
     public virtual ICollection<Review> Reviews { get; set; }
     public virtual ICollection<Address> Addresses { get; set; }
-    public virtual UserPreferences Preferences { get; set; }
+    public virtual UserServiceLike Preferences { get; set; }
     
 }

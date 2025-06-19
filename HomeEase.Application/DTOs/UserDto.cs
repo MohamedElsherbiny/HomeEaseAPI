@@ -67,4 +67,14 @@ namespace HomeEase.Application.DTOs
         public DateTime? UpdatedAt { get; set; }
 
     }
+
+    public class UserServiceLikeDto
+    {
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+        public Guid ServiceId { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
 }
+
+

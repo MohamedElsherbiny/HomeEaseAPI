@@ -44,30 +44,6 @@ public class AccountController(IMediator _mediator, ICurrentUserService _current
         return Ok(new { message = "Password changed successfully" });
     }
 
-    [HttpGet("preferences")]
-    [ProducesResponseType(typeof(UserPreferencesDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserPreferences()
-    {
-        var userId = _currentUserService.UserId;
-        var query = new GetUserPreferencesQuery(userId);
-
-        var result = await _mediator.Send(query);
-        return Ok(result);
-    }
-
-    [HttpPut("preferences")]
-    [ProducesResponseType(typeof(UserPreferencesDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateUserPreferences([FromBody] UserPreferencesDto preferencesDto)
-    {
-        var userId = _currentUserService.UserId;
-        preferencesDto.UserId = userId;
-
-        var command = new UpdateUserPreferencesCommand(preferencesDto);
-        var result = await _mediator.Send(command);
-        return Ok(result);
-    }
 
     [HttpGet("addresses")]
     [ProducesResponseType(typeof(IEnumerable<AddressDto>), StatusCodes.Status200OK)]
@@ -127,5 +103,34 @@ public class AccountController(IMediator _mediator, ICurrentUserService _current
             message = "Account status retrieved successfully",
             status
         });
+    }
+
+
+    [HttpGet("likes")]
+    public async Task<IActionResult> GetAll([FromQuery] Guid? userId, [FromQuery] Guid? serviceId)
+    {
+        var result = await _mediator.Send(new GetAllUserServiceLikesQuery { UserId = userId, ServiceId = serviceId });
+        return Ok(result);
+    }
+
+    [HttpGet("likes/{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _mediator.Send(new GetUserServiceLikeByIdQuery(id));
+        return result != null ? Ok(result) : NotFound();
+    }
+
+    [HttpPost("likes")]
+    public async Task<IActionResult> Create([FromBody] CreateUserServiceLikeCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
+
+    [HttpDelete("likes/{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _mediator.Send(new DeleteUserServiceLikeCommand(id));
+        return NoContent();
     }
 }

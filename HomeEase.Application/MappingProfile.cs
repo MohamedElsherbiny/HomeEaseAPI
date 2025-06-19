@@ -50,8 +50,7 @@ namespace HomeEase.Application.Mappings
 
 
             CreateMap<User, UserDto>();
-            CreateMap<UserPreferences, UserPreferencesDto>();
-            CreateMap<UserPreferencesDto, UserPreferences>();
+            CreateMap<UserServiceLike, UserServiceLikeDto>();
 
             CreateMap<User, UserDto>()
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));

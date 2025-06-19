@@ -17,11 +17,12 @@ namespace HomeEase.Application.Interfaces
         DbSet<WorkingHours> WorkingHours { get; set; }
         DbSet<Address> Addresses { get; set; }
         DbSet<ProviderSchedule> ProviderSchedules { get; set; }
-        DbSet<UserPreferences> UserPreferences { get; set; }
         DbSet<PaymentInfo> PaymentInfos { get; set; }
         DbSet<AvailabilitySlots> AvailabilitySlots { get; set; }
         DbSet<BasePlatformService> BasePlatformService { get; set; }
-         DbSet<ProviderImage> ProviderImages { get; set; }
+        DbSet<ProviderImage> ProviderImages { get; set; }
+        DbSet<UserServiceLike> UserServiceLikes { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     }
