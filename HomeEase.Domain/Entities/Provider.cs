@@ -7,9 +7,9 @@ public class Provider
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public string BusinessName { get; set; }
-    public string BusinessNameAr { get; set; }
+    public string? BusinessNameAr { get; set; }
     public string Description { get; set; }
-    public string DescriptionAr { get; set; }
+    public string? DescriptionAr { get; set; }
     public int ReviewCount { get; set; }
     public decimal Rating { get; set; }
     public ProviderStatus Status { get; set; }

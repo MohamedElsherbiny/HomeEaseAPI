@@ -62,6 +62,9 @@ namespace HomeEase.Application.Mappings
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"));
             CreateMap<CreateReviewDto, Review>();
             CreateMap<UpdateReviewDto, Review>();
+
+
+            CreateMap<ProviderImage, ProviderImageDto>();
         }
     }
 
