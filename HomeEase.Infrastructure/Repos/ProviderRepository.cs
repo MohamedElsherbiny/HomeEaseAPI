@@ -121,6 +121,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.User)
             .Include(p => p.Services)
             .Where(p => p.User.Role == UserRole.Provider)
+            .Where(p => p.Services.Any())
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
