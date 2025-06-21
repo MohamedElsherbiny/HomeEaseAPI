@@ -19,7 +19,7 @@ namespace HomeEase.Application.Commands.PlatformService
 }
 
 
-// Command Handler
+
 public class ActivatePlatformServiceHandler : IRequestHandler<ActivatePlatformServiceCommand, BasePlatformServiceDto>
 {
     private readonly IAppDbContext _context;
