@@ -24,7 +24,8 @@ namespace HomeEase.Domain.Repositories
               string? city,
               bool? isHomeServiceAvailable,
               bool? isCenterServiceAvailable,
-              decimal? minAverageServiceRating
+              decimal? minAverageServiceRating,
+              List<Guid>? basePlatformServiceIds
   );
 
         Task<List<Provider>> SearchProvidersAsync(

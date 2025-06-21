@@ -24,6 +24,7 @@ namespace HomeEase.Application.Queries.ProviderQueries
         public bool? IsHomeServiceAvailable { get; set; }
         public bool? IsCenterServiceAvailable { get; set; }
         public decimal? MinAverageServiceRating { get; set; }
+        public List<Guid>? BasePlatformServiceIds { get; set; }
     }
 
 }
@@ -53,7 +54,8 @@ public class GetAllProvidersQueryHandler : IRequestHandler<GetAllProvidersQuery,
             request.City,
             request.IsHomeServiceAvailable,
             request.IsCenterServiceAvailable,
-            request.MinAverageServiceRating
+            request.MinAverageServiceRating,
+            request.BasePlatformServiceIds
         );
 
         var mappedProviders = _mapper.Map<List<ProviderDto>>(providers);

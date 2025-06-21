@@ -113,7 +113,8 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
         string? city,
         bool? isHomeServiceAvailable,
         bool? isCenterServiceAvailable,
-        decimal? minAverageServiceRating
+        decimal? minAverageServiceRating,
+        List<Guid>? basePlatformServiceIds
     )
     {
         var query = _dbContext.Providers
@@ -170,7 +171,14 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             query = query.Where(p => p.Services.Any() && p.Services.Average(s => s.Rating) >= minAverageServiceRating.Value);
         }
 
-        // Sorting
+
+        if (basePlatformServiceIds != null && basePlatformServiceIds.Any())
+        {
+            query = query.Where(p => p.Services.Any(s => basePlatformServiceIds.Contains(s.BasePlatformService.Id)));
+        }
+
+
+
         query = sortBy.ToLower() switch
         {
             "createdat" => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
