@@ -21,6 +21,9 @@ namespace HomeEase.Application.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? VerifiedAt { get; set; }
         public decimal? StartingPrice { get; set; }
+        public List<ProviderImageDto> Gallery { get; set; }
+        public ProviderImageDto? Logo { get; set; }
+        public ProviderImageDto? Cover { get; set; }
         public UserDto User { get; set; }
 
         // Navigation properties
@@ -39,6 +42,9 @@ namespace HomeEase.Application.DTOs
         public int ReviewCount { get; set; }
         public AddressDto Address { get; set; }
         public decimal? Distance { get; set; }
+        public List<ProviderImageDto> Gallery { get; set; }
+        public ProviderImageDto? Logo { get; set; }
+        public ProviderImageDto? Cover { get; set; }
     }
 
     public class ProviderScheduleDto

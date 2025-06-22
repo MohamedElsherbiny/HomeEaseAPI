@@ -1,69 +1,59 @@
 ﻿using AutoMapper;
-using Azure.Storage.Blobs;
 using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces;
 using HomeEase.Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeEase.Application.Commands.ProviderImages;
 
 public class CreateProviderImageCommand : IRequest<ProviderImageDto>
 {
     public Guid ProviderId { get; set; }
-    public int SortOrder { get; set; }
-    public IFormFile ImageFile { get; set; } = default!;
+    public ImageType ImageType { get; set; } = ImageType.Gallery;
+    public required string ImageUrl { get; set; }
 }
 
-
-public class CreateProviderImageCommandHandler : IRequestHandler<CreateProviderImageCommand, ProviderImageDto>
+public class CreateProviderImageCommandHandler(IAppDbContext _context, IMapper _mapper) : IRequestHandler<CreateProviderImageCommand, ProviderImageDto>
 {
-    private readonly IAppDbContext _context;
-    private readonly IMapper _mapper;
-    private readonly BlobContainerClient _containerClient;
-
-    public CreateProviderImageCommandHandler(IAppDbContext context, IMapper mapper, IConfiguration config)
-    {
-        _context = context;
-        _mapper = mapper;
-        var blobServiceClient = new BlobServiceClient(config["BlobStorage:ConnectionString"]);
-        _containerClient = blobServiceClient.GetBlobContainerClient("general-files");
-        _containerClient.CreateIfNotExists();
-    }
-
     public async Task<ProviderImageDto> Handle(CreateProviderImageCommand request, CancellationToken cancellationToken)
     {
-        var fileName = SanitizeFileName(request.ImageFile.FileName);
-        var blobPath = $"provider-images/{Guid.NewGuid()}/{fileName}";
-        var blobClient = _containerClient.GetBlobClient(blobPath);
+        // If ImageType is Logo or Cover, ensure only one exists
+        if (request.ImageType is ImageType.Logo or ImageType.Cover)
+        {
+            var existing = await _context.ProviderImages
+                .Where(p => p.ProviderId == request.ProviderId && p.ImageType == request.ImageType)
+                .ToListAsync(cancellationToken);
 
-        await using var stream = request.ImageFile.OpenReadStream();
-        await blobClient.UploadAsync(stream, overwrite: true);
+            if (existing.Any())
+            {
+                _context.ProviderImages.RemoveRange(existing);
+            }
+        }
+
+        int sortOrder = 1;
+        if (request.ImageType == ImageType.Gallery)
+        {
+            var maxSortOrder = await _context.ProviderImages
+                .Where(p => p.ProviderId == request.ProviderId && p.ImageType == ImageType.Gallery)
+                .MaxAsync(p => (int?)p.SortOrder, cancellationToken) ?? 0;
+
+            sortOrder = maxSortOrder + 1;
+        }
 
         var entity = new ProviderImage
         {
             Id = Guid.NewGuid(),
             ProviderId = request.ProviderId,
-            SortOrder = request.SortOrder,
-            ImageUrl = blobClient.Uri.ToString(),
+            SortOrder = sortOrder,
+            ImageUrl = request.ImageUrl,
+            ImageType = request.ImageType,
             CreatedAt = DateTime.UtcNow
         };
 
         _context.ProviderImages.Add(entity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map<ProviderImageDto>(entity);
-    }
-
-    private string SanitizeFileName(string fileName)
-    {
-        var extension = Path.GetExtension(fileName)?.ToLower() ?? "";
-        var baseName = Path.GetFileNameWithoutExtension(fileName);
-        baseName = Regex.Replace(baseName, @"[^a-zA-Z0-9_\-]", "");
-        if (string.IsNullOrWhiteSpace(baseName)) baseName = "file";
-        return $"{baseName}_{Guid.NewGuid()}{extension}";
     }
 }

@@ -14,6 +14,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
     {
         return await _dbContext.Providers
             .Include(p => p.Address)
+            .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -78,6 +79,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.Schedule)
                 .ThenInclude(s => s.AvailableSlots)
             .Include(p => p.Services)
+            .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -85,6 +87,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
     public async Task<Provider> GetByUserIdAsync(Guid userId)
     {
         return await _dbContext.Providers
+            .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.UserId == userId);
     }
 
@@ -99,6 +102,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.Schedule)
                 .ThenInclude(s => s.AvailableSlots)
             .Include(p => p.Services)
+            .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.UserId == userId);
     }
 
@@ -121,6 +125,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.Address)
             .Include(p => p.User)
             .Include(p => p.Services)
+            .Include(p => p.Images)
             .Where(p => p.User.Role == UserRole.Provider)
             .Where(p => p.Services.Any())
             .AsQueryable();
@@ -217,6 +222,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
         IQueryable<Provider> query = _dbContext.Providers
             .Include(p => p.Address)
             .Include(p => p.Services)
+            .Include(p => p.Images)
             .Where(p => p.Status != ProviderStatus.Suspended);
 
         // Filter by service types

@@ -18,12 +18,32 @@ namespace HomeEase.Application.Mappings
                 .ForMember(dest => dest.StartingPrice, opt =>
                     opt.MapFrom(src => src.Services != null && src.Services.Any()
                         ? src.Services.Min(s => s.Price)
-                        : (decimal?)null));
+                        : (decimal?)null))
+                  .ForMember(dest => dest.Gallery, opt =>
+                  opt.MapFrom(src => src.Images
+                  .Where(img => img.ImageType == ImageType.Gallery)
+                  .OrderBy(img => img.SortOrder))) // Optional: order gallery images
+                .ForMember(dest => dest.Logo, opt =>
+                    opt.MapFrom(src => src.Images
+                        .FirstOrDefault(img => img.ImageType == ImageType.Logo)))
+                .ForMember(dest => dest.Cover, opt =>
+                    opt.MapFrom(src => src.Images
+                        .FirstOrDefault(img => img.ImageType == ImageType.Cover)));
 
 
             CreateMap<Provider, ProviderSearchResultDto>()
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.Distance, opt => opt.Ignore());
+                .ForMember(dest => dest.Distance, opt => opt.Ignore())
+                .ForMember(dest => dest.Gallery, opt =>
+                  opt.MapFrom(src => src.Images
+                  .Where(img => img.ImageType == ImageType.Gallery)
+                  .OrderBy(img => img.SortOrder))) // Optional: order gallery images
+                .ForMember(dest => dest.Logo, opt =>
+                    opt.MapFrom(src => src.Images
+                        .FirstOrDefault(img => img.ImageType == ImageType.Logo)))
+                .ForMember(dest => dest.Cover, opt =>
+                    opt.MapFrom(src => src.Images
+                        .FirstOrDefault(img => img.ImageType == ImageType.Cover)));
 
             // Address mapping
             CreateMap<Address, AddressDto>();

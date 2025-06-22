@@ -43,9 +43,17 @@ public class ProviderImage
     public Guid Id { get; set; }
     public Guid ProviderId { get; set; }
     public string ImageUrl { get; set; }
+    public ImageType ImageType { get; set; }
     public int SortOrder { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
     public virtual Provider Provider { get; set; }
+}
+
+public enum ImageType
+{
+    Gallery,
+    Logo,
+    Cover
 }
