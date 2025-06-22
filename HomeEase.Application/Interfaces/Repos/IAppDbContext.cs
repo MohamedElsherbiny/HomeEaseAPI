@@ -9,7 +9,6 @@ namespace HomeEase.Application.Interfaces
         DbSet<Provider> Providers { get; set; }
         DbSet<Service> Services { get; set; }
         DbSet<Location> Locations { get; set; }
-        DbSet<Schedule> Schedules { get; set; }
         DbSet<Booking> Bookings { get; set; }
         DbSet<Review> Reviews { get; set; }
         DbSet<SpecialDate> SpecialDates { get; set; }

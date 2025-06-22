@@ -141,13 +141,16 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
 
         if (minPrice.HasValue)
         {
-            query = query.Where(p => p.Services.Any(s => s.Price >= minPrice.Value));
+            query = query.Where(p =>
+                p.Services.All(s => s.Price >= minPrice.Value));
         }
 
         if (maxPrice.HasValue)
         {
-            query = query.Where(p => p.Services.Any(s => s.Price <= maxPrice.Value));
+            query = query.Where(p =>
+                p.Services.All(s => s.Price <= maxPrice.Value));
         }
+
 
         if (!string.IsNullOrWhiteSpace(city))
         {

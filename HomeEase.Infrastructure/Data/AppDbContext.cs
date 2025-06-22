@@ -12,7 +12,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<Provider> Providers { get; set; }
     public DbSet<Service> Services { get; set; }
     public DbSet<Location> Locations { get; set; }
-    public DbSet<Schedule> Schedules { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<SpecialDate> SpecialDates { get; set; }
