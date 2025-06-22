@@ -13,6 +13,7 @@ namespace HomeEase.Application.DTOs
         public Guid ProviderId { get; set; }
         public Guid BasePlatformServiceId { get; set; }
         public string Name { get; set; }
+        public string ImageUrl { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
         public int DurationMinutes { get; set; }
