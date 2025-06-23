@@ -18,6 +18,7 @@ namespace HomeEase.Infrastructure.Services
         public async Task<Service> GetByIdAsync(Guid id)
         {
             return await _dbContext.Services
+                .Include(x => x.BasePlatformService)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
@@ -25,6 +26,7 @@ namespace HomeEase.Infrastructure.Services
         {
             return await _dbContext.Services
                 .Where(s => s.ProviderId == providerId)
+                .Include(x => x.BasePlatformService)
                 .ToListAsync();
         }
 
