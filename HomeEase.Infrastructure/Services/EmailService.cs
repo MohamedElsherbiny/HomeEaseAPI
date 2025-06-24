@@ -1,45 +1,50 @@
-﻿using System.Net;
-using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
+﻿using Azure;
 using HomeEase.Application.Interfaces.Services;
-using HomeEase.Infrastructure.Data;
+using Microsoft.Extensions.Configuration;
+using Azure.Communication.Email;
 
 namespace HomeEase.Infrastructure.Services
 {
-    public class EmailService(AppDbContext _context, IConfiguration _configuration) : IEmailService
+    public class EmailService(IConfiguration configuration) : IEmailService
     {
+        private readonly EmailClient _emailClient = new(configuration["EmailService:ConnectionString"]);
+        private readonly string _senderAddress = configuration["EmailService:SenderAddress"]!;
+
+        public Task SendEmailAsync(EmailMassage email)
+        {
+            var emailMessage = new EmailMessage(
+                _senderAddress,
+                content: new EmailContent(email.Subject)
+                {
+                    Html = email.Body
+                },
+                recipients: new EmailRecipients(email.MailTo.Select(x => new EmailAddress(x))));
+
+            _emailClient.Send(WaitUntil.Completed, emailMessage);
+
+            return Task.CompletedTask;
+        }
+
         public async Task SendPasswordResetEmailAsync(string email, string token)
         {
-            try
+            var emailMessage = new EmailMassage
             {
-                // Create a mail message
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(_configuration["EmailSettings:Sender"], _configuration["EmailSettings:SenderName"]),
-                    Subject = "Password Reset Request",
-                    Body = $"<p>Please use the following token to reset your password:</p><p><strong>{token}</strong></p>",
-                    IsBodyHtml = true
-                };
-                mailMessage.To.Add(email);
+                MailTo = [email],
+                Title = "Password Reset Request",
+                Subject = "Password Reset Request",
+                Body = $"<p>Please use the following token to reset your password:</p><p><strong>{token}</strong></p>"
+            };
 
-                // Create a SMTP client for SendinBlue
-                var smtpClient = new SmtpClient("smtp-relay.sendinblue.com")
-                {
-                    Port = 587, // Standard SMTP port
-                    EnableSsl = true,
-                    Credentials = new NetworkCredential(
-                        _configuration["EmailSettings:Sender"],
-                        _configuration["EmailSettings:ApiKey"])
-                };
-
-                // Send the email
-                await smtpClient.SendMailAsync(mailMessage);
-            }
-            catch (Exception ex)
-            {
-                // Log and rethrow the exception
-                throw new Exception($"Failed to send email: {ex.Message}", ex);
-            }
+            await SendEmailAsync(emailMessage);
         }
+    }
+
+    public class EmailMassage
+    {
+        public List<string> MailTo { get; set; }
+        public string Subject { get; set; }
+        public string Body { get; set; }
+        public string Title { get; set; }
+        public string SubTitle { get; set; }
     }
 }
