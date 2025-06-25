@@ -27,7 +27,6 @@ public class Provider
     public virtual Address? Address { get; set; }
     public virtual ProviderSchedule? Schedule { get; set; }
     public virtual ICollection<Service> Services { get; set; }
-    public virtual ICollection<Location> Locations { get; set; }
     public virtual ICollection<Booking> Bookings { get; set; }
     public virtual ICollection<string> ServiceTypes { get; set; }
     public virtual ICollection<ProviderImage> Images { get; set; } = new List<ProviderImage>();

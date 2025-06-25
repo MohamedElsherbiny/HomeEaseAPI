@@ -94,7 +94,14 @@ namespace HomeEase.Application.Mappings
             CreateMap<Booking, BookingDto>()
                 .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
                 .ForMember(dest => dest.ProviderBusinessName, opt => opt.MapFrom(src => src.Provider.BusinessName))
-                .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.Name));
+                .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.Name))
+                .ForMember(dest => dest.ServicePrice, opt => opt.MapFrom(src => src.ServicePrice))
+                .ForMember(dest => dest.DurationMinutes, opt => opt.MapFrom(src => src.DurationMinutes))
+                .ForMember(dest => dest.ProviderImageUrl, opt => opt.MapFrom(src => src.Provider.ProfileImageUrl))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.ProviderLocationString, opt => opt.MapFrom(src => $"{src.Provider.Address.Country}، {src.Provider.Address.City}"))
+                .ForMember(dest => dest.SessionLocationType, opt => opt.MapFrom(src => src.IsHomeService ? "بالمنزل" : "بالمركز"))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
             CreateMap<PaymentInfo, PaymentInfoDto>();
             CreateMap<PaymentInfoDto, PaymentInfo>();

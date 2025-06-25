@@ -20,7 +20,7 @@ public class CreateBookingCommandHandler(
     IBookingRepository _bookingRepository,
     IUserRepository _userRepository,
     IProviderRepository _providerRepository,
-    IServiceRepository _serviceRepository,
+    IServiceRepository _serviceRepository, 
     ILogger<CreateBookingCommandHandler> _logger) : IRequestHandler<CreateBookingCommand, Guid>
 {
     public async Task<Guid> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
@@ -48,10 +48,37 @@ public class CreateBookingCommandHandler(
                 throw new BusinessException("Service not found or does not belong to the provider");
             }
 
+            // Validate service availability based on location type
+            if (request.BookingRequest.IsHomeService && !service.IsAvailableAtHome)
+            {
+                throw new BusinessException("This service is not available for home visits");
+            }
+
+            if (!request.BookingRequest.IsHomeService && !service.IsAvailableAtCenter)
+            {
+                throw new BusinessException("This service is not available at the center");
+            }
+
+
+            // Validate customer address for home service
+            if (request.BookingRequest.IsHomeService && string.IsNullOrWhiteSpace(request.BookingRequest.CustomerAddress))
+            {
+                throw new BusinessException("Customer address is required for home service");
+            }
+
+            // Combine date and time for appointment datetime
+            var appointmentDateTime = request.BookingRequest.AppointmentDate.Date + request.BookingRequest.AppointmentTime;
+
+            // Validate appointment is in the future
+            if (appointmentDateTime <= DateTime.Now)
+            {
+                throw new BusinessException("Appointment time must be in the future");
+            }
+
             // Check provider availability
             var isAvailable = await _providerRepository.CheckAvailabilityAsync(
                 request.BookingRequest.ProviderId,
-                request.BookingRequest.AppointmentDateTime,
+                appointmentDateTime,
                 service.DurationMinutes);
 
             if (!isAvailable)
@@ -66,7 +93,12 @@ public class CreateBookingCommandHandler(
                 UserId = request.UserId,
                 ProviderId = request.BookingRequest.ProviderId,
                 ServiceId = request.BookingRequest.ServiceId,
-                AppointmentDateTime = request.BookingRequest.AppointmentDateTime,
+                AddressId = request.BookingRequest.AddressId,
+                CustomerAddress = request.BookingRequest.CustomerAddress,
+                AppointmentDate = request.BookingRequest.AppointmentDate,
+                AppointmentTime = request.BookingRequest.AppointmentTime,
+                AppointmentDateTime = appointmentDateTime, // Combined datetime for compatibility
+                IsHomeService = request.BookingRequest.IsHomeService,
                 Notes = request.BookingRequest.Notes,
                 Status = BookingStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
@@ -74,38 +106,10 @@ public class CreateBookingCommandHandler(
                 ServicePrice = service.Price
             };
 
-            //// Set location if provided
-            //if (request.BookingRequest.Location != null)
-            //{
-            //    booking.Location = new Location
-            //    {
-            //        Address = new Address
-            //        {
-            //            Street = request.BookingRequest.Location.Street,
-            //            City = request.BookingRequest.Location.City,
-            //            State = request.BookingRequest.Location.State,
-            //            ZipCode = request.BookingRequest.Location.ZipCode,
-            //            Country = request.BookingRequest.Location.Country
-            //        }
-            //    };
-            //}
-
-            // Create initial payment record if payment info is provided
-            //if (request.BookingRequest.PaymentInfo != null)
-            //{
-            //    booking.Payment = new PaymentInfo
-            //    {
-            //        Amount = request.BookingRequest.PaymentInfo.Amount,
-            //        Currency = request.BookingRequest.PaymentInfo.Currency,
-            //        PaymentMethod = request.BookingRequest.PaymentInfo.PaymentMethod,
-            //        Status = "Pending"
-            //    };
-            //}
-
             await _bookingRepository.AddAsync(booking);
             await _bookingRepository.SaveChangesAsync();
 
-            _logger.LogInformation($"Booking created successfully. ID: {booking.Id}");
+            _logger.LogInformation($"Booking created successfully. ID: {booking.Id}, Type: {(booking.IsHomeService ? "Home Service" : "Center Visit")}");
             return booking.Id;
         }
         catch (Exception ex)

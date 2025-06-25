@@ -21,7 +21,6 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.User)
             .Include(b => b.Provider)
             .Include(b => b.Service)
-            .Include(b => b.Location)
             .Include(b => b.Payment)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
@@ -31,7 +30,6 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
         var query = _context.Bookings
             .Include(b => b.Provider)
             .Include(b => b.Service)
-            .Include(b => b.Location)
             .Include(b => b.Payment)
             .Where(b => b.UserId == userId);
 
@@ -65,7 +63,6 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
         var query = _context.Bookings
             .Include(b => b.User)
             .Include(b => b.Service)
-            .Include(b => b.Location)
             .Include(b => b.Payment)
             .Where(b => b.ProviderId == providerId);
 

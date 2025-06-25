@@ -8,7 +8,7 @@ public class Booking
     public Guid UserId { get; set; }
     public Guid ProviderId { get; set; }
     public Guid ServiceId { get; set; }
-    public Guid? LocationId { get; set; }
+    public Guid? AddressId { get; set; }
     public string? CustomerAddress { get; set; }
     public DateTime AppointmentDate { get; set; }
     public TimeSpan AppointmentTime { get; set; }
@@ -27,7 +27,7 @@ public class Booking
     public virtual User User { get; set; }
     public virtual Provider Provider { get; set; }
     public virtual Service Service { get; set; }
-    public virtual Location Location { get; set; }
+    public virtual Address Address { get; set; }
     public virtual Review Review { get; set; }
     public PaymentInfo Payment { get; set; }
 }

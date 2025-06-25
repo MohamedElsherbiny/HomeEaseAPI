@@ -68,15 +68,15 @@ public class UpdateBookingCommandHandler(
             }
 
             // Update location if provided
-            if (request.UpdateRequest.Location != null)
+            if (request.UpdateRequest.Address != null)
             {
-                booking.Location.Address = new Address
+                booking.Address = new Address
                 {
-                    Street = request.UpdateRequest.Location.Street,
-                    City = request.UpdateRequest.Location.City,
-                    State = request.UpdateRequest.Location.State,
-                    ZipCode = request.UpdateRequest.Location.ZipCode,
-                    Country = request.UpdateRequest.Location.Country
+                    Street = request.UpdateRequest.Address.Street,
+                    City = request.UpdateRequest.Address.City,
+                    State = request.UpdateRequest.Address.State,
+                    ZipCode = request.UpdateRequest.Address.ZipCode,
+                    Country = request.UpdateRequest.Address.Country
                 };
             }
 

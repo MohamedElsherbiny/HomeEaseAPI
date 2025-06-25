@@ -44,11 +44,6 @@ namespace HomeEase.Infrastructure.Data.Configurations
                 .HasForeignKey(s => s.ProviderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasMany(p => p.Locations)
-                .WithOne(l => l.Provider)
-                .HasForeignKey(l => l.ProviderId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             entity.HasMany(p => p.Bookings)
                 .WithOne(b => b.Provider)
                 .HasForeignKey(b => b.ProviderId)

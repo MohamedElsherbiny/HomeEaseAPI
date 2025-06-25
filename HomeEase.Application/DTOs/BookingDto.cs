@@ -6,27 +6,41 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HomeEase.Application.DTOs
 {
-    public class BookingDto
+public class BookingDto
+{
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public string UserFullName { get; set; }
+    public Guid ProviderId { get; set; }
+    public string ProviderBusinessName { get; set; }
+    public string ProviderImageUrl { get; set; }
+    public string ProviderLocationString { get; set; }
+    public Guid ServiceId { get; set; }
+    public string ServiceName { get; set; }
+    public decimal ServicePrice { get; set; }
+    public int DurationMinutes { get; set; }
+    public DateTime AppointmentDateTime { get; set; }
+    public string FormattedAppointmentDateTime => AppointmentDateTime.ToString("dd MMMM yyyy - hh:mm tt", new System.Globalization.CultureInfo("ar-SA"));
+    public string Status { get; set; }
+    public string TranslatedStatus => Status switch
     {
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-        public string UserFullName { get; set; }
-        public Guid ProviderId { get; set; }
-        public string ProviderBusinessName { get; set; }
-        public Guid ServiceId { get; set; }
-        public string ServiceName { get; set; }
-        public decimal ServicePrice { get; set; }
-        public int DurationMinutes { get; set; }
-        public DateTime AppointmentDateTime { get; set; }
-        public string Status { get; set; }
-        public string Notes { get; set; }
-        public AddressDto Location { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? ConfirmedAt { get; set; }
-        public DateTime? CancelledAt { get; set; }
-        public string CancellationReason { get; set; }
-        public PaymentInfoDto Payment { get; set; }
-    }
+        "Pending" => "قيد الانتظار",
+        "Confirmed" => "تم القبول",
+        "Completed" => "مكتملة",
+        "Cancelled" => "ملغاة",
+        "Rejected" => "مرفوضة",
+        _ => "غير معروف"
+    };
+    public string SessionLocationType { get; set; }
+    public string Notes { get; set; }
+    public AddressDto Address { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? ConfirmedAt { get; set; }
+    public DateTime? CancelledAt { get; set; }
+    public string CancellationReason { get; set; }
+    public PaymentInfoDto Payment { get; set; }
+
+}
 
     public class CreateBookingRequestDto
     {
@@ -37,20 +51,24 @@ namespace HomeEase.Application.DTOs
         public Guid ServiceId { get; set; }
 
         [Required]
-        public DateTime AppointmentDateTime { get; set; }
+        public DateTime AppointmentDate { get; set; }
+
+        [Required]
+        public TimeSpan AppointmentTime { get; set; }
 
         public string Notes { get; set; }
 
-        //public AddressDto Location { get; set; }
+        public bool IsHomeService { get; set; }
+        public Guid? AddressId { get; set; } // For center bookings
+        public string CustomerAddress { get; set; } // For home service bookings
 
-        //public PaymentInfoDto PaymentInfo { get; set; }
     }
 
     public class UpdateBookingRequestDto
     {
         public DateTime? AppointmentDateTime { get; set; }
         public string Notes { get; set; }
-        public AddressDto Location { get; set; }
+        public AddressDto Address { get; set; }
     }
 
     public class BookingConfirmationDto

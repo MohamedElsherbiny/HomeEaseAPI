@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using HomeEase.Domain.Entities;
+using System.Reflection.Emit;
 
 namespace HomeEase.Infrastructure.Data.Configurations
 {
@@ -37,15 +38,17 @@ namespace HomeEase.Infrastructure.Data.Configurations
                 .HasForeignKey(b => b.ServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(b => b.Location)
-                .WithMany()
-                .HasForeignKey(b => b.LocationId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.HasOne(b => b.Review)
                 .WithOne(r => r.Booking)
                 .HasForeignKey<Review>(r => r.BookingId);
+
+
+            builder.HasOne(b => b.Address)
+                   .WithMany()
+                   .HasForeignKey(b => b.AddressId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+
         }
     }
 }
