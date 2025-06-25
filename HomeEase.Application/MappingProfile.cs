@@ -50,7 +50,9 @@ namespace HomeEase.Application.Mappings
             CreateMap<AddressDto, Address>();
 
             // Service mapping
-            CreateMap<Service, ServiceDto>();
+            CreateMap<Service, ServiceDto>()
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.BasePlatformService.ImageUrl));
+
             CreateMap<CreateServiceDto, Service>();
             CreateMap<UpdateServiceDto, Service>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
