@@ -6,24 +6,6 @@ using System.Threading.Tasks;
 
 namespace HomeEase.Application.DTOs
 {
-    //public class CreatePlatformServiceDto
-    //{
-    //    public string Name { get; set; }
-    //    public string? NameAr { get; set; }
-    //    public string Description { get; set; }
-    //    public string? DescriptionAr { get; set; }
-    //    public string ImageUrl { get; set; }
-    //}
-
-    //public class UpdatePlatformServiceDto
-    //{
-    //    public string Name { get; set; }
-    //    public string? NameAr { get; set; }
-    //    public string Description { get; set; }
-    //    public string? DescriptionAr { get; set; }
-    //    public string ImageUrl { get; set; }
-    //}
-
     public class BasePlatformServiceDto
     {
         public Guid Id { get; set; }

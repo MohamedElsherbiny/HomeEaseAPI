@@ -187,6 +187,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
         query = sortBy.ToLower() switch
         {
             "createdat" => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+            "updatedat" => sortDescending ? query.OrderByDescending(p => p.UpdatedAt) : query.OrderBy(p => p.UpdatedAt),
             "rating" => sortDescending ? query.OrderByDescending(p => p.Services.Any() ? p.Services.Average(s => s.Rating) : 0) : query.OrderBy(p => p.Services.Any() ? p.Services.Average(s => s.Rating) : 0),
             _ => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt)
         };
