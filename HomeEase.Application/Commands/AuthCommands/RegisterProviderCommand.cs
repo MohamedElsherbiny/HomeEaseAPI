@@ -15,12 +15,15 @@ namespace HomeEase.Application.Commands.AuthCommands
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
+        public DateTime DateOfBirth { get; set; } 
         public string BusinessName { get; set; }
+        public string BusinessNameAr { get; set; } 
         public string Description { get; set; }
+        public string DescriptionAr { get; set; } 
+        public int ExperienceYears { get; set; } 
+        public string SpokenLanguage { get; set; } 
         public string ProfileImageUrl { get; set; }
-        public string[] ServiceTypes { get; set; }
         public string BusinessAddress { get; set; }
-
 
         public RegisterProviderCommand(RegisterProviderDto dto)
         {
@@ -30,12 +33,17 @@ namespace HomeEase.Application.Commands.AuthCommands
             LastName = dto.LastName;
             PhoneNumber = dto.PhoneNumber;
             BusinessName = dto.BusinessName;
-            BusinessAddress = dto.BusinessAddress;
+            BusinessNameAr = dto.BusinessNameAr;
             Description = dto.Description;
+            DescriptionAr = dto.DescriptionAr;
+            ExperienceYears = dto.ExperienceYears;
+            SpokenLanguage = dto.SpokenLanguage;
             ProfileImageUrl = dto.ProfileImageUrl;
-            ServiceTypes = dto.ServiceTypes;
+            BusinessAddress = dto.BusinessAddress;
+            DateOfBirth = dto.DateOfBirth;
         }
     }
+
 }
 
 
@@ -71,7 +79,8 @@ public class RegisterProviderCommandHandler : IRequestHandler<RegisterProviderCo
             RefreshToken = "",
             ProfileImageUrl = "",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            DateOfBirth = request.DateOfBirth
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -81,8 +90,18 @@ public class RegisterProviderCommandHandler : IRequestHandler<RegisterProviderCo
         //await _userManager.AddToRoleAsync(user, "Provider");
 
         // Create provider profile
-        await _providerService.CreateProviderProfile(user.Id, request.BusinessName, request.BusinessAddress, request.Email, request.Description, request.ProfileImageUrl, request.ServiceTypes);
-
+        await _providerService.CreateProviderProfile(
+            user.Id,
+            request.BusinessName,
+            request.BusinessAddress,
+            request.Email,
+            request.Description,
+            request.ProfileImageUrl,
+            request.BusinessNameAr,
+            request.DescriptionAr,
+            request.ExperienceYears,
+            request.SpokenLanguage
+        );
         var userDto = new UserDto
         {
             Id = user.Id,

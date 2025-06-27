@@ -22,6 +22,8 @@ public class Provider
     public Guid? AddressId { get; set; }
     public string Email { get; set; }
     public string BusinessAddress { get; set; }
+    public int ExperienceYears { get; set; }         
+    public string SpokenLanguage { get; set; }
 
     public virtual User User { get; set; }
     public virtual Address? Address { get; set; }

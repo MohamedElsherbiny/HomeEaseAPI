@@ -15,6 +15,7 @@ public class User : IdentityUser<Guid>
     public string ProfileImageUrl { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? DeactivatedAt { get; set; }
+    public DateTime DateOfBirth { get; set; }
 
     public virtual ICollection<Booking> Bookings { get; set; }
     public virtual ICollection<Review> Reviews { get; set; }
