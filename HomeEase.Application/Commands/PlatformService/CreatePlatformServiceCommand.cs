@@ -8,6 +8,8 @@ namespace HomeEase.Application.Commands.PlatformService
     {
         public string Name { get; set; }
         public string NameAr { get; set; }
+        public string Description { get; set; }
+        public string? DescriptionAr { get; set; }
         public string ImageUrl { get; set; }
     }
 
@@ -25,6 +27,8 @@ namespace HomeEase.Application.Commands.PlatformService
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
+                Description = request.Description,
+                DescriptionAr = request.DescriptionAr,
                 NameAr = request.NameAr,
                 ImageUrl = request.ImageUrl
             };

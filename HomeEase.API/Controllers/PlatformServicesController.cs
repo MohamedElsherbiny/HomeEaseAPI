@@ -40,7 +40,7 @@ public class PlatformServicesController(IMediator _mediator, IWebHostEnvironment
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, UpdatePlatformServiceDto dto)
+    public async Task<IActionResult> Update(Guid id, BasePlatformServiceDto dto)
     {
         var success = await _mediator.Send(new UpdatePlatformServiceCommand
         {

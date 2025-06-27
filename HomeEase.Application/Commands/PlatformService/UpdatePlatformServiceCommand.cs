@@ -12,6 +12,9 @@ namespace HomeEase.Application.Commands.PlatformService
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string? NameAr { get; set; }
+        public string Description { get; set; }
+        public string? DescriptionAr { get; set; }
         public string ImageUrl { get; set; }
     }
 
@@ -30,6 +33,9 @@ namespace HomeEase.Application.Commands.PlatformService
             if (service == null) return false;
 
             service.Name = request.Name;
+            service.NameAr = request.NameAr;
+            service.Description = request.Description;
+            service.DescriptionAr = request.DescriptionAr;
             service.ImageUrl = request.ImageUrl;
             await _context.SaveChangesAsync(cancellationToken);
 
