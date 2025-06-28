@@ -96,8 +96,16 @@ public class AuthController(IMediator _mediator) : ControllerBase
         var result = await _mediator.Send(command);
 
         return result
-            ? Ok("OTP verified successfully")
-            : BadRequest("Invalid or expired OTP code");
+            ? Ok(new
+            {
+                IsValid = true,
+                Message = "OTP code is valid",
+            })
+            : BadRequest(new
+            {
+                IsValid = false,
+                Message = "Invalid or expired OTP code",
+            });
     }
 
     //[HttpPost("refresh-token")]
