@@ -6,62 +6,47 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 
-namespace HomeEase.Application.Commands.AuthCommands
+namespace HomeEase.Application.Commands.AuthCommands;
+
+public class RegisterProviderCommand : IRequest<RegisterProviderResponseDto>
 {
-    public class RegisterProviderCommand : IRequest<UserDto>
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string PhoneNumber { get; set; }
+    public DateTime DateOfBirth { get; set; }
+    public string BusinessName { get; set; }
+    public string BusinessNameAr { get; set; }
+    public string Description { get; set; }
+    public string DescriptionAr { get; set; }
+    public int ExperienceYears { get; set; }
+    public string SpokenLanguage { get; set; }
+    public string ProfileImageUrl { get; set; }
+    public string BusinessAddress { get; set; }
+
+    public RegisterProviderCommand(RegisterProviderDto dto)
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PhoneNumber { get; set; }
-        public DateTime DateOfBirth { get; set; } 
-        public string BusinessName { get; set; }
-        public string BusinessNameAr { get; set; } 
-        public string Description { get; set; }
-        public string DescriptionAr { get; set; } 
-        public int ExperienceYears { get; set; } 
-        public string SpokenLanguage { get; set; } 
-        public string ProfileImageUrl { get; set; }
-        public string BusinessAddress { get; set; }
-
-        public RegisterProviderCommand(RegisterProviderDto dto)
-        {
-            Email = dto.Email;
-            Password = dto.Password;
-            FirstName = dto.FirstName;
-            LastName = dto.LastName;
-            PhoneNumber = dto.PhoneNumber;
-            BusinessName = dto.BusinessName;
-            BusinessNameAr = dto.BusinessNameAr;
-            Description = dto.Description;
-            DescriptionAr = dto.DescriptionAr;
-            ExperienceYears = dto.ExperienceYears;
-            SpokenLanguage = dto.SpokenLanguage;
-            ProfileImageUrl = dto.ProfileImageUrl;
-            BusinessAddress = dto.BusinessAddress;
-            DateOfBirth = dto.DateOfBirth;
-        }
+        Email = dto.Email;
+        Password = dto.Password;
+        FirstName = dto.FirstName;
+        LastName = dto.LastName;
+        PhoneNumber = dto.PhoneNumber;
+        BusinessName = dto.BusinessName;
+        BusinessNameAr = dto.BusinessNameAr;
+        Description = dto.Description;
+        DescriptionAr = dto.DescriptionAr;
+        ExperienceYears = dto.ExperienceYears;
+        SpokenLanguage = dto.SpokenLanguage;
+        ProfileImageUrl = dto.ProfileImageUrl;
+        BusinessAddress = dto.BusinessAddress;
+        DateOfBirth = dto.DateOfBirth;
     }
-
 }
 
-
-// Command Handler
-public class RegisterProviderCommandHandler : IRequestHandler<RegisterProviderCommand, UserDto>
+public class RegisterProviderCommandHandler(UserManager<User> _userManager, IUserRepository _userService, IJwtService _jwtService, IProviderService _providerService) : IRequestHandler<RegisterProviderCommand, RegisterProviderResponseDto>
 {
-    private readonly UserManager<User> _userManager;
-    private readonly IUserRepository _userService;
-    private readonly IProviderService _providerService;
-
-    public RegisterProviderCommandHandler(UserManager<User> userManager, IUserRepository userService, IProviderService providerService)
-    {
-        _userManager = userManager;
-        _userService = userService;
-        _providerService = providerService;
-    }
-
-    public async Task<UserDto> Handle(RegisterProviderCommand request, CancellationToken cancellationToken)
+    public async Task<RegisterProviderResponseDto> Handle(RegisterProviderCommand request, CancellationToken cancellationToken)
     {
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
@@ -102,20 +87,35 @@ public class RegisterProviderCommandHandler : IRequestHandler<RegisterProviderCo
             request.ExperienceYears,
             request.SpokenLanguage
         );
-        var userDto = new UserDto
+        //var userDto = new UserDto
+        //{
+        //    Id = user.Id,
+        //    Email = user.Email,
+        //    FirstName = user.FirstName,
+        //    LastName = user.LastName,
+        //    PhoneNumber = user.PhoneNumber,
+        //    Role = user.Role.ToString(),
+        //    ProfileImageUrl = "",
+        //    IsActive = user.IsActive,
+        //    CreatedAt = DateTime.UtcNow,
+        //    UpdatedAt = DateTime.UtcNow
+        //};
+
+        var roles = new List<string> { user.Role.ToString() };
+        var (Token, Expiration) = _jwtService.GenerateToken(user, roles);
+        var refreshToken = _jwtService.GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        await _userManager.UpdateAsync(user);
+
+        var response = new RegisterProviderResponseDto
         {
-            Id = user.Id,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PhoneNumber = user.PhoneNumber,
-            Role = user.Role.ToString(),
-            ProfileImageUrl = "",
-            IsActive = user.IsActive,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            Token = Token,
+            RefreshToken = refreshToken,
+            Expiration = Expiration
         };
 
-        return userDto;
+        return response;
     }
 }

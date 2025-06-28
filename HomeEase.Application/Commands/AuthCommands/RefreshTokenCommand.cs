@@ -71,8 +71,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, L
         {
             Token = newToken.Token,
             RefreshToken = newRefreshToken,
-            Expiration = newToken.Expiration,
-            User = userDto
+            Expiration = newToken.Expiration
         };
     }
 }

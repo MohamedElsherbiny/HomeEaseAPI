@@ -58,32 +58,31 @@ namespace HomeEase.Application.Commands.AuthCommands
 
             var roles = new List<string> { user.Role.ToString() };
 
-            var token = _jwtService.GenerateToken(user, roles);
+            var (Token, Expiration) = _jwtService.GenerateToken(user, roles);
             var refreshToken = _jwtService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _userManager.UpdateAsync(user);
 
-            var userDto = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                Role = user.Role.ToString(),
-                ProfileImageUrl = user.ProfileImageUrl,
-                CreatedAt = user.CreatedAt,
-                LastLoginAt = user.UpdatedAt
-            };
+            //var userDto = new UserDto
+            //{
+            //    Id = user.Id,
+            //    Email = user.Email,
+            //    FirstName = user.FirstName,
+            //    LastName = user.LastName,
+            //    PhoneNumber = user.PhoneNumber,
+            //    Role = user.Role.ToString(),
+            //    ProfileImageUrl = user.ProfileImageUrl,
+            //    CreatedAt = user.CreatedAt,
+            //    LastLoginAt = user.UpdatedAt
+            //};
 
             return new LoginResponseDto
             {
-                Token = token.Token,
+                Token = Token,
                 RefreshToken = refreshToken,
-                Expiration = token.Expiration,
-                User = userDto
+                Expiration = Expiration
             };
         }
     }
