@@ -1,45 +1,33 @@
-﻿using HomeEase.Application.Commands.AuthCommands;
-using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 
-namespace HomeEase.Application.Commands.AuthCommands
-{
-    public class ResetPasswordCommand : IRequest<bool>
-    {
-        public string Token { get; set; }
-        public string Email { get; set; }
-        public string NewPassword { get; set; }
+namespace HomeEase.Application.Commands.AuthCommands;
 
-        public ResetPasswordCommand(PasswordResetDto dto)
-        {
-            Token = dto.Token;
-            Email = dto.Email;
-            NewPassword = dto.NewPassword;
-        }
-    }
+public class ResetPasswordCommand(PasswordResetDto dto) : IRequest<bool>
+{
+    public string OtpCode { get; set; } = dto.OtpCode;
+    public string Email { get; set; } = dto.Email;
+    public string NewPassword { get; set; } = dto.NewPassword;
 }
 
-
-// Command Handler
-public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, bool>
+public class ResetPasswordCommandHandler(UserManager<User> _userManager) : IRequestHandler<ResetPasswordCommand, bool>
 {
-    private readonly UserManager<User> _userManager;
-
-    public ResetPasswordCommandHandler(UserManager<User> userManager)
-    {
-        _userManager = userManager;
-    }
-
     public async Task<bool> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
+        {
             throw new ApplicationException("User not found.");
+        }
 
-        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        var isValid = await _userManager.VerifyUserTokenAsync(user, "OtpProvider", "ResetPassword", request.OtpCode);
+        if (!isValid)
+            throw new ApplicationException("Invalid or expired code");
+
+        var result = await _userManager.ResetPasswordAsync(user, await _userManager.GeneratePasswordResetTokenAsync(user), request.NewPassword);
         if (!result.Succeeded)
             throw new ApplicationException($"Password reset failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 

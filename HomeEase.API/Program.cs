@@ -1,4 +1,4 @@
-using Azure.Monitor.OpenTelemetry.Exporter;
+﻿using Azure.Monitor.OpenTelemetry.Exporter;
 using Azure.Storage.Blobs;
 using DinkToPdf;
 using DinkToPdf.Contracts;
@@ -123,17 +123,22 @@ builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 
 builder.Services.AddIdentityCore<User>(options =>
 {
-    // Password options here if needed
+    // 🔐 Simplify password requirements
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 4;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequiredUniqueChars = 0;
+
+    // 🆔 Token provider for OTP
+    options.Tokens.ProviderMap["OtpProvider"] = new TokenProviderDescriptor(typeof(EmailOtpTokenProvider<User>));
 })
 .AddRoles<IdentityRole<Guid>>()
 .AddEntityFrameworkStores<AppDbContext>()
 .AddSignInManager()
 .AddDefaultTokenProviders();
-
-builder.Services.AddIdentity<User, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
+builder.Services.AddTransient<EmailOtpTokenProvider<User>>();
 
 
 builder.Services.AddHttpContextAccessor();
@@ -243,3 +248,12 @@ using (var scope = app.Services.CreateScope())
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();
+
+public class EmailOtpTokenProvider<TUser> : TotpSecurityStampBasedTokenProvider<TUser> where TUser : class
+{
+    public override Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<TUser> manager, TUser user)
+    {
+        // Always allow for password reset OTP
+        return Task.FromResult(true);
+    }
+}

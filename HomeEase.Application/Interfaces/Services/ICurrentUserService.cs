@@ -10,5 +10,6 @@ namespace HomeEase.Application.Interfaces.Services
     {
         Guid UserId { get; }
         string UserRole { get; }
+        string Language { get; }
     }
 }

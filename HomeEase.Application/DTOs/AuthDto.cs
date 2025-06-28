@@ -75,7 +75,7 @@ namespace HomeEase.Application.DTOs
     public class PasswordResetDto
     {
         [Required]
-        public string Token { get; set; }
+        public string OtpCode { get; set; }
 
         [Required]
         [EmailAddress]

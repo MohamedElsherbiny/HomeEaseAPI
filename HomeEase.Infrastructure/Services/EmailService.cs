@@ -25,14 +25,39 @@ namespace HomeEase.Infrastructure.Services
             return Task.CompletedTask;
         }
 
-        public async Task SendPasswordResetEmailAsync(string email, string token)
+        public async Task SendPasswordResetEmailAsync(string email, string otpCode, string lang = "ar")
         {
+            string subject;
+            string title;
+            string body;
+
+            if (lang == "en")
+            {
+                subject = "Your Password Reset Code";
+                title = "Password Reset Code";
+                body = $"""
+                <p>Your password reset code is:</p>
+                <h2>{otpCode}</h2>
+                <p>This code will expire in 10 minutes.</p>
+                """;
+            }
+            else // default to Arabic
+            {
+                subject = "رمز إعادة تعيين كلمة المرور";
+                title = "رمز إعادة تعيين كلمة المرور";
+                body = $"""
+                <p>رمز إعادة تعيين كلمة المرور الخاص بك هو:</p>
+                <h2>{otpCode}</h2>
+                <p>سينتهي صلاحية هذا الرمز خلال 10 دقائق.</p>
+                """;
+            }
+
             var emailMessage = new EmailMassage
             {
                 MailTo = [email],
-                Title = "Password Reset Request",
-                Subject = "Password Reset Request",
-                Body = $"<p>Please use the following token to reset your password:</p><p><strong>{token}</strong></p>"
+                Title = title,
+                Subject = subject,
+                Body = body
             };
 
             await SendEmailAsync(emailMessage);

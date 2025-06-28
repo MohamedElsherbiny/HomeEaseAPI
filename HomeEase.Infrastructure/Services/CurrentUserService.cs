@@ -22,4 +22,25 @@ public class CurrentUserService(IHttpContextAccessor _httpContextAccessor) : ICu
             return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
         }
     }
+
+    public string Language
+    {
+        get
+        {
+            var acceptLanguage = _httpContextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString();
+
+            if (!string.IsNullOrWhiteSpace(acceptLanguage))
+            {
+                // Extract primary language from header like "en-US,en;q=0.9"
+                var primary = acceptLanguage.Split(',').FirstOrDefault()?.Trim().ToLower();
+                if (primary?.StartsWith("en") == true)
+                    return "en";
+                if (primary?.StartsWith("ar") == true)
+                    return "ar";
+            }
+
+            // Default to "ar" if not found or invalid
+            return "ar";
+        }
+    }
 }
