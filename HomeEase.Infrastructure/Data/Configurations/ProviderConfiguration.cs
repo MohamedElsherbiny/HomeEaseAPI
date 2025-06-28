@@ -22,11 +22,6 @@ namespace HomeEase.Infrastructure.Data.Configurations
             entity.Property(e => e.Status).IsRequired();
             entity.Property(e => e.Rating).HasPrecision(3, 2);
 
-            // Conversion for ServiceTypes
-            entity.Property(e => e.ServiceTypes).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList());
-
             // Relationships
             entity.HasOne(p => p.User)
                 .WithMany()

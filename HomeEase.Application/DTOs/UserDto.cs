@@ -35,7 +35,6 @@ namespace HomeEase.Application.DTOs
         public bool EmailNotifications { get; set; }
         public bool SmsNotifications { get; set; }
         public string PreferredCurrency { get; set; }
-        public string[] FavoriteServiceTypes { get; set; }
     }
 
     public class ChangePasswordDto

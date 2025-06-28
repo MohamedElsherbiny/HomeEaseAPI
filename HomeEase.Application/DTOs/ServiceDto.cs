@@ -13,7 +13,6 @@ namespace HomeEase.Application.DTOs
         public decimal Price { get; set; }
         public decimal HomePrice { get; set; }
         public int DurationMinutes { get; set; }
-        public string ServiceType { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
@@ -35,8 +34,6 @@ namespace HomeEase.Application.DTOs
 
         public int DurationMinutes { get; set; }
 
-        //[Required]
-        //public string ServiceType { get; set; }
     }
 
     public class UpdateServiceDto
@@ -47,6 +44,5 @@ namespace HomeEase.Application.DTOs
         public decimal? Price { get; set; }
         public decimal? HomePrice { get; set; }
         public int? DurationMinutes { get; set; }
-        public string ServiceType { get; set; }
     }
 }

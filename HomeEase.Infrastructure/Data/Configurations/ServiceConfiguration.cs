@@ -14,7 +14,6 @@ namespace HomeEase.Infrastructure.Data.Configurations
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Price).HasPrecision(10, 2);
             entity.Property(e => e.HomePrice).HasPrecision(10, 2);
-            entity.Property(e => e.ServiceType).IsRequired().HasMaxLength(50);
 
             entity.HasOne(s => s.Provider)
                   .WithMany(p => p.Services)

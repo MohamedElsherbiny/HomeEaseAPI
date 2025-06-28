@@ -44,7 +44,6 @@ public class UpdateProviderCommandHandler : IRequestHandler<UpdateProviderComman
         provider.BusinessName = request.ProviderDto.BusinessName ?? provider.BusinessName;
         provider.Description = request.ProviderDto.Description ?? provider.Description;
         provider.ProfileImageUrl = request.ProviderDto.ProfileImageUrl ?? provider.ProfileImageUrl;
-        provider.ServiceTypes = request.ProviderDto.ServiceTypes?.ToList() ?? provider.ServiceTypes;
 
         if (request.ProviderDto.Address != null)
         {

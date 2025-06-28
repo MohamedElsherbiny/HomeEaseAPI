@@ -15,7 +15,6 @@ namespace HomeEase.Application.DTOs
         public string BusinessName { get; set; }
         public string Description { get; set; }
         public string ProfileImageUrl { get; set; }
-        public string[] ServiceTypes { get; set; }
         public AddressDto Address { get; set; }
         public decimal Rating { get; set; }
         public int ReviewCount { get; set; }
@@ -40,7 +39,6 @@ namespace HomeEase.Application.DTOs
         public Guid Id { get; set; }
         public string BusinessName { get; set; }
         public string ProfileImageUrl { get; set; }
-        public string[] ServiceTypes { get; set; }
         public decimal Rating { get; set; }
         public int ReviewCount { get; set; }
         public AddressDto Address { get; set; }
@@ -86,7 +84,6 @@ namespace HomeEase.Application.DTOs
         public string BusinessName { get; set; }
         public string Description { get; set; }
         public string ProfileImageUrl { get; set; }
-        public string[] ServiceTypes { get; set; }
         public AddressDto Address { get; set; }
     }
 }

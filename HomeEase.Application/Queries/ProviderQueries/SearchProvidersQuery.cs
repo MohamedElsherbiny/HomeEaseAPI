@@ -16,7 +16,6 @@ namespace HomeEase.Application.Queries.ProviderQueries
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public double? MaxDistance { get; set; }
-        public string[] ServiceTypes { get; set; }
         public decimal? MinRating { get; set; }
         public string City { get; set; }
         public string State { get; set; }
@@ -43,7 +42,6 @@ public class SearchProvidersQueryHandler : IRequestHandler<SearchProvidersQuery,
             request.Latitude,
             request.Longitude,
             request.MaxDistance,
-            request.ServiceTypes,
             request.MinRating,
             request.City,
             request.State,

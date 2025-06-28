@@ -210,7 +210,6 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
         double? latitude,
         double? longitude,
         double? maxDistance,
-        string[] serviceTypes,
         decimal? minRating,
         string city,
         string state,
@@ -224,11 +223,6 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.Services).ThenInclude(s => s.BasePlatformService)
             .Where(p => p.Status != ProviderStatus.Suspended);
 
-        // Filter by service types
-        if (serviceTypes != null && serviceTypes.Length > 0)
-        {
-            query = query.Where(p => p.ServiceTypes.Any(st => serviceTypes.Contains(st)));
-        }
 
         // Filter by minimum rating
         if (minRating.HasValue)

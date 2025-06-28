@@ -32,7 +32,6 @@ namespace HomeEase.Domain.Repositories
                 double? latitude,
                 double? longitude,
                 double? maxDistance,
-                string[] serviceTypes,
                 decimal? minRating,
                 string city,
                 string state,

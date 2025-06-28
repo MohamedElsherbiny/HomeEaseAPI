@@ -10,7 +10,6 @@ public class Service
     public string? NameAr { get; set; }
     public string Description { get; set; }
     public string? DescriptionAr { get; set; }
-    public ServiceType ServiceType { get; set; }
     public int DurationMinutes { get; set; }
     public decimal Price { get; set; }
     public decimal HomePrice { get; set; }
