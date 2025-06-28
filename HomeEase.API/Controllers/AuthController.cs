@@ -88,6 +88,26 @@ public class AuthController(IMediator _mediator) : ControllerBase
         }
     }
 
+    [HttpPost("verify-otp")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpCommand command)
+    {
+        var result = await _mediator.Send(command);
+
+        return result
+            ? Ok(new
+            {
+                IsValid = true,
+                Message = "OTP code is valid",
+            })
+            : BadRequest(new
+            {
+                IsValid = false,
+                Message = "Invalid or expired OTP code",
+            });
+    }
+
     //[HttpPost("refresh-token")]
     //[ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
