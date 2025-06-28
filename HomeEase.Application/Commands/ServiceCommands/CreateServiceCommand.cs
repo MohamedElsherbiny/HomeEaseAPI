@@ -56,6 +56,7 @@ namespace HomeEase.Application.Commands.ServiceCommands
                 Description = request.ServiceDto.Description,
                 DescriptionAr = request.ServiceDto.DescriptionAr,
                 Price = request.ServiceDto.Price,
+                HomePrice = request.ServiceDto.HomePrice,
                 DurationMinutes = request.ServiceDto.DurationMinutes,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow

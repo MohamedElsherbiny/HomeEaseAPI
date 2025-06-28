@@ -22,6 +22,7 @@ public class Booking
     public DateTime AppointmentDateTime { get; set; }
     public int DurationMinutes { get; set; }
     public decimal ServicePrice { get; set; }
+    public decimal ServiceHomePrice { get; set; }
 
     // Navigation properties
     public virtual User User { get; set; }

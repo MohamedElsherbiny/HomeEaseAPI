@@ -13,6 +13,7 @@ public class Service
     public ServiceType ServiceType { get; set; }
     public int DurationMinutes { get; set; }
     public decimal Price { get; set; }
+    public decimal HomePrice { get; set; }
     public decimal Rating { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; }

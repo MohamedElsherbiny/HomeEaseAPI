@@ -103,7 +103,8 @@ public class CreateBookingCommandHandler(
                 Status = BookingStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 DurationMinutes = service.DurationMinutes,
-                ServicePrice = service.Price
+                ServicePrice = service.Price,
+                ServiceHomePrice = service.HomePrice
             };
 
             await _bookingRepository.AddAsync(booking);

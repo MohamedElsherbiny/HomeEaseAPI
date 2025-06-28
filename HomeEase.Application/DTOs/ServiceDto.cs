@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HomeEase.Application.DTOs
 {
@@ -16,11 +11,14 @@ namespace HomeEase.Application.DTOs
         public string ImageUrl { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public decimal HomePrice { get; set; }
         public int DurationMinutes { get; set; }
         public string ServiceType { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public bool IsAvailableAtCenter => Price != 0;
+        public bool IsAvailableAtHome => HomePrice != 0;
     }
 
     public class CreateServiceDto
@@ -32,13 +30,9 @@ namespace HomeEase.Application.DTOs
         public string NameAr { get; set; }
         public string Description { get; set; }
         public string DescriptionAr { get; set; }
-
-        [Required]
-        [Range(0.01, 10000)]
         public decimal Price { get; set; }
+        public decimal HomePrice { get; set; }
 
-        [Required]
-        [Range(15, 300)]
         public int DurationMinutes { get; set; }
 
         //[Required]
@@ -51,6 +45,7 @@ namespace HomeEase.Application.DTOs
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal? Price { get; set; }
+        public decimal? HomePrice { get; set; }
         public int? DurationMinutes { get; set; }
         public string ServiceType { get; set; }
     }

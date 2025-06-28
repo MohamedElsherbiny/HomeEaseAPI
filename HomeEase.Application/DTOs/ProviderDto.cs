@@ -23,6 +23,7 @@ namespace HomeEase.Application.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? VerifiedAt { get; set; }
         public decimal? StartingPrice { get; set; }
+        public decimal? StartingHomePrice { get; set; }
         public List<ProviderImageDto> Gallery { get; set; }
         public ProviderImageDto? Logo { get; set; }
         public ProviderImageDto? Cover { get; set; }

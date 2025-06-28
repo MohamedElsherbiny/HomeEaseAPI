@@ -21,6 +21,10 @@ namespace HomeEase.Application.Mappings
                     opt.MapFrom(src => src.Services != null && src.Services.Any()
                         ? src.Services.Min(s => s.Price)
                         : (decimal?)null))
+                .ForMember(dest => dest.StartingHomePrice, opt =>
+                    opt.MapFrom(src => src.Services != null && src.Services.Any()
+                        ? src.Services.Min(s => s.HomePrice)
+                        : (decimal?)null))
                   .ForMember(dest => dest.Gallery, opt =>
                   opt.MapFrom(src => src.Images
                   .Where(img => img.ImageType == ImageType.Gallery)

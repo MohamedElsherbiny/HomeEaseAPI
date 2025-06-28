@@ -88,20 +88,20 @@ public class AuthController(IMediator _mediator) : ControllerBase
         }
     }
 
-    [HttpPost("refresh-token")]
-    [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
-    {
-        try
-        {
-            var command = new RefreshTokenCommand(refreshTokenDto);
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
-        catch (SecurityTokenException)
-        {
-            return Unauthorized(new { message = "Invalid token" });
-        }
-    }
+    //[HttpPost("refresh-token")]
+    //[ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    //public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
+    //{
+    //    try
+    //    {
+    //        var command = new RefreshTokenCommand(refreshTokenDto);
+    //        var result = await _mediator.Send(command);
+    //        return Ok(result);
+    //    }
+    //    catch (SecurityTokenException)
+    //    {
+    //        return Unauthorized(new { message = "Invalid token" });
+    //    }
+    //}
 }

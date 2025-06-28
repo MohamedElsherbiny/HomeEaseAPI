@@ -59,6 +59,9 @@ public class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceCommand,
         if (request.ServiceDto.Price.HasValue)
             service.Price = request.ServiceDto.Price.Value;
 
+        if (request.ServiceDto.HomePrice.HasValue)
+            service.Price = request.ServiceDto.HomePrice.Value;
+
         if (request.ServiceDto.DurationMinutes.HasValue)
             service.DurationMinutes = request.ServiceDto.DurationMinutes.Value;
 
