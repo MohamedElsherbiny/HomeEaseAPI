@@ -16,6 +16,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.Address)
             .Include(p => p.Images)
             .Include(p => p.Services).ThenInclude(s => s.BasePlatformService)
+            .Include(x => x.Schedule)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
