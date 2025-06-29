@@ -25,6 +25,7 @@ public class RegisterProviderCommand : IRequest<RegisterProviderResponseDto>
     public string BusinessAddress { get; set; }
     public string LogoUrl { get; set; }
     public string CoverUrl { get; set; }
+    public string Street { get; set; }
     public List<string> Images { get; set; } = new();
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
@@ -69,6 +70,7 @@ public class RegisterProviderCommandHandler(UserManager<User> _userManager, IJwt
             request.DescriptionAr,
             request.ExperienceYears,
             request.SpokenLanguage,
+            request.Street,
             request.LogoUrl,
             request.CoverUrl,
             request.Images,

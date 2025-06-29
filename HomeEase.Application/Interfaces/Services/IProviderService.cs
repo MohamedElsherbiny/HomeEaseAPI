@@ -12,6 +12,7 @@ namespace HomeEase.Application.Interfaces.Services
         Task CreateProviderProfile(User user, string businessName, string businessAddress, string email,
             string description, string profileImageUrl, string businessNameAr, string descriptionAr,
             int experienceYears, string spokenLanguage,
+            string street,
             string logoUrl,
             string coverUrl,
             List<string> images,
