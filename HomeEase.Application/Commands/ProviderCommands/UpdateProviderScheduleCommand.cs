@@ -44,9 +44,9 @@ public class UpdateProviderScheduleCommandHandler : IRequestHandler<UpdateProvid
         }
 
         // Clear old data to avoid EF tracking conflicts
-        provider.Schedule.RegularHours?.Clear();
-        provider.Schedule.SpecialDates?.Clear();
-        provider.Schedule.AvailableSlots?.Clear();
+        //provider.Schedule.RegularHours?.Clear();
+        //provider.Schedule.SpecialDates?.Clear();
+        //provider.Schedule.AvailableSlots?.Clear();
 
         // Regular Hours
         if (request.ScheduleDto.RegularHours != null && request.ScheduleDto.RegularHours.Any())
