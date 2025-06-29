@@ -1,0 +1,2 @@
+dotnet ef migrations add RemoveIsAvailbeAtHomeFromProvider --project HomeEase.Infrastructure --startup-project HomeEase.API
+dotnet ef database update --project HomeEase.Infrastructure --startup-project HomeEase.API

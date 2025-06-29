@@ -165,12 +165,12 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
 
         if (isHomeServiceAvailable.HasValue)
         {
-            query = query.Where(p => p.Services.Any(s => s.IsAvailableAtHome == isHomeServiceAvailable.Value));
+            query = query.Where(p => p.Services.Any(s => s.HomePrice > 0));
         }
 
         if (isCenterServiceAvailable.HasValue)
         {
-            query = query.Where(p => p.Services.Any(s => s.IsAvailableAtCenter == isCenterServiceAvailable.Value));
+            query = query.Where(p => p.Services.Any(s => s.Price > 0));
         }
       
         if (minAverageServiceRating.HasValue)

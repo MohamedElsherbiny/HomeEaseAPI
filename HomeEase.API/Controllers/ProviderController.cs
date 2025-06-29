@@ -123,7 +123,8 @@ public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHo
     }
 
     [HttpPut("schedule/{id}")]
-    [Authorize(Policy = "ProviderOnly")]
+    //[Authorize(Policy = "ProviderOnly")]
+    [AllowAnonymous]
     public async Task<IActionResult> UpdateProviderSchedule(Guid id, ProviderScheduleDto scheduleDto)
     {
         var command = new UpdateProviderScheduleCommand { ProviderId = id, ScheduleDto = scheduleDto };

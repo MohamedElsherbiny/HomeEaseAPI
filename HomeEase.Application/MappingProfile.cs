@@ -14,8 +14,6 @@ namespace HomeEase.Application.Mappings
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Schedule, opt => opt.MapFrom(src => src.Schedule))
                 .ForMember(dest => dest.Services, opt => opt.MapFrom(src => src.Services))
-                .ForMember(dest => dest.IsAvailableAtCenter, opt => opt.MapFrom(src => src.Services.Any(s => s.IsAvailableAtCenter)))
-                .ForMember(dest => dest.IsAvailableAtHome, opt => opt.MapFrom(src => src.Services.Any(s => s.IsAvailableAtHome)))
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
                 .ForMember(dest => dest.StartingPrice, opt =>
                     opt.MapFrom(src => src.Services != null && src.Services.Any()

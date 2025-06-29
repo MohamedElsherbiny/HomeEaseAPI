@@ -43,10 +43,17 @@ public class UpdateProviderScheduleCommandHandler : IRequestHandler<UpdateProvid
             provider.Schedule = new ProviderSchedule();
         }
 
+        // Clear old data to avoid EF tracking conflicts
+        provider.Schedule.RegularHours?.Clear();
+        provider.Schedule.SpecialDates?.Clear();
+        provider.Schedule.AvailableSlots?.Clear();
+
+        // Regular Hours
         if (request.ScheduleDto.RegularHours != null && request.ScheduleDto.RegularHours.Any())
         {
             provider.Schedule.RegularHours = request.ScheduleDto.RegularHours.Select(wh => new WorkingHours
             {
+                Id = wh.Id ?? Guid.NewGuid(),
                 DayOfWeek = (DayOfWeek)wh.DayOfWeek,
                 StartTime = wh.StartTime,
                 EndTime = wh.EndTime,
@@ -54,10 +61,12 @@ public class UpdateProviderScheduleCommandHandler : IRequestHandler<UpdateProvid
             }).ToList();
         }
 
+        // Special Dates
         if (request.ScheduleDto.SpecialDates != null && request.ScheduleDto.SpecialDates.Any())
         {
             provider.Schedule.SpecialDates = request.ScheduleDto.SpecialDates.Select(sd => new SpecialDate
             {
+                Id = sd.Id ?? Guid.NewGuid(),
                 Date = sd.Date,
                 StartTime = sd.StartTime,
                 EndTime = sd.EndTime,
@@ -66,10 +75,12 @@ public class UpdateProviderScheduleCommandHandler : IRequestHandler<UpdateProvid
             }).ToList();
         }
 
+        // Available Slots
         if (request.ScheduleDto.AvailableSlots != null && request.ScheduleDto.AvailableSlots.Any())
         {
             provider.Schedule.AvailableSlots = request.ScheduleDto.AvailableSlots.Select(ts => new TimeSlot
             {
+                Id = ts.Id ?? Guid.NewGuid(),
                 StartTime = ts.StartTime,
                 EndTime = ts.EndTime,
                 IsAvailable = ts.IsAvailable
