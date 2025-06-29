@@ -1,5 +1,4 @@
-﻿using HomeEase.Application.Commands.AuthCommands;
-using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using MediatR;
@@ -24,27 +23,14 @@ public class RegisterProviderCommand : IRequest<RegisterProviderResponseDto>
     public string SpokenLanguage { get; set; }
     public string ProfileImageUrl { get; set; }
     public string BusinessAddress { get; set; }
-
-    public RegisterProviderCommand(RegisterProviderDto dto)
-    {
-        Email = dto.Email;
-        Password = dto.Password;
-        FirstName = dto.FirstName;
-        LastName = dto.LastName;
-        PhoneNumber = dto.PhoneNumber;
-        BusinessName = dto.BusinessName;
-        BusinessNameAr = dto.BusinessNameAr;
-        Description = dto.Description;
-        DescriptionAr = dto.DescriptionAr;
-        ExperienceYears = dto.ExperienceYears;
-        SpokenLanguage = dto.SpokenLanguage;
-        ProfileImageUrl = dto.ProfileImageUrl;
-        BusinessAddress = dto.BusinessAddress;
-        DateOfBirth = dto.DateOfBirth;
-    }
+    public string LogoUrl { get; set; }
+    public string CoverUrl { get; set; }
+    public List<string> Images { get; set; } = new();
+    public decimal? Latitude { get; set; }
+    public decimal? Longitude { get; set; }
 }
 
-public class RegisterProviderCommandHandler(UserManager<User> _userManager, IUserRepository _userService, IJwtService _jwtService, IProviderService _providerService) : IRequestHandler<RegisterProviderCommand, RegisterProviderResponseDto>
+public class RegisterProviderCommandHandler(UserManager<User> _userManager, IJwtService _jwtService, IProviderService _providerService) : IRequestHandler<RegisterProviderCommand, RegisterProviderResponseDto>
 {
     public async Task<RegisterProviderResponseDto> Handle(RegisterProviderCommand request, CancellationToken cancellationToken)
     {
@@ -72,11 +58,8 @@ public class RegisterProviderCommandHandler(UserManager<User> _userManager, IUse
         if (!result.Succeeded)
             throw new ApplicationException($"Provider registration failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        //await _userManager.AddToRoleAsync(user, "Provider");
-
-        // Create provider profile
         await _providerService.CreateProviderProfile(
-            user.Id,
+            user,
             request.BusinessName,
             request.BusinessAddress,
             request.Email,
@@ -85,21 +68,13 @@ public class RegisterProviderCommandHandler(UserManager<User> _userManager, IUse
             request.BusinessNameAr,
             request.DescriptionAr,
             request.ExperienceYears,
-            request.SpokenLanguage
+            request.SpokenLanguage,
+            request.LogoUrl,
+            request.CoverUrl,
+            request.Images,
+            request.Latitude,
+            request.Longitude
         );
-        //var userDto = new UserDto
-        //{
-        //    Id = user.Id,
-        //    Email = user.Email,
-        //    FirstName = user.FirstName,
-        //    LastName = user.LastName,
-        //    PhoneNumber = user.PhoneNumber,
-        //    Role = user.Role.ToString(),
-        //    ProfileImageUrl = "",
-        //    IsActive = user.IsActive,
-        //    CreatedAt = DateTime.UtcNow,
-        //    UpdatedAt = DateTime.UtcNow
-        //};
 
         var roles = new List<string> { user.Role.ToString() };
         var (Token, Expiration) = _jwtService.GenerateToken(user, roles);

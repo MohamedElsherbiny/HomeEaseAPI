@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HomeEase.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,13 @@ namespace HomeEase.Application.Interfaces.Services
 {
     public interface IProviderService
     {
-        Task CreateProviderProfile(Guid userId, string businessName, string businessAddress, string email,
+        Task CreateProviderProfile(User user, string businessName, string businessAddress, string email,
             string description, string profileImageUrl, string businessNameAr, string descriptionAr,
-            int experienceYears, string spokenLanguage);
+            int experienceYears, string spokenLanguage,
+            string logoUrl,
+            string coverUrl,
+            List<string> images,
+            decimal? lat,
+            decimal? lng);
     }
 }
