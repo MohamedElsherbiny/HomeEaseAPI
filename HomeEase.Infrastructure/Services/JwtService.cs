@@ -26,7 +26,7 @@ public class JwtService(AppDbContext _context, IConfiguration _configuration) : 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var expiration = DateTime.UtcNow.AddHours(2);
+        var expiration = DateTime.UtcNow.AddYears(1);
 
         var token = new JwtSecurityToken(
             _configuration["Jwt:Issuer"],
