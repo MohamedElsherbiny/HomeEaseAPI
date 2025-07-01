@@ -48,11 +48,10 @@ public class AuthController(IMediator _mediator) : ControllerBase
     [HttpPost("register-provider")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> RegisterProvider([FromBody] RegisterProviderDto registerDto)
+    public async Task<IActionResult> RegisterProvider([FromBody] RegisterProviderCommand command)
     {
         try
         {
-            var command = new RegisterProviderCommand(registerDto);
             var result = await _mediator.Send(command);
             return Created(string.Empty, result);
         }

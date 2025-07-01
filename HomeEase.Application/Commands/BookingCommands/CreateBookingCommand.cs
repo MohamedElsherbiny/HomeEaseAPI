@@ -48,18 +48,6 @@ public class CreateBookingCommandHandler(
                 throw new BusinessException("Service not found or does not belong to the provider");
             }
 
-            // Validate service availability based on location type
-            if (request.BookingRequest.IsHomeService && !service.IsAvailableAtHome)
-            {
-                throw new BusinessException("This service is not available for home visits");
-            }
-
-            if (!request.BookingRequest.IsHomeService && !service.IsAvailableAtCenter)
-            {
-                throw new BusinessException("This service is not available at the center");
-            }
-
-
             // Validate customer address for home service
             if (request.BookingRequest.IsHomeService && string.IsNullOrWhiteSpace(request.BookingRequest.CustomerAddress))
             {

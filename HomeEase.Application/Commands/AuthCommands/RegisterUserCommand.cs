@@ -4,44 +4,33 @@ using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using System.Data;
 
 
 
-namespace HomeEase.Application.Commands.AuthCommands
+namespace HomeEase.Application.Commands.AuthCommands;
+
+public class RegisterUserCommand : IRequest<RegisterResponseDto>
 {
-    public class RegisterUserCommand : IRequest<UserDto>
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PhoneNumber { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string PhoneNumber { get; set; }
 
-        public RegisterUserCommand(RegisterUserDto dto)
-        {
-            Email = dto.Email;
-            Password = dto.Password;
-            FirstName = dto.FirstName;
-            LastName = dto.LastName;
-            PhoneNumber = dto.PhoneNumber;
-        }
+    public RegisterUserCommand(RegisterUserDto dto)
+    {
+        Email = dto.Email;
+        Password = dto.Password;
+        FirstName = dto.FirstName;
+        LastName = dto.LastName;
+        PhoneNumber = dto.PhoneNumber;
     }
 }
 
-
-// Command Handler
-public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, UserDto>
+public class RegisterUserCommandHandler(UserManager<User> _userManager, IUserRepository _userService, IJwtService _jwtService) : IRequestHandler<RegisterUserCommand, RegisterResponseDto>
 {
-    private readonly UserManager<User> _userManager; // Corrected type
-    private readonly IUserRepository _userService;
-
-    public RegisterUserCommandHandler(UserManager<User> userManager, IUserRepository userService) // Corrected type
-    {
-        _userManager = userManager;
-        _userService = userService;
-    }
-
-    public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<RegisterResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
@@ -66,18 +55,33 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
         if (!result.Succeeded)
             throw new ApplicationException($"User registration failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        var userDto = new UserDto
+        //var userDto = new UserDto
+        //{
+        //    Id = user.Id,
+        //    Email = user.Email,
+        //    FirstName = user.FirstName,
+        //    LastName = user.LastName,
+        //    PhoneNumber = user.PhoneNumber,
+        //    Role = user.Role.ToString(),
+        //    ProfileImageUrl = user.ProfileImageUrl,
+        //    IsActive = user.IsActive
+        //};
+
+        var roles = new List<string> { user.Role.ToString() };
+        var (Token, Expiration) = _jwtService.GenerateToken(user, roles);
+        var refreshToken = _jwtService.GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        await _userManager.UpdateAsync(user);
+
+        var response = new RegisterResponseDto
         {
-            Id = user.Id,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PhoneNumber = user.PhoneNumber,
-            Role = user.Role.ToString(),
-            ProfileImageUrl = user.ProfileImageUrl,
-            IsActive = user.IsActive
+            Token = Token,
+            RefreshToken = refreshToken,
+            Expiration = Expiration
         };
 
-        return userDto;
+        return response;
     }
 }

@@ -16,6 +16,9 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .Include(p => p.Address)
             .Include(p => p.Images)
             .Include(p => p.Services).ThenInclude(s => s.BasePlatformService)
+            .Include(x => x.Schedule).ThenInclude(s => s.RegularHours)
+            .Include(x => x.Schedule).ThenInclude(s => s.SpecialDates)
+            .Include(x => x.Schedule).ThenInclude(s => s.AvailableSlots)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -165,12 +168,12 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
 
         if (isHomeServiceAvailable.HasValue)
         {
-            query = query.Where(p => p.Services.Any(s => s.IsAvailableAtHome == isHomeServiceAvailable.Value));
+            query = query.Where(p => p.Services.Any(s => s.HomePrice > 0));
         }
 
         if (isCenterServiceAvailable.HasValue)
         {
-            query = query.Where(p => p.Services.Any(s => s.IsAvailableAtCenter == isCenterServiceAvailable.Value));
+            query = query.Where(p => p.Services.Any(s => s.Price > 0));
         }
       
         if (minAverageServiceRating.HasValue)

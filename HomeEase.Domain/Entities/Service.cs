@@ -20,6 +20,4 @@ public class Service
     public Guid BasePlatformServiceId { get; set; }
     public virtual Provider Provider { get; set; }
     public virtual BasePlatformService BasePlatformService { get; set; }
-    public bool IsAvailableAtCenter { get; set; }
-    public bool IsAvailableAtHome { get; set; }
 }
