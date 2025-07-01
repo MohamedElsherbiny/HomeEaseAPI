@@ -82,15 +82,15 @@ public class CreateBookingCommandHandler(
                 ProviderId = request.BookingRequest.ProviderId,
                 ServiceId = request.BookingRequest.ServiceId,
                 AddressId = request.BookingRequest.AddressId,
-                CustomerAddress = request.BookingRequest.CustomerAddress,
+                CustomerAddress = request.BookingRequest.CustomerAddress ?? "",
                 AppointmentDate = request.BookingRequest.AppointmentDate,
                 AppointmentTime = request.BookingRequest.AppointmentTime,
                 AppointmentDateTime = appointmentDateTime, // Combined datetime for compatibility
                 IsHomeService = request.BookingRequest.IsHomeService,
-                Notes = request.BookingRequest.Notes,
+                Notes = request.BookingRequest.Notes ?? "",
                 Status = BookingStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
-                DurationMinutes = service.DurationMinutes,
+                DurationMinutes = request.BookingRequest.DurationMinutes,
                 ServicePrice = service.Price,
                 ServiceHomePrice = service.HomePrice
             };

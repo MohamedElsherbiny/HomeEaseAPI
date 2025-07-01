@@ -56,11 +56,12 @@ public class BookingDto
         [Required]
         public TimeSpan AppointmentTime { get; set; }
 
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
+        public int DurationMinutes { get; set; }
         public bool IsHomeService { get; set; }
         public Guid? AddressId { get; set; } // For center bookings
-        public string CustomerAddress { get; set; } // For home service bookings
+        public string? CustomerAddress { get; set; } // For home service bookings
 
     }
 
