@@ -7,7 +7,7 @@ namespace HomeEase.API.Controllers;
 
 [ApiController]
 [Route("api/files")]
-[Authorize]
+[AllowAnonymous]
 public class FileController : ControllerBase
 {
     private readonly string _connectionString;
