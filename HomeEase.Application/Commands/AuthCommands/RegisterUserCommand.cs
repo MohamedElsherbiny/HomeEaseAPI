@@ -55,17 +55,6 @@ public class RegisterUserCommandHandler(UserManager<User> _userManager, IUserRep
         if (!result.Succeeded)
             throw new ApplicationException($"User registration failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        //var userDto = new UserDto
-        //{
-        //    Id = user.Id,
-        //    Email = user.Email,
-        //    FirstName = user.FirstName,
-        //    LastName = user.LastName,
-        //    PhoneNumber = user.PhoneNumber,
-        //    Role = user.Role.ToString(),
-        //    ProfileImageUrl = user.ProfileImageUrl,
-        //    IsActive = user.IsActive
-        //};
 
         var roles = new List<string> { user.Role.ToString() };
         var (Token, Expiration) = _jwtService.GenerateToken(user, roles);
