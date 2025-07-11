@@ -9,10 +9,10 @@ namespace HomeEase.Application.Commands.UserCommends;
 public class UpdateUserCommand(Guid userId, UpdateUserDto dto) : IRequest<UserDto>
 {
     public Guid UserId { get; set; } = userId;
-    public string FirstName { get; set; } = dto.FirstName;
-    public string LastName { get; set; } = dto.LastName;
-    public string PhoneNumber { get; set; } = dto.PhoneNumber;
-    public string ProfileImageUrl { get; set; } = dto.ProfileImageUrl;
+    public string? FirstName { get; set; } = dto.FirstName;
+    public string? LastName { get; set; } = dto.LastName;
+    public string? PhoneNumber { get; set; } = dto.PhoneNumber;
+    public string? ProfileImageUrl { get; set; } = dto.ProfileImageUrl;
 }
 
 public class UpdateUserCommandHandler(IUserRepository _userRepository, IMapper _mapper, IUnitOfWork _unitOfWork) : IRequestHandler<UpdateUserCommand, UserDto>

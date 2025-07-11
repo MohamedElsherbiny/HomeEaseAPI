@@ -20,6 +20,8 @@ namespace HomeEase.Application.DTOs
         public string RefreshToken { get; set; }
         public DateTime Expiration { get; set; }
         //public UserDto User { get; set; }
+        public bool ProfileCompleted { get; set; }
+        public string Role { get; set; }
     }
 
     public class RegisterResponseDto

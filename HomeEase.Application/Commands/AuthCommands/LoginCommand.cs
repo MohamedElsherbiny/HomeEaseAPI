@@ -39,6 +39,7 @@ namespace HomeEase.Application.Commands.AuthCommands
             }
 
             Provider? provider = null;
+            bool profileCompleted = true;
             if (user.Role == UserRole.Provider)
             {
                  provider = await _providerRepository.GetByUserIdAsync(user.Id);
@@ -51,6 +52,7 @@ namespace HomeEase.Application.Commands.AuthCommands
                 {
                     throw new AuthenticationException("Provider account is deactivated. Please contact support.");
                 }
+                profileCompleted = provider.ProfileCompleted; 
             }
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
@@ -66,24 +68,13 @@ namespace HomeEase.Application.Commands.AuthCommands
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _userManager.UpdateAsync(user);
 
-            //var userDto = new UserDto
-            //{
-            //    Id = user.Id,
-            //    Email = user.Email,
-            //    FirstName = user.FirstName,
-            //    LastName = user.LastName,
-            //    PhoneNumber = user.PhoneNumber,
-            //    Role = user.Role.ToString(),
-            //    ProfileImageUrl = user.ProfileImageUrl,
-            //    CreatedAt = user.CreatedAt,
-            //    LastLoginAt = user.UpdatedAt
-            //};
-
             return new LoginResponseDto
             {
                 Token = Token,
                 RefreshToken = refreshToken,
-                Expiration = Expiration
+                Expiration = Expiration,
+                ProfileCompleted = profileCompleted,
+                Role = user.Role.ToString()
             };
         }
     }
