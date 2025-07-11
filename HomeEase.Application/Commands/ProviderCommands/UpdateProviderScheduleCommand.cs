@@ -40,7 +40,10 @@ public class UpdateProviderScheduleCommandHandler : IRequestHandler<UpdateProvid
 
         if (provider.Schedule == null)
         {
-            provider.Schedule = new ProviderSchedule();
+            provider.Schedule = new ProviderSchedule
+            {
+                Id = Guid.NewGuid(),
+            };
         }
 
         // Clear old data to avoid EF tracking conflicts
