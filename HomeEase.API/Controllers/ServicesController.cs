@@ -43,6 +43,16 @@ public class ProviderServicesController(IMediator _mediator) : ControllerBase
         return CreatedAtAction(nameof(GetServiceById), new { providerId, serviceId }, serviceId);
     }
 
+    [HttpPost("bulk")]
+    [Authorize(Policy = "ProviderOnly")]
+    public async Task<ActionResult<List<Guid>>> CreateServices(Guid providerId, CreateServicesDto servicesDto)
+    {
+        var command = new CreateServicesCommand { ProviderId = providerId, ServicesDto = servicesDto };
+        await _mediator.Send(command);
+
+        return Ok();
+    }
+
     [HttpPut("{serviceId}")]
     [Authorize(Policy = "ProviderOnly")]
     public async Task<IActionResult> UpdateService(Guid providerId, Guid serviceId, UpdateServiceDto serviceDto)

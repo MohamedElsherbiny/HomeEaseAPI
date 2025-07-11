@@ -59,7 +59,7 @@ public class RegisterProviderCommandHandler(UserManager<User> _userManager, IJwt
         if (!result.Succeeded)
             throw new ApplicationException($"Provider registration failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        await _providerService.CreateProviderProfile(
+       var provider = await _providerService.CreateProviderProfile(
             user,
             request.BusinessName,
             request.BusinessAddress,
@@ -79,7 +79,7 @@ public class RegisterProviderCommandHandler(UserManager<User> _userManager, IJwt
         );
 
         var roles = new List<string> { user.Role.ToString() };
-        var (Token, Expiration) = _jwtService.GenerateToken(user, roles);
+        var (Token, Expiration) = _jwtService.GenerateToken(user, roles, provider);
         var refreshToken = _jwtService.GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;

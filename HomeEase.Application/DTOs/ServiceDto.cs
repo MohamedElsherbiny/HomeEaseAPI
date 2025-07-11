@@ -20,29 +20,25 @@ namespace HomeEase.Application.DTOs
         public bool IsAvailableAtHome => HomePrice != 0;
     }
 
+    public class CreateServicesDto 
+    {
+        [Required] 
+        [MinLength(1, ErrorMessage = "At least one service must be provided.")]
+        public List<CreateServiceDto> Services { get; set; } = [];
+    }
+
     public class CreateServiceDto
     {
         public Guid BasePlatformServiceId { get; set; }
-        [Required]
-        public string Name { get; set; }
-
-        public string NameAr { get; set; }
-        public string Description { get; set; }
-        public string DescriptionAr { get; set; }
         public decimal Price { get; set; }
         public decimal HomePrice { get; set; }
-
-        public int DurationMinutes { get; set; }
 
     }
 
     public class UpdateServiceDto
     {
         public Guid BasePlatformServiceId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
         public decimal? Price { get; set; }
         public decimal? HomePrice { get; set; }
-        public int? DurationMinutes { get; set; }
     }
 }

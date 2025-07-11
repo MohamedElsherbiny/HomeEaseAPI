@@ -1,9 +1,7 @@
-﻿using HomeEase.Application.Commands.ServiceCommands;
-using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
-using HomeEase.Domain.Enums;
 using HomeEase.Domain.Repositories;
 using MediatR;
 
@@ -51,13 +49,13 @@ namespace HomeEase.Application.Commands.ServiceCommands
                 Id = Guid.NewGuid(),
                 ProviderId = request.ProviderId,
                 BasePlatformServiceId = request.ServiceDto.BasePlatformServiceId,
-                Name = request.ServiceDto.Name,
-                NameAr = request.ServiceDto.NameAr,
-                Description = request.ServiceDto.Description,
-                DescriptionAr = request.ServiceDto.DescriptionAr,
+                Name = basePlatformService.Name,
+                NameAr = basePlatformService.NameAr,
+                Description = basePlatformService.Description,
+                DescriptionAr = basePlatformService.DescriptionAr,
                 Price = request.ServiceDto.Price,
                 HomePrice = request.ServiceDto.HomePrice,
-                DurationMinutes = request.ServiceDto.DurationMinutes,
+                DurationMinutes = 60,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };

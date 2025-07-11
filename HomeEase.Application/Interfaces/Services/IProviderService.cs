@@ -9,7 +9,7 @@ namespace HomeEase.Application.Interfaces.Services
 {
     public interface IProviderService
     {
-        Task CreateProviderProfile(User user, string businessName, string businessAddress, string email,
+        Task<Provider> CreateProviderProfile(User user, string businessName, string businessAddress, string email,
             string description, string profileImageUrl, string businessNameAr, string descriptionAr,
             int experienceYears, string spokenLanguage,
             string street,

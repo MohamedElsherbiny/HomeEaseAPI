@@ -7,7 +7,7 @@ namespace HomeEase.Infrastructure.Services;
 
 public class ProviderService(AppDbContext _context) : IProviderService
 {
-    public async Task CreateProviderProfile(
+    public async Task<Provider> CreateProviderProfile(
         User user,
         string businessName,
         string businessAddress,
@@ -103,6 +103,8 @@ public class ProviderService(AppDbContext _context) : IProviderService
 
         _context.Providers.Add(provider);
         await _context.SaveChangesAsync();
+
+        return provider;
     }
 }
 

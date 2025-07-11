@@ -12,13 +12,14 @@ namespace HomeEase.Infrastructure.Services;
 
 public class JwtService(AppDbContext _context, IConfiguration _configuration) : IJwtService
 {
-    public (string Token, DateTime Expiration) GenerateToken(User user, IList<string> roles)
+    public (string Token, DateTime Expiration) GenerateToken(User user, IList<string> roles, Provider? provider = null)
     {
         var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Name, user.FirstName ?? string.Empty),
-        new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
+        new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+        new Claim("providerId", provider?.Id.ToString() ?? string.Empty)
     };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

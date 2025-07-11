@@ -17,6 +17,7 @@ namespace HomeEase.Application.DTOs
         public string Role { get; set; }
 
         public bool IsActive { get; set; }
+        public string? ProviderId { get; set; }
     }
 
     public class UpdateUserDto

@@ -10,7 +10,7 @@ namespace HomeEase.Application.Interfaces.Services
 {
     public interface IJwtService
     {
-        (string Token, DateTime Expiration) GenerateToken(User user, IList<string> roles);
+        (string Token, DateTime Expiration) GenerateToken(User user, IList<string> roles, Provider? provider = null);
         string GenerateRefreshToken();
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     }

@@ -38,9 +38,10 @@ namespace HomeEase.Application.Commands.AuthCommands
                 throw new AuthenticationException("Account is deactivated. Please contact support.");
             }
 
+            Provider? provider = null;
             if (user.Role == UserRole.Provider)
             {
-                var provider = await _providerRepository.GetByUserIdAsync(user.Id);
+                 provider = await _providerRepository.GetByUserIdAsync(user.Id);
                 if (provider == null)
                 {
                     throw new AuthenticationException("Provider profile not found.");
@@ -58,7 +59,7 @@ namespace HomeEase.Application.Commands.AuthCommands
 
             var roles = new List<string> { user.Role.ToString() };
 
-            var (Token, Expiration) = _jwtService.GenerateToken(user, roles);
+            var (Token, Expiration) = _jwtService.GenerateToken(user, roles, provider);
             var refreshToken = _jwtService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
