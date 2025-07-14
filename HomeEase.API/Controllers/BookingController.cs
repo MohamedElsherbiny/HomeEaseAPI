@@ -1,10 +1,11 @@
-﻿using MediatR;
+﻿using HomeEase.Application.Commands.BookingCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.Queries.BookingQueries;
+using HomeEase.Domain.Enums;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using HomeEase.Application.Queries.BookingQueries;
-using HomeEase.Application.Commands.BookingCommands;
 
 namespace HomeEase.API.Controllers;
 
@@ -89,6 +90,24 @@ public class BookingsController(IMediator _mediator) : ControllerBase
 
         var result = await _mediator.Send(query);
         return Ok(result);
+    }
+
+    [HttpGet("booking-statuses")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public ActionResult<List<BookingStatusDto>> GetBookingStatuses()
+    {
+        var statuses = Enum.GetValues(typeof(BookingStatus))
+            .Cast<BookingStatus>()
+            .Select(status => new BookingStatusDto
+            {
+                Id = (int)status,
+                Name = status.ToString(),
+                NameAr = GetArabicTranslation(status)
+            })
+            .ToList();
+
+        return Ok(statuses);
     }
 
     [HttpPost]
@@ -195,5 +214,25 @@ public class BookingsController(IMediator _mediator) : ControllerBase
             throw new UnauthorizedAccessException("Provider ID not found in claims");
 
         return Guid.Parse(providerIdClaim.Value);
+    }
+
+    private string GetArabicTranslation(BookingStatus status)
+    {
+        return status switch
+        {
+            BookingStatus.Pending => "قيد الانتظار",
+            BookingStatus.Confirmed => "تم التأكيد",
+            BookingStatus.Completed => "مكتمل",
+            BookingStatus.Cancelled => "ألغيت",
+            BookingStatus.Rejected => "مرفوض",
+            _ => string.Empty
+        };
+    }
+
+    public class BookingStatusDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string NameAr { get; set; } = string.Empty;
     }
 }
