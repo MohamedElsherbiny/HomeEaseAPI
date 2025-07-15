@@ -25,7 +25,9 @@ public class GetUserByIdQueryHandler(IUserRepository _userRepository, IProviderR
         var userToReturn = _mapper.Map<UserDto>(user);
         if (user.Role == Domain.Enums.UserRole.Provider)
         {
-            userToReturn.ProviderId = (await _providerRepository.GetByUserIdAsync(user.Id)).Id.ToString();
+            var provider = await _providerRepository.GetByUserIdAsync(user.Id);
+            userToReturn.ProviderId = provider.Id.ToString();
+            userToReturn.ProfileCompleted = (provider.Services?.Any() ?? false) && (provider.Schedule?.RegularHours?.Any() ?? false);
         }
 
         return userToReturn;
