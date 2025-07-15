@@ -92,6 +92,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
         return await _dbContext.Providers
             .Include(p => p.Images)
             .Include(p => p.Services).ThenInclude(s => s.BasePlatformService)
+            .Include(p => p.Schedule).ThenInclude(s => s.RegularHours)
             .FirstOrDefaultAsync(p => p.UserId == userId);
     }
 

@@ -52,7 +52,7 @@ namespace HomeEase.Application.Commands.AuthCommands
                 {
                     throw new AuthenticationException("Provider account is deactivated. Please contact support.");
                 }
-                profileCompleted = provider.ProfileCompleted; 
+                profileCompleted = (provider.Services?.Any() ?? false) && (provider.Schedule?.RegularHours?.Any() ?? false);
             }
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
