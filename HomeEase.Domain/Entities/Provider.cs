@@ -17,7 +17,6 @@ public class Provider
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? DeactivatedAt { get; set; }
     public bool IsActive { get; set; } = true;
-    public bool ProfileCompleted { get; set; } = true;
     public DateTime? VerifiedAt { get; set; }
     public string ProfileImageUrl { get; set; }
     public Guid? AddressId { get; set; }
