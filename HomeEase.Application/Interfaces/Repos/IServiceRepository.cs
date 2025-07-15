@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HomeEase.Domain.Entities;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using HomeEase.Domain.Entities;
 
 namespace HomeEase.Domain.Repositories
 {
@@ -12,5 +13,6 @@ namespace HomeEase.Domain.Repositories
         Task AddAsync(Service service);
         void Update(Service service);
         void Delete(Service service);
+        Task<Service?> FindAsync(Expression<Func<Service, bool>> predicate);
     }
 }
