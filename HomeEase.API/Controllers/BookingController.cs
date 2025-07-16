@@ -123,7 +123,7 @@ public class BookingsController(IMediator _mediator) : ControllerBase
         };
 
         var bookingId = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { id = bookingId }, bookingId);
+        return Ok(new { bookingId });
     }
 
     [HttpPut("{id}")]

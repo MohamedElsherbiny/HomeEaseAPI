@@ -9,6 +9,7 @@ namespace HomeEase.Domain.Repositories
     {
         Task<Provider> GetByIdAsync(Guid id);
         Task<bool> CheckAvailabilityAsync(Guid providerId, DateTime appointmentTime, int durationMinutes);
+        Task<bool> CheckAvailabilityAsync(Provider provider, DateTime appointmentTime);
         Task<Provider> GetByIdWithDetailsAsync(Guid id);
         Task<Provider> GetByUserIdAsync(Guid userId);
         Task<Provider> GetByUserIdWithDetailsAsync(Guid userId);

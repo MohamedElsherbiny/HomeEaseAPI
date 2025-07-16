@@ -22,6 +22,37 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
+    public Task<bool> CheckAvailabilityAsync(Provider provider, DateTime appointmentTime)
+    {
+        // 1. Check if the provider or their schedule is null
+        if (provider == null || provider.Schedule == null)
+        {
+            return Task.FromResult(false);
+        }
+
+        // 2. Get the DayOfWeek for the appointment time
+        DayOfWeek appointmentDay = appointmentTime.DayOfWeek;
+        TimeSpan appointmentTimeOfDay = appointmentTime.TimeOfDay;
+
+        // 3. Find the regular working hours for the appointment day
+        var relevantWorkingHours = provider.Schedule.RegularHours
+                                        .FirstOrDefault(wh => wh.DayOfWeek == appointmentDay && wh.IsOpen);
+
+        // 4. If no open working hours found for the day, the provider is not available
+        if (relevantWorkingHours == null)
+        {
+            return Task.FromResult(false);
+        }
+
+        // 5. Check if the appointment time falls within the open hours
+        // The appointment is considered available if its time is greater than or equal to StartTime
+        // and strictly less than EndTime to allow for appointments ending exactly at EndTime.
+        bool isAvailable = appointmentTimeOfDay >= relevantWorkingHours.StartTime &&
+                           appointmentTimeOfDay < relevantWorkingHours.EndTime;
+
+        return Task.FromResult(isAvailable);
+    }
+
     public async Task<bool> CheckAvailabilityAsync(Guid providerId, DateTime appointmentTime, int durationMinutes)
     {
         // Step 1: Validate provider exists

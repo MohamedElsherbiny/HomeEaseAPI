@@ -65,9 +65,8 @@ public class CreateBookingCommandHandler(
 
             // Check provider availability
             var isAvailable = await _providerRepository.CheckAvailabilityAsync(
-                request.BookingRequest.ProviderId,
-                appointmentDateTime,
-                service.DurationMinutes);
+                provider,
+                appointmentDateTime);
 
             if (!isAvailable)
             {
