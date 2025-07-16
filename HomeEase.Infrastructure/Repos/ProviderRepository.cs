@@ -160,6 +160,7 @@ public class ProviderRepository(AppDbContext _dbContext) : IProviderRepository
         var query = _dbContext.Providers
             .Include(p => p.Address)
             .Include(p => p.User)
+            .Include(p => p.Schedule).ThenInclude(x => x.RegularHours)
             .Include(p => p.Services).ThenInclude(s => s.BasePlatformService)
             .Include(p => p.Images)
             .Where(p => p.User.Role == UserRole.Provider)
