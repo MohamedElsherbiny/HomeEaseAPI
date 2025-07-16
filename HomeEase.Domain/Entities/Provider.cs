@@ -34,10 +34,6 @@ public class Provider
 
 }
 
-
-
-
-
 public class ProviderImage
 {
     public Guid Id { get; set; }

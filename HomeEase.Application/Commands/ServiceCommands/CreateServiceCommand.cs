@@ -44,6 +44,18 @@ namespace HomeEase.Application.Commands.ServiceCommands
             if (basePlatformService == null || !basePlatformService.IsActive)
                 throw new ApplicationException($"BasePlatformService with ID {request.ServiceDto.BasePlatformServiceId} not found or inactive");
 
+            // Check for existing service
+            var existingService = await _serviceRepository.FindAsync(s =>
+                s.ProviderId == request.ProviderId &&
+                s.BasePlatformServiceId == request.ServiceDto.BasePlatformServiceId);
+
+            if (existingService != null)
+            {
+                // Skip creation and return existing ID
+                return existingService.Id;
+            }
+
+            // Create new service
             var service = new Service
             {
                 Id = Guid.NewGuid(),

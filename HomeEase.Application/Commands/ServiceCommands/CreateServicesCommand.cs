@@ -21,7 +21,8 @@ namespace HomeEase.Application.Commands.ServiceCommands
     {
         public async Task<List<Guid>> Handle(CreateServicesCommand request, CancellationToken cancellationToken)
         {
-            var provider = await _providerRepository.GetByIdAsync(request.ProviderId) ?? throw new ApplicationException($"Provider with ID {request.ProviderId} not found");
+            var provider = await _providerRepository.GetByIdAsync(request.ProviderId)
+                ?? throw new ApplicationException($"Provider with ID {request.ProviderId} not found");
 
             if (request.ServicesDto == null || !request.ServicesDto.Services.Any())
             {
@@ -32,11 +33,18 @@ namespace HomeEase.Application.Commands.ServiceCommands
 
             foreach (var serviceDto in request.ServicesDto.Services)
             {
+                // Skip if service already exists for this provider
+                var existingService = await _serviceRepository.FindAsync(s =>
+                    s.ProviderId == request.ProviderId &&
+                    s.BasePlatformServiceId == serviceDto.BasePlatformServiceId);
+
+                if (existingService != null)
+                    continue;
+
                 var basePlatformService = await _basePlatformServiceRepository.GetByIdAsync(serviceDto.BasePlatformServiceId);
                 if (basePlatformService == null || !basePlatformService.IsActive)
                     throw new ApplicationException($"BasePlatformService with ID {serviceDto.BasePlatformServiceId} not found or inactive for one of the services");
 
-                // Create the service entity
                 var service = new Service
                 {
                     Id = Guid.NewGuid(),

@@ -2,6 +2,7 @@
 using HomeEase.Domain.Repositories;
 using HomeEase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 
 namespace HomeEase.Infrastructure.Services
@@ -43,6 +44,13 @@ namespace HomeEase.Infrastructure.Services
         public void Delete(Service service)
         {
             _dbContext.Services.Remove(service);
+        }
+
+        public async Task<Service?> FindAsync(Expression<Func<Service, bool>> predicate)
+        {
+            return await _dbContext.Services
+                .Include(x => x.BasePlatformService)
+                .FirstOrDefaultAsync(predicate);
         }
     }
 }
