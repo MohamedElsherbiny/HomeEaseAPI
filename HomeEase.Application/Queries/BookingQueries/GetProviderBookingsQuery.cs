@@ -1,37 +1,36 @@
 ﻿using AutoMapper;
 using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Repos;
+using HomeEase.Domain.Common;
+using HomeEase.Domain.Enums;
 using MediatR;
-using Microsoft.Extensions.Logging;
-
 namespace HomeEase.Application.Queries.BookingQueries;
 
-public class GetProviderBookingsQuery : IRequest<List<BookingDto>>
+public class GetProviderBookingsQuery : IRequest<PaginatedList<BookingDto>>
 {
-    public Guid ProviderId { get; set; }
-    public string Status { get; set; }
+    public Guid? ProviderId { get; set; }
+    public BookingStatus? Status { get; set; }
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
-    public int Page { get; set; } = 1;
+    public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
 
 public class GetProviderBookingsQueryHandler(
     IBookingRepository _bookingRepository,
-    IMapper _mapper,
-    ILogger<GetProviderBookingsQueryHandler> _logger) : IRequestHandler<GetProviderBookingsQuery, List<BookingDto>>
+    IMapper _mapper) : IRequestHandler<GetProviderBookingsQuery, PaginatedList<BookingDto>>
 {
-    public async Task<List<BookingDto>> Handle(GetProviderBookingsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<BookingDto>> Handle(GetProviderBookingsQuery request, CancellationToken cancellationToken)
     {
 
         var bookings = await _bookingRepository.GetProviderBookingsAsync(
-            request.ProviderId,
+            request.ProviderId!.Value,
             request.Status,
             request.FromDate,
             request.ToDate,
-            request.Page,
+            request.PageNumber,
             request.PageSize);
 
-        return _mapper.Map<List<BookingDto>>(bookings);
+        return new PaginatedList<BookingDto>(_mapper.Map<List<BookingDto>>(bookings.items), bookings.totalCount, request.PageNumber, request.PageSize);
     }
 }

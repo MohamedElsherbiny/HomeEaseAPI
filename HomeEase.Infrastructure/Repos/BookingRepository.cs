@@ -1,5 +1,6 @@
 ﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Repos;
+using HomeEase.Domain.Common;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;
 using HomeEase.Infrastructure.Data;
@@ -25,7 +26,13 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public async Task<List<Booking>> GetUserBookingsAsync(Guid userId, string status, DateTime? fromDate, DateTime? toDate, int page, int pageSize)
+    public async Task<(List<Booking> items, int totalCount)> GetUserBookingsAsync(
+     Guid userId,
+      BookingStatus? status,
+     DateTime? fromDate,
+     DateTime? toDate,
+     int page,
+     int pageSize)
     {
         var query = _context.Bookings
             .Include(b => b.Provider)
@@ -33,12 +40,9 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.Payment)
             .Where(b => b.UserId == userId);
 
-        if (!string.IsNullOrEmpty(status))
+        if (status.HasValue)
         {
-            if (Enum.TryParse<BookingStatus>(status, out var parsedStatus))
-            {
-                query = query.Where(b => b.Status == parsedStatus);
-            }
+            query = query.Where(b => b.Status == status.Value);
         }
 
         if (fromDate.HasValue)
@@ -51,14 +55,19 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             query = query.Where(b => b.AppointmentDateTime <= toDate.Value);
         }
 
-        return await query
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderByDescending(b => b.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
 
-    public async Task<List<Booking>> GetProviderBookingsAsync(Guid providerId, string status, DateTime? fromDate, DateTime? toDate, int page, int pageSize)
+
+    public async Task<(List<Booking> items, int totalCount)> GetProviderBookingsAsync(Guid providerId, BookingStatus? status, DateTime? fromDate, DateTime? toDate, int page, int pageSize)
     {
         var query = _context.Bookings
             .Include(b => b.User)
@@ -66,12 +75,9 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.Payment)
             .Where(b => b.ProviderId == providerId);
 
-        if (!string.IsNullOrEmpty(status))
+        if (status.HasValue)
         {
-            if (Enum.TryParse<BookingStatus>(status, out var parsedStatus))
-            {
-                query = query.Where(b => b.Status == parsedStatus);
-            }
+            query = query.Where(b => b.Status == status.Value);
         }
 
         if (fromDate.HasValue)
@@ -84,11 +90,15 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             query = query.Where(b => b.AppointmentDateTime <= toDate.Value);
         }
 
-        return await query
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderByDescending(b => b.AppointmentDateTime)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
 
     public async Task<BookingStatisticsDto> GetProviderBookingStatisticsAsync(Guid providerId, DateTime? fromDate, DateTime? toDate)

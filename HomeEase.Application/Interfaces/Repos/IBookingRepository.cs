@@ -1,8 +1,10 @@
-﻿using System;
+﻿using HomeEase.Application.DTOs;
+using HomeEase.Domain.Common;
+using HomeEase.Domain.Entities;
+using HomeEase.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HomeEase.Application.DTOs;
-using HomeEase.Domain.Entities;
 
 namespace HomeEase.Application.Interfaces.Repos
 {
@@ -10,8 +12,8 @@ namespace HomeEase.Application.Interfaces.Repos
     {
         Task<Booking?> GetByIdAsync(Guid id);
         Task<Booking> GetByIdWithDetailsAsync(Guid id);
-        Task<List<Booking>> GetUserBookingsAsync(Guid userId, string status, DateTime? fromDate, DateTime? toDate, int page, int pageSize);
-        Task<List<Booking>> GetProviderBookingsAsync(Guid providerId, string status, DateTime? fromDate, DateTime? toDate, int page, int pageSize);
+        Task<(List<Booking> items, int totalCount)> GetUserBookingsAsync(Guid userId, BookingStatus? status, DateTime? fromDate, DateTime? toDate, int page, int pageSize);
+        Task<(List<Booking> items, int totalCount)> GetProviderBookingsAsync(Guid providerId, BookingStatus? status, DateTime? fromDate, DateTime? toDate, int page, int pageSize);
         Task<BookingStatisticsDto> GetProviderBookingStatisticsAsync(Guid providerId, DateTime? fromDate, DateTime? toDate);
         Task<bool> CheckProviderAvailabilityAsync(Guid providerId, DateTime appointmentTime, int durationMinutes, Guid? excludeBookingId = null);
         Task AddAsync(Booking booking);

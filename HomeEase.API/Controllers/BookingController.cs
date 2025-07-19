@@ -1,6 +1,7 @@
 ﻿using HomeEase.Application.Commands.BookingCommands;
 using HomeEase.Application.DTOs;
 using HomeEase.Application.Queries.BookingQueries;
+using HomeEase.Domain.Common;
 using HomeEase.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -26,23 +27,10 @@ public class BookingsController(IMediator _mediator) : ControllerBase
 
     [HttpGet("user")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<BookingDto>>> GetUserBookings(
-        [FromQuery] string status = null,
-        [FromQuery] DateTime? fromDate = null,
-        [FromQuery] DateTime? toDate = null,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<PaginatedList<BookingDto>>> GetUserBookings([FromQuery] GetUserBookingsQuery query)
     {
         var userId = GetCurrentUserId();
-        var query = new GetUserBookingsQuery
-        {
-            UserId = userId,
-            Status = status,
-            FromDate = fromDate,
-            ToDate = toDate,
-            Page = page,
-            PageSize = pageSize
-        };
+        query.UserId = userId;
 
         var result = await _mediator.Send(query);
         return Ok(result);
@@ -51,23 +39,11 @@ public class BookingsController(IMediator _mediator) : ControllerBase
     [HttpGet("provider")]
     [Authorize(Policy = "ProviderOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<BookingDto>>> GetProviderBookings(
-        [FromQuery] string status = null,
-        [FromQuery] DateTime? fromDate = null,
-        [FromQuery] DateTime? toDate = null,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<PaginatedList<BookingDto>>> GetProviderBookings([FromQuery] GetProviderBookingsQuery query)
     {
         var providerId = GetCurrentProviderId();
-        var query = new GetProviderBookingsQuery
-        {
-            ProviderId = providerId,
-            Status = status,
-            FromDate = fromDate,
-            ToDate = toDate,
-            Page = page,
-            PageSize = pageSize
-        };
+
+        query.ProviderId = providerId;
 
         var result = await _mediator.Send(query);
         return Ok(result);
