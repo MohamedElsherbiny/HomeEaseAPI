@@ -197,11 +197,11 @@ public class BookingsController(IMediator _mediator) : ControllerBase
         return status switch
         {
             BookingStatus.Pending => "قيد الانتظار",
-            BookingStatus.Confirmed => "تم التأكيد",
-            BookingStatus.Completed => "مكتمل",
-            BookingStatus.Cancelled => "ألغيت",
-            BookingStatus.Rejected => "مرفوض",
-            _ => string.Empty
+            BookingStatus.Confirmed => "تم القبول",
+            BookingStatus.Completed => "مكتملة",
+            BookingStatus.Cancelled => "ملغاة",
+            BookingStatus.Rejected => "مرفوضة",
+            _ => "غير معروف"
         };
     }
 

@@ -19,7 +19,8 @@ public class JwtService(AppDbContext _context, IConfiguration _configuration) : 
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Name, user.FirstName ?? string.Empty),
         new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-        new Claim("providerId", provider?.Id.ToString() ?? string.Empty)
+        new Claim("providerId", provider?.Id.ToString() ?? string.Empty),
+        new Claim("role", user.Role.ToString()),
     };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

@@ -103,7 +103,6 @@ builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IAppDbContext, AppDbContext>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGeolocationService, GeolocationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
