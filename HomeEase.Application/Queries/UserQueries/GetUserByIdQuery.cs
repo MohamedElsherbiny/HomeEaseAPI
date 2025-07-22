@@ -29,6 +29,10 @@ public class GetUserByIdQueryHandler(IUserRepository _userRepository, IProviderR
             userToReturn.ProviderId = provider.Id.ToString();
             userToReturn.ProfileCompleted = (provider.Services?.Any() ?? false) && (provider.Schedule?.RegularHours?.Any() ?? false);
         }
+        else
+        {
+            userToReturn.ProfileCompleted = true;
+        }
 
         return userToReturn;
     }
