@@ -4,46 +4,52 @@ using HomeEase.Application.Interfaces;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Repositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HomeEase.Application.Commands.ProviderCommands;
 
-namespace HomeEase.Application.Commands.ProviderCommands
+namespace HomeEase.Application.Commands.ProviderCommands;
+
+public class UpdateProviderCommand : IRequest<bool>
 {
-    public class UpdateProviderCommand : IRequest<bool>
-    {
-        public Guid ProviderId { get; set; }
-        public UpdateProviderDto ProviderDto { get; set; }
-    }
+    public Guid ProviderId { get; set; }
+    public UpdateProviderDto ProviderDto { get; set; }
 }
 
-
-// Command Handler
-public class UpdateProviderCommandHandler : IRequestHandler<UpdateProviderCommand, bool>
+public class UpdateProviderCommandHandler(IProviderRepository _providerRepository, IUnitOfWork _unitOfWork) : IRequestHandler<UpdateProviderCommand, bool>
 {
-    private readonly IProviderRepository _providerRepository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IAddressRepository _addressRepository;
-
-    public UpdateProviderCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork, IAddressRepository addressRepository)
-    {
-        _providerRepository = providerRepository;
-        _unitOfWork = unitOfWork;
-        _addressRepository = addressRepository;
-    }
-
     public async Task<bool> Handle(UpdateProviderCommand request, CancellationToken cancellationToken)
     {
         var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
         if (provider == null)
             return false;
 
-        provider.BusinessName = request.ProviderDto.BusinessName ?? provider.BusinessName;
-        provider.Description = request.ProviderDto.Description ?? provider.Description;
-        provider.ProfileImageUrl = request.ProviderDto.ProfileImageUrl ?? provider.ProfileImageUrl;
+        if (!string.IsNullOrWhiteSpace(request.ProviderDto.BusinessName))
+        {
+
+            provider.BusinessName = request.ProviderDto.BusinessName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.ProviderDto.BusinessAddress))
+        {
+
+            provider.BusinessAddress = request.ProviderDto.BusinessAddress;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.ProviderDto.PhoneNumber))
+        {
+
+            provider.PhoneNumber = request.ProviderDto.PhoneNumber;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.ProviderDto.Email))
+        {
+
+            provider.Email = request.ProviderDto.Email;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.ProviderDto.Description))
+        {
+
+            provider.Description = request.ProviderDto.Description;
+        }
 
         if (request.ProviderDto.Address != null)
         {

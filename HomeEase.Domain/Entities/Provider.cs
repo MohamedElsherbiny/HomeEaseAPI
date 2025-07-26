@@ -21,6 +21,7 @@ public class Provider
     public string ProfileImageUrl { get; set; }
     public Guid? AddressId { get; set; }
     public string Email { get; set; }
+    public string? PhoneNumber { get; set; }
     public string BusinessAddress { get; set; }
     public int ExperienceYears { get; set; }         
     public string SpokenLanguage { get; set; }
