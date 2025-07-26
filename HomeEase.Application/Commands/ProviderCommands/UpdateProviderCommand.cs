@@ -51,6 +51,12 @@ public class UpdateProviderCommandHandler(IProviderRepository _providerRepositor
             provider.Description = request.ProviderDto.Description;
         }
 
+        if (!string.IsNullOrWhiteSpace(request.ProviderDto.DescriptionAr))
+        {
+
+            provider.DescriptionAr = request.ProviderDto.DescriptionAr;
+        }
+
         if (request.ProviderDto.Address != null)
         {
             if (provider.Address == null)

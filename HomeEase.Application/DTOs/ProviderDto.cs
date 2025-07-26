@@ -86,6 +86,7 @@ namespace HomeEase.Application.DTOs
     {
         public string? BusinessName { get; set; }
         public string? Description { get; set; }
+        public string? DescriptionAr { get; set; }
         public string? BusinessAddress { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
