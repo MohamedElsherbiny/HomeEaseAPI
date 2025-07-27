@@ -1,4 +1,5 @@
 ﻿using HomeEase.Application.DTOs;
+using HomeEase.Application.Interfaces;
 using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
@@ -16,30 +17,22 @@ public class ProcessBookingPaymentCommand : IRequest<PaymentResult>
     public CustomerInfo Customer { get; set; }
 }
 
-public class ProcessBookingPaymentCommandHandler : IRequestHandler<ProcessBookingPaymentCommand, PaymentResult>
+public class ProcessBookingPaymentCommandHandler(
+    IBookingRepository _bookingRepository,
+    IPaymentProcessor _paymentProcessor,
+    INotificationService _notificationService,
+    IAppDbContext _context,
+    ILogger<ProcessBookingPaymentCommandHandler> _logger) : IRequestHandler<ProcessBookingPaymentCommand, PaymentResult>
 {
-    private readonly IBookingRepository _bookingRepository;
-    private readonly IPaymentProcessor _paymentProcessor;
-    private readonly INotificationService _notificationService;
-    private readonly ILogger<ProcessBookingPaymentCommandHandler> _logger;
-
-    public ProcessBookingPaymentCommandHandler(
-        IBookingRepository bookingRepository,
-        IPaymentProcessor paymentProcessor,
-        INotificationService notificationService,
-        ILogger<ProcessBookingPaymentCommandHandler> logger)
-    {
-        _bookingRepository = bookingRepository;
-        _paymentProcessor = paymentProcessor;
-        _notificationService = notificationService;
-        _logger = logger;
-    }
 
     public async Task<PaymentResult> Handle(ProcessBookingPaymentCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var booking = await _bookingRepository.GetByIdAsync(request.BookingId);
+            var booking = await _context.Bookings
+                .Include(b => b.Payment)
+                .FirstOrDefaultAsync(b => b.Id == request.BookingId, cancellationToken);
+
             if (booking == null)
                 throw new BusinessException("Booking not found");
 
@@ -49,13 +42,17 @@ public class ProcessBookingPaymentCommandHandler : IRequestHandler<ProcessBookin
                 booking.Payment = new PaymentInfo
                 {
                     Id = Guid.NewGuid(),
-                    BookingId = request.BookingId,
+                    BookingId = booking.Id,
+                    Booking = booking,
                     Amount = request.PaymentInfo.Amount,
                     Currency = request.PaymentInfo.Currency ?? "SAR",
                     PaymentMethod = request.PaymentInfo.PaymentMethod,
                     Status = "Pending",
                     CreatedAt = DateTime.UtcNow
                 };
+
+                _context.PaymentInfos.Add(booking.Payment);
+
             }
             else
             {
@@ -63,7 +60,11 @@ public class ProcessBookingPaymentCommandHandler : IRequestHandler<ProcessBookin
                 booking.Payment.Currency = request.PaymentInfo.Currency ?? "SAR";
                 booking.Payment.PaymentMethod = request.PaymentInfo.PaymentMethod;
                 booking.Payment.Status = "Processing";
+
+                _context.PaymentInfos.Update(booking.Payment);
             }
+
+            await _context.SaveChangesAsync(cancellationToken);
 
             // Process payment through Tap Gateway
             var paymentResult = await _paymentProcessor.ProcessPaymentAsync(
@@ -76,11 +77,10 @@ public class ProcessBookingPaymentCommandHandler : IRequestHandler<ProcessBookin
 
             // Update payment record based on result
             booking.Payment.Status = paymentResult.Status.ToString();
-            booking.Payment.TapChargeId = paymentResult.TapChargeId;
-            booking.Payment.TransactionId = paymentResult.TransactionId;
-            booking.Payment.PaymentUrl = paymentResult.PaymentUrl;
-            booking.Payment.ErrorCode = paymentResult.ErrorCode;
-            booking.Payment.ErrorMessage = paymentResult.ErrorMessage;
+            booking.Payment.TransactionId = paymentResult.TransactionId ?? "";
+            booking.Payment.PaymentUrl = paymentResult.PaymentUrl ?? "";
+            booking.Payment.ErrorCode = paymentResult.ErrorCode ?? "";
+            booking.Payment.ErrorMessage = paymentResult.ErrorMessage ?? "";
 
             if (paymentResult.IsSuccessful)
             {
@@ -92,19 +92,8 @@ public class ProcessBookingPaymentCommandHandler : IRequestHandler<ProcessBookin
                 _logger.LogWarning($"Payment failed for booking {booking.Id}: {paymentResult.ErrorMessage}");
             }
 
-            // Single save operation after all modifications
-            try
-            {
-                await _bookingRepository.UpdatePaymentAsync(booking.Payment);
-                await _bookingRepository.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                _logger.LogError(ex, $"Concurrency conflict while updating booking {booking.Id}");
-
-                throw new BusinessException("Your reservation has been modified by someone else. Please refresh the page and try again.");
-            }
-
+            _context.PaymentInfos.Update(booking.Payment);
+            await _context.SaveChangesAsync(cancellationToken);
 
             // Send notifications after successful save
             if (paymentResult.IsSuccessful)

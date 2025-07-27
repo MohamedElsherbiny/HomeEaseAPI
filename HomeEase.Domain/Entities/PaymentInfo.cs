@@ -6,21 +6,21 @@ public class PaymentInfo
 {
     public Guid Id { get; set; }
     public Guid BookingId { get; set; }
-    public string Status { get; set; } // Pending, Processing, Completed, Failed, Cancelled, Refunded
+    public string Status { get; set; } = "";
     public decimal Amount { get; set; }
-    public string Currency { get; set; } = "SAR"; 
-    public string PaymentMethod { get; set; }
-    public string TransactionId { get; set; }
-    public string TapChargeId { get; set; } // Tap Gateway charge ID
-    public string TapPaymentId { get; set; } // Tap Gateway payment ID
+    public string Currency { get; set; } = "SAR";
+    public string PaymentMethod { get; set; } = "";
+    public string TransactionId { get; set; } = "";
+    public string TapChargeId { get; set; } = "";
+    public string TapPaymentId { get; set; } = "";
     public DateTime? ProcessedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? RefundedAt { get; set; }
     public decimal? RefundedAmount { get; set; }
-    public string ErrorCode { get; set; }
-    public string ErrorMessage { get; set; }
-    public string PaymentUrl { get; set; } 
-    public string WebhookData { get; set; }
+    public string ErrorCode { get; set; } = "";
+    public string ErrorMessage { get; set; } = "";
+    public string PaymentUrl { get; set; } = "";
+    public string WebhookData { get; set; } = "";
     public Booking Booking { get; set; }
 }
 
