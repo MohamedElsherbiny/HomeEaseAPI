@@ -110,6 +110,8 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddScoped<IBasePlatformServiceRepository, BasePlatformServiceRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IPaymentProcessor, TapPaymentProcessor>();
+
 
 
 // Configure Blob Storage

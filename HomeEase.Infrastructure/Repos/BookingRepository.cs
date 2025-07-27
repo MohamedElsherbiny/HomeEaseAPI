@@ -3,6 +3,7 @@ using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Domain.Common;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;
+using HomeEase.Domain.Exceptions;
 using HomeEase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
     public async Task<Booking?> GetByIdAsync(Guid id)
     {
         return await _context.Bookings
+            .Include(b => b.Payment)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
@@ -205,5 +207,36 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
     public Task SaveChangesAsync()
     {
         return _context.SaveChangesAsync();
+    }
+
+    public async Task<List<PaymentInfo>> GetPendingPaymentsAsync(TimeSpan olderThan)
+    {
+        var thresholdTime = DateTime.UtcNow - olderThan;
+        return await _context.Bookings
+            .Where(b => b.Payment != null && b.Payment.Status == PaymentStatus.Pending.ToString() && b.Payment.CreatedAt < thresholdTime)
+            .Select(b => b.Payment)
+            .ToListAsync();
+    }
+
+    public async Task UpdatePaymentAsync(PaymentInfo payment)
+    {
+        var booking = await _context.Bookings
+            .Include(b => b.Payment)
+            .FirstOrDefaultAsync(b => b.Id == payment.BookingId);
+
+        if (booking == null || booking.Payment == null)
+        {
+            throw new BusinessException("Booking or payment not found");
+        }
+
+        booking.Payment.Status = payment.Status;
+        booking.Payment.ProcessedAt = payment.ProcessedAt;
+        booking.Payment.TapChargeId = payment.TapChargeId;
+        booking.Payment.TransactionId = payment.TransactionId;
+        booking.Payment.ErrorCode = payment.ErrorCode;
+        booking.Payment.ErrorMessage = payment.ErrorMessage;
+
+        _context.Update(booking);
+        await _context.SaveChangesAsync();
     }
 }

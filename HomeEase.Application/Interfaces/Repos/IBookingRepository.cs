@@ -20,5 +20,7 @@ namespace HomeEase.Application.Interfaces.Repos
         Task UpdateAsync(Booking booking);
         Task DeleteAsync(Guid id);
         Task SaveChangesAsync();
+        Task<List<PaymentInfo>> GetPendingPaymentsAsync(TimeSpan olderThan);
+        Task UpdatePaymentAsync(PaymentInfo payment);
     }
 }

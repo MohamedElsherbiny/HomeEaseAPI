@@ -1,0 +1,2 @@
+dotnet ef migrations add --startup-project HomeEase.API --project HomeEase.Infrastructure AddPhoneNumberToProvider
+dotnet ef database update --startup-project HomeEase.API --project HomeEase.Application

@@ -91,17 +91,6 @@ public class BookingDto
         public string CancellationReason { get; set; }
     }
 
-    public class PaymentInfoDto
-    {
-        public Guid? Id { get; set; }
-        public string Status { get; set; }
-        public decimal Amount { get; set; }
-        public string Currency { get; set; } = "USD";
-        public string PaymentMethod { get; set; }
-        public string TransactionId { get; set; }
-        public DateTime? ProcessedAt { get; set; }
-    }
-
     public class BookingStatisticsDto
     {
         public int TotalBookings { get; set; }

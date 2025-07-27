@@ -12,5 +12,8 @@ namespace HomeEase.Application.Interfaces.Services
         Task SendBookingRejectionAsync(Booking booking);
         Task SendProviderCancellationAsync(Booking booking);
         Task SendUserCancellationAsync(Booking booking);
+        Task SendPaymentConfirmationAsync(string email, Guid bookingId, decimal amount, string currency);
+        Task SendPaymentFailureNotificationAsync(string email, Guid bookingId, string errorMessage);
+        Task SendRefundConfirmationAsync(string email, Guid bookingId, decimal refundAmount, string currency);
     }
 }
