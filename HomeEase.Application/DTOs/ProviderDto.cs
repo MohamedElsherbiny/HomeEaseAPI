@@ -13,7 +13,9 @@ namespace HomeEase.Application.DTOs
         public bool IsAvailableAtCenter => Services.Any(x => x.IsAvailableAtCenter);
         public bool IsAvailableAtHome => Services.Any(x => x.IsAvailableAtHome);
         public string BusinessName { get; set; }
+        public string BusinessNameAr { get; set; }
         public string Description { get; set; }
+        public string DescriptionAr { get; set; }
         public string ProfileImageUrl { get; set; }
         public AddressDto Address { get; set; }
         public decimal Rating { get; set; }

@@ -29,45 +29,52 @@ namespace HomeEase.Application.Commands.ServiceCommands
                 return [];
             }
 
-            var createdServiceIds = new List<Guid>();
+            var createdOrUpdatedServiceIds = new List<Guid>();
 
             foreach (var serviceDto in request.ServicesDto.Services)
             {
-                // Skip if service already exists for this provider
-                var existingService = await _serviceRepository.FindAsync(s =>
-                    s.ProviderId == request.ProviderId &&
-                    s.BasePlatformServiceId == serviceDto.BasePlatformServiceId);
-
-                if (existingService != null)
-                    continue;
-
                 var basePlatformService = await _basePlatformServiceRepository.GetByIdAsync(serviceDto.BasePlatformServiceId);
                 if (basePlatformService == null || !basePlatformService.IsActive)
                     throw new ApplicationException($"BasePlatformService with ID {serviceDto.BasePlatformServiceId} not found or inactive for one of the services");
 
-                var service = new Service
+                var existingService = await _serviceRepository.FindAsync(s =>
+                 s.ProviderId == request.ProviderId &&
+                 s.BasePlatformServiceId == serviceDto.BasePlatformServiceId);
+
+                if (existingService != null)
                 {
-                    Id = Guid.NewGuid(),
-                    ProviderId = request.ProviderId,
-                    BasePlatformServiceId = serviceDto.BasePlatformServiceId,
-                    Name = basePlatformService.Name,
-                    NameAr = basePlatformService.NameAr,
-                    Description = basePlatformService.Description,
-                    DescriptionAr = basePlatformService.DescriptionAr,
-                    Price = serviceDto.Price,
-                    HomePrice = serviceDto.HomePrice,
-                    DurationMinutes = 60,
-                    IsActive = true,
-                    CreatedAt = DateTime.UtcNow
-                };
+                    existingService.Price = serviceDto.Price;
+                    existingService.HomePrice = serviceDto.HomePrice;
+                    _serviceRepository.Update(existingService);
+                    createdOrUpdatedServiceIds.Add(existingService.Id);
+                }
+                else
+                {
+                    var service = new Service
+                    {
+                        Id = Guid.NewGuid(),
+                        ProviderId = request.ProviderId,
+                        BasePlatformServiceId = serviceDto.BasePlatformServiceId,
+                        Name = basePlatformService.Name,
+                        NameAr = basePlatformService.NameAr,
+                        Description = basePlatformService.Description,
+                        DescriptionAr = basePlatformService.DescriptionAr,
+                        Price = serviceDto.Price,
+                        HomePrice = serviceDto.HomePrice,
+                        DurationMinutes = 60,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
 
-                await _serviceRepository.AddAsync(service);
-                createdServiceIds.Add(service.Id);
+                    await _serviceRepository.AddAsync(service);
+                    createdOrUpdatedServiceIds.Add(service.Id);
+                }
+
+               
             }
-
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return createdServiceIds;
+            return createdOrUpdatedServiceIds;
         }
     }
 }
