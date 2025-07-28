@@ -21,6 +21,8 @@ namespace HomeEase.Application.DTOs
         public decimal Rating { get; set; }
         public int ReviewCount { get; set; }
         public string Status { get; set; }
+        public string? Street { get; set; }
+        public string? PhoneNumber { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? VerifiedAt { get; set; }
         public decimal? StartingPrice { get; set; }
@@ -90,6 +92,7 @@ namespace HomeEase.Application.DTOs
         public string? Description { get; set; }
         public string? DescriptionAr { get; set; }
         public string? BusinessAddress { get; set; }
+        public string? Street { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public AddressDto? Address { get; set; }

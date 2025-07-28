@@ -25,6 +25,7 @@ public class Provider
     public string BusinessAddress { get; set; }
     public int ExperienceYears { get; set; }         
     public string SpokenLanguage { get; set; }
+    public string? Street { get; set; }
 
     public virtual User User { get; set; }
     public virtual Address? Address { get; set; }
