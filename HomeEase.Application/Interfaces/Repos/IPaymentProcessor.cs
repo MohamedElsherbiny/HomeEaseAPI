@@ -9,7 +9,7 @@ namespace HomeEase.Application.Interfaces.Repos
 {
     public interface IPaymentProcessor
     {
-        Task<PaymentResult> ProcessPaymentAsync(Guid bookingId, decimal amount, string currency, string paymentMethod, CustomerInfo customer, string transactionId = null);
+        Task<PaymentResult> ProcessPaymentAsync(Guid bookingId, decimal amount, string currency, string paymentMethod, CustomerInfo customer);
         Task<RefundResult> RefundPaymentAsync(string chargeId, decimal amount, string currency, string reason = "requested_by_customer");
         Task<PaymentResult> GetPaymentStatusAsync(string chargeId);
     }

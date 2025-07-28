@@ -72,8 +72,7 @@ public class ProcessBookingPaymentCommandHandler(
                 booking.Payment.Amount,
                 booking.Payment.Currency,
                 booking.Payment.PaymentMethod,
-                request.Customer,
-                request.PaymentInfo.TransactionId);
+                request.Customer);
 
             // Update payment record based on result
             booking.Payment.Status = paymentResult.Status.ToString();

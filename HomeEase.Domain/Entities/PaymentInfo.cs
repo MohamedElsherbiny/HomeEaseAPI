@@ -1,6 +1,6 @@
 ﻿namespace HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;
-
+using Newtonsoft.Json;
 
 public class PaymentInfo
 {
@@ -85,6 +85,11 @@ public class TapChargeRequest
     public TapSource source { get; set; }
     public TapPost post { get; set; }
     public TapRedirect redirect { get; set; }
+    public bool customer_initiated { get; set; }
+    public Dictionary<string, string> metadata { get; set; }
+    public TapReceipt receipt { get; set; } 
+    public TapReference reference { get; set; } 
+    public TapMerchant merchant { get; set; } 
 }
 
 public class TapCustomer
@@ -103,16 +108,19 @@ public class TapPhone
 
 public class TapSource
 {
+    [JsonProperty("id")]
     public string id { get; set; } // For saved cards or "src_card" for new cards
 }
 
 public class TapPost
 {
+    [JsonProperty("url")]
     public string url { get; set; }
 }
 
 public class TapRedirect
 {
+    [JsonProperty("url")]
     public string url { get; set; }
 }
 
@@ -185,4 +193,21 @@ public class CustomerInfo
     public string PhoneNumber { get; set; }
     public string PhoneCountryCode { get; set; } = "966"; // Saudi Arabia default
 }
- 
+
+
+public class TapReceipt
+{
+    public bool email { get; set; }
+    public bool sms { get; set; }
+}
+
+public class TapReference
+{
+    public string transaction { get; set; }
+    public string order { get; set; }
+}
+
+public class TapMerchant
+{
+    public string id { get; set; }
+}

@@ -11,7 +11,6 @@ namespace HomeEase.Application.DTOs
         public decimal Amount { get; set; }
         public string Currency { get; set; } = "SAR";
         public string PaymentMethod { get; set; }
-        public string TransactionId { get; set; }
         public CustomerInfoDto Customer { get; set; }
     }
 

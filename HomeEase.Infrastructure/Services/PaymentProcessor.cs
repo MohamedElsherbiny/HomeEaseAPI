@@ -8,6 +8,9 @@ using System.Text.Json;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using static System.Net.WebRequestMethods;
+using System.Reflection.Metadata;
+using System.Text.Json.Serialization;
 
 namespace HomeEase.Infrastructure.Services;
 
@@ -37,8 +40,7 @@ public class TapPaymentProcessor : IPaymentProcessor
         decimal amount,
         string currency,
         string paymentMethod,
-        CustomerInfo customer,
-        string transactionId = null)
+        CustomerInfo customer)
     {
         try
         {
@@ -47,10 +49,34 @@ public class TapPaymentProcessor : IPaymentProcessor
             var chargeRequest = new TapChargeRequest
             {
                 amount = amount,
-                currency = currency,
+                currency = currency.ToUpper(),
+                customer_initiated = true, // ✅ مفقود في الكود الأصلي
                 threeDSecure = true,
+                save_card = false, // ✅ مفقود في الكود الأصلي
                 description = $"Massage booking payment - {bookingId}",
                 statement_descriptor = "HomeEase Massage",
+
+                // ✅ إضافة metadata
+                metadata = new Dictionary<string, string>
+            {
+                { "booking_id", bookingId.ToString() },
+                { "service", "massage" }
+            },
+
+                // ✅ إضافة receipt settings
+                receipt = new TapReceipt
+                {
+                    email = false,
+                    sms = false
+                },
+
+                // ✅ إضافة reference
+                reference = new TapReference
+                {
+                    transaction = $"txn_{bookingId}",
+                    order = $"ord_{bookingId}"
+                },
+
                 customer = new TapCustomer
                 {
                     first_name = customer.FirstName,
@@ -59,22 +85,28 @@ public class TapPaymentProcessor : IPaymentProcessor
                     phone = new TapPhone
                     {
                         country_code = customer.PhoneCountryCode ?? "966",
-                        number = customer.PhoneNumber
+                        number = customer.PhoneNumber?.Replace("+", "").Replace(" ", "")
                     }
                 },
                 source = new TapSource { id = "src_card" }, // For new card payments
                 redirect = new TapRedirect { url = _settings.RedirectUrl },
-                post = new TapPost { url = _settings.PostUrl }
+                redirect = new TapRedirect { url = "https://yoursite.com/payment/success" },
+                post = new TapPost { url = "https://yoursite.com/api/paymentwebhook/tap" }
             };
 
             var json = JsonSerializer.Serialize(chargeRequest, new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
+
+            _logger.LogInformation($"Sending request to Tap: {json}");
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("/charges", content);
             var responseContent = await response.Content.ReadAsStringAsync();
+
+            _logger.LogInformation($"Tap response: Status={response.StatusCode}, Content={responseContent}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -86,9 +118,9 @@ public class TapPaymentProcessor : IPaymentProcessor
                 var result = new PaymentResult
                 {
                     IsSuccessful = chargeResponse.status == "CAPTURED",
-                    TransactionId = chargeResponse.transaction?.url ?? chargeResponse.id,
+                    TransactionId = chargeResponse.id, // ✅ استخدم chargeResponse.id بدلاً من transaction.url
                     TapChargeId = chargeResponse.id,
-                    PaymentUrl = chargeResponse.transaction?.url,
+                    PaymentUrl = chargeResponse.redirect?.url, // ✅ تحديث المسار
                     Status = MapTapStatusToPaymentStatus(chargeResponse.status),
                     Timestamp = DateTime.UtcNow
                 };
@@ -100,7 +132,6 @@ public class TapPaymentProcessor : IPaymentProcessor
             {
                 _logger.LogError($"Tap payment failed. Status: {response.StatusCode}, Response: {responseContent}");
 
-                // Try to parse error response
                 try
                 {
                     var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
