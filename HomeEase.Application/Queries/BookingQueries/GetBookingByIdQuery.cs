@@ -12,6 +12,9 @@ public class GetBookingByIdQuery : IRequest<BookingDto>
 {
     public Guid BookingId { get; set; }
 }
+
+
+
 public class GetBookingByIdQueryHandler(
     IBookingRepository _bookingRepository,
     IMapper _mapper,

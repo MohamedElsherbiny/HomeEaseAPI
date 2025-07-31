@@ -11,6 +11,7 @@ namespace HomeEase.Application.DTOs
 public class BookingDto
 {
     public Guid Id { get; set; }
+    public int SerialNumber { get; set; }
     public Guid UserId { get; set; }
     public string UserFullName { get; set; }
     public Guid ProviderId { get; set; }
@@ -40,7 +41,6 @@ public class BookingDto
     public DateTime? CancelledAt { get; set; }
     public string CancellationReason { get; set; }
     public PaymentInfoDto Payment { get; set; }
-    public List<ServiceDto> Services { get; set; } = new List<ServiceDto>();
 
     }
 

@@ -28,6 +28,12 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
+
+    public async Task<int> GetMaxSerialNumberAsync()
+    {
+        return await _context.Bookings.MaxAsync(b => (int?)b.SerialNumber) ?? 0;
+    }
+
     public async Task<(List<Booking> items, int totalCount)> GetUserBookingsAsync(
      Guid userId,
       BookingStatus? status,
