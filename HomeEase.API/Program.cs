@@ -223,7 +223,7 @@ builder.Services.AddAuthorizationBuilder()
 var app = builder.Build();
 
 app.UseCors(MyAllowSpecificOrigins);
-
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
