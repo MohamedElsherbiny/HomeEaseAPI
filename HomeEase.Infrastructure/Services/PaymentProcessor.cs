@@ -89,7 +89,7 @@ public class TapPaymentProcessor : IPaymentProcessor
                     }
                 },
                 source = new TapSource { id = "src_card" }, // For new card payments
-                redirect = new TapRedirect { url = _settings.RedirectUrl },
+                //redirect = new TapRedirect { url = _settings.RedirectUrl },
                 redirect = new TapRedirect { url = "https://yoursite.com/payment/success" },
                 post = new TapPost { url = "https://yoursite.com/api/paymentwebhook/tap" }
             };

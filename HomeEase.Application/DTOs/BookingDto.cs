@@ -1,6 +1,8 @@
-﻿using System;
+﻿using HomeEase.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 
 
@@ -28,7 +30,6 @@ public class BookingDto
         "Confirmed" => "تم القبول",
         "Completed" => "مكتملة",
         "Cancelled" => "ملغاة",
-        "Rejected" => "مرفوضة",
         _ => "غير معروف"
     };
     public string SessionLocationType { get; set; }
@@ -39,8 +40,9 @@ public class BookingDto
     public DateTime? CancelledAt { get; set; }
     public string CancellationReason { get; set; }
     public PaymentInfoDto Payment { get; set; }
+    public List<ServiceDto> Services { get; set; } = new List<ServiceDto>();
 
-}
+    }
 
     public class CreateBookingRequestDto
     {
@@ -67,7 +69,7 @@ public class BookingDto
     public class UpdateBookingRequestDto
     {
         public DateTime? AppointmentDateTime { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public AddressDto Address { get; set; }
     }
 
@@ -79,7 +81,6 @@ public class BookingDto
         [Required]
         public bool IsConfirmed { get; set; }
 
-        public string Notes { get; set; }
     }
 
     public class BookingCancellationDto
@@ -96,8 +97,11 @@ public class BookingDto
         public int TotalBookings { get; set; }
         public int CompletedBookings { get; set; }
         public int CancelledBookings { get; set; }
+        public int PendingBookings { get; set; }
         public decimal TotalRevenue { get; set; }
-        public Dictionary<string, int> BookingsByService { get; set; }
-        public Dictionary<string, int> BookingsByMonth { get; set; }
+
+        public Dictionary<string, int> BookingsByBasePlatformService { get; set; }
+        public Dictionary<string, Dictionary<string, int>> BookingsByStatusAndMonth { get; set; }
     }
+
 }

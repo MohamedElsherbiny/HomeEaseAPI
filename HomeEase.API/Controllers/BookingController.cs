@@ -200,7 +200,6 @@ public class BookingsController(IMediator _mediator) : ControllerBase
             BookingStatus.Confirmed => "تم القبول",
             BookingStatus.Completed => "مكتملة",
             BookingStatus.Cancelled => "ملغاة",
-            BookingStatus.Rejected => "مرفوضة",
             _ => "غير معروف"
         };
     }
