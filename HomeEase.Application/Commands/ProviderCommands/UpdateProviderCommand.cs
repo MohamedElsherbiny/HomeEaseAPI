@@ -33,6 +33,12 @@ public class UpdateProviderCommandHandler(IProviderRepository _providerRepositor
             provider.BusinessAddress = request.ProviderDto.BusinessAddress;
         }
 
+        if (!string.IsNullOrWhiteSpace(request.ProviderDto.Street))
+        {
+
+            provider.Street = request.ProviderDto.Street;
+        }
+
         if (!string.IsNullOrWhiteSpace(request.ProviderDto.PhoneNumber))
         {
 
