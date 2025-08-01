@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using HomeEase.Domain.Entities;
 using System.Reflection.Emit;
+using AngleSharp.Dom;
 
 namespace HomeEase.Infrastructure.Data.Configurations
 {
@@ -22,6 +23,9 @@ namespace HomeEase.Infrastructure.Data.Configurations
 
             builder.Property(b => b.Notes)
                 .HasMaxLength(500);
+
+            builder.Property(b => b.RowVersion)
+                .IsRowVersion();
 
             builder.HasOne(b => b.User)
                 .WithMany(u => u.Bookings)
@@ -47,6 +51,12 @@ namespace HomeEase.Infrastructure.Data.Configurations
                    .WithMany()
                    .HasForeignKey(b => b.AddressId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(b => b.Payment)
+                .WithOne()
+                .HasForeignKey<PaymentInfo>(p => p.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
 
 
         }

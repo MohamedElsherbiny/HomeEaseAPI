@@ -1,10 +1,12 @@
 ﻿using HomeEase.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeEase.Domain.Entities;
 
 public class Booking
 {
     public Guid Id { get; set; }
+    public int SerialNumber { get; set; }
     public Guid UserId { get; set; }
     public Guid ProviderId { get; set; }
     public Guid ServiceId { get; set; }
@@ -23,6 +25,8 @@ public class Booking
     public int DurationMinutes { get; set; }
     public decimal ServicePrice { get; set; }
     public decimal ServiceHomePrice { get; set; }
+    [Timestamp]
+    public byte[] RowVersion { get; set; }
 
     // Navigation properties
     public virtual User User { get; set; }

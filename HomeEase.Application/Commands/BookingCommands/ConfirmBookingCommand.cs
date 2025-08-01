@@ -48,11 +48,6 @@ public class ConfirmBookingCommandHandler(
                 booking.Status = BookingStatus.Confirmed;
                 booking.ConfirmedAt = DateTime.UtcNow;
 
-                // Add provider notes if any
-                if (!string.IsNullOrEmpty(request.ConfirmationRequest.Notes))
-                {
-                    booking.Notes += $"\n[Provider Note: {request.ConfirmationRequest.Notes}]";
-                }
 
                 // Send notification to user
                 await _notificationService.SendBookingConfirmationAsync(booking);
@@ -60,10 +55,8 @@ public class ConfirmBookingCommandHandler(
             else
             {
                 // If not confirmed, treat it as rejection
-                booking.Status = BookingStatus.Rejected;
+                booking.Status = BookingStatus.Cancelled;
                 booking.CancelledAt = DateTime.UtcNow;
-                booking.CancellationReason = request.ConfirmationRequest.Notes ?? "Rejected by provider";
-
                 // Send notification to user
                 await _notificationService.SendBookingRejectionAsync(booking);
             }

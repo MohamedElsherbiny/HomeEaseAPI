@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
@@ -11,6 +12,7 @@ namespace HomeEase.Infrastructure.Services
 {
     public class NotificationService(
         ILogger<NotificationService> _logger,
+        HttpClient _httpClient,
         IUserRepository _userRepository,
         IProviderRepository _providerRepository,
         IOptions<NotificationSettings> _settings) : INotificationService
@@ -147,6 +149,105 @@ namespace HomeEase.Infrastructure.Services
             {
                 throw new Exception($"Email service returned {response.StatusCode}");
             }
+        }
+
+        public async Task SendPaymentConfirmationAsync(string email, Guid bookingId, decimal amount, string currency)
+        {
+            try
+            {
+                var emailModel = new EmailModel
+                {
+                    To = email,
+                    Subject = "Payment Confirmation - HomeEase Massage Booking",
+                    Body = $@"
+                    <h2>Payment Confirmed</h2>
+                    <p>Your payment has been successfully processed.</p>
+                    <p><strong>Booking ID:</strong> {bookingId}</p>
+                    <p><strong>Amount:</strong> {amount} {currency}</p>
+                    <p><strong>Date:</strong> {DateTime.Now:yyyy-MM-dd HH:mm}</p>
+                    <p>Thank you for choosing HomeEase!</p>
+                "
+                };
+
+                await SendEmailAsync(emailModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send payment confirmation email to {email}");
+            }
+        }
+
+        public async Task SendPaymentFailureNotificationAsync(string email, Guid bookingId, string errorMessage)
+        {
+            try
+            {
+                var emailModel = new EmailModel
+                {
+                    To = email,
+                    Subject = "Payment Failed - HomeEase Massage Booking",
+                    Body = $@"
+                    <h2>Payment Failed</h2>
+                    <p>Unfortunately, your payment could not be processed.</p>
+                    <p><strong>Booking ID:</strong> {bookingId}</p>
+                    <p><strong>Error:</strong> {errorMessage}</p>
+                    <p>Please try again or contact our support team.</p>
+                "
+                };
+
+                await SendEmailAsync(emailModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send payment failure email to {email}");
+            }
+        }
+
+        public async Task SendRefundConfirmationAsync(string email, Guid bookingId, decimal refundAmount, string currency)
+        {
+            try
+            {
+                var emailModel = new EmailModel
+                {
+                    To = email,
+                    Subject = "Refund Processed - HomeEase Massage Booking",
+                    Body = $@"
+                    <h2>Refund Processed</h2>
+                    <p>Your refund has been successfully processed.</p>
+                    <p><strong>Booking ID:</strong> {bookingId}</p>
+                    <p><strong>Refund Amount:</strong> {refundAmount} {currency}</p>
+                    <p><strong>Date:</strong> {DateTime.Now:yyyy-MM-dd HH:mm}</p>
+                    <p>The refunded amount will appear in your account within 3-5 business days.</p>
+                "
+                };
+
+                await SendEmailAsync(emailModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send refund confirmation email to {email}");
+            }
+        }
+
+        private async Task SendEmailAsync(EmailModel emailModel)
+        {
+            // Implementation depends on your email service provider
+            // This is a generic HTTP client example
+            var payload = new
+            {
+                to = emailModel.To,
+                from = _settings.Value.FromEmail,
+                subject = emailModel.Subject,
+                html = emailModel.Body
+            };
+
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", _settings.Value.ApiKey);
+
+            await _httpClient.PostAsync(_settings.Value.ApiEndpoint, content);
+
         }
     }
 }

@@ -74,9 +74,11 @@ public class CreateBookingCommandHandler(
             }
 
             // Create new booking
+            var maxSerialNumber = await _bookingRepository.GetMaxSerialNumberAsync();
             var booking = new Booking
             {
                 Id = Guid.NewGuid(),
+                SerialNumber = maxSerialNumber + 1,
                 UserId = request.UserId,
                 ProviderId = request.BookingRequest.ProviderId,
                 ServiceId = request.BookingRequest.ServiceId,

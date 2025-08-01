@@ -3,6 +3,7 @@ using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Domain.Common;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;
+using HomeEase.Domain.Exceptions;
 using HomeEase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
     public async Task<Booking?> GetByIdAsync(Guid id)
     {
         return await _context.Bookings
+            .Include(b => b.Payment)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
@@ -24,6 +26,12 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.Service)
             .Include(b => b.Payment)
             .FirstOrDefaultAsync(b => b.Id == id);
+    }
+
+
+    public async Task<int> GetMaxSerialNumberAsync()
+    {
+        return await _context.Bookings.MaxAsync(b => (int?)b.SerialNumber) ?? 0;
     }
 
     public async Task<(List<Booking> items, int totalCount)> GetUserBookingsAsync(
@@ -67,7 +75,14 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
     }
 
 
-    public async Task<(List<Booking> items, int totalCount)> GetProviderBookingsAsync(Guid providerId, BookingStatus? status, DateTime? fromDate, DateTime? toDate, int page, int pageSize)
+    public async Task<(List<Booking> items, int totalCount)> GetProviderBookingsAsync(
+        Guid providerId,
+        BookingStatus? status,
+        DateTime? fromDate,
+        DateTime? toDate,
+        int page,
+        int pageSize,
+        string? search)
     {
         var query = _context.Bookings
             .Include(b => b.User)
@@ -90,6 +105,15 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             query = query.Where(b => b.AppointmentDateTime <= toDate.Value);
         }
 
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.ToLower();
+            query = query.Where(b =>
+                b.User.FirstName.ToLower().Contains(search) ||
+                b.CustomerAddress.ToLower().Contains(search) ||
+                b.Service.Name.ToLower().Contains(search));
+        }
+
         var totalCount = await query.CountAsync();
 
         var items = await query
@@ -101,22 +125,20 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
         return (items, totalCount);
     }
 
+
     public async Task<BookingStatisticsDto> GetProviderBookingStatisticsAsync(Guid providerId, DateTime? fromDate, DateTime? toDate)
     {
         var query = _context.Bookings
             .Include(b => b.Service)
+            .ThenInclude(s => s.BasePlatformService)
             .Include(b => b.Payment)
             .Where(b => b.ProviderId == providerId);
 
         if (fromDate.HasValue)
-        {
             query = query.Where(b => b.AppointmentDateTime >= fromDate.Value);
-        }
 
         if (toDate.HasValue)
-        {
             query = query.Where(b => b.AppointmentDateTime <= toDate.Value);
-        }
 
         var bookings = await query.ToListAsync();
 
@@ -125,23 +147,33 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             TotalBookings = bookings.Count,
             CompletedBookings = bookings.Count(b => b.Status == BookingStatus.Completed),
             CancelledBookings = bookings.Count(b => b.Status == BookingStatus.Cancelled),
+            PendingBookings = bookings.Count(b => b.Status == BookingStatus.Pending),
+
             TotalRevenue = bookings
                 .Where(b => b.Status == BookingStatus.Completed && b.Payment != null && b.Payment.Status == "Completed")
                 .Sum(b => b.Payment.Amount),
-            BookingsByService = bookings
-                .GroupBy(b => b.Service.Name)
+
+            BookingsByBasePlatformService = bookings
+                .GroupBy(b => b.Service.BasePlatformService.Name)
                 .ToDictionary(g => g.Key, g => g.Count()),
-            BookingsByMonth = bookings
-                .GroupBy(b => new { b.AppointmentDateTime.Year, b.AppointmentDateTime.Month })
-                .OrderBy(g => g.Key.Year)
-                .ThenBy(g => g.Key.Month)
+
+            BookingsByStatusAndMonth = bookings
+                .GroupBy(b => b.Status.ToString()) 
                 .ToDictionary(
-                    g => $"{g.Key.Year}-{g.Key.Month:D2}",
-                    g => g.Count())
+                    g => g.Key,
+                    g => g.GroupBy(b => new { b.AppointmentDateTime.Year, b.AppointmentDateTime.Month })
+                          .OrderBy(x => x.Key.Year).ThenBy(x => x.Key.Month)
+                          .ToDictionary(
+                              sg => $"{sg.Key.Year}-{sg.Key.Month:D2}",
+                              sg => sg.Count()
+                          )
+                )
+
         };
 
         return statistics;
     }
+
 
     public async Task<bool> CheckProviderAvailabilityAsync(Guid providerId, DateTime appointmentTime, int durationMinutes, Guid? excludeBookingId = null)
     {
@@ -205,5 +237,36 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
     public Task SaveChangesAsync()
     {
         return _context.SaveChangesAsync();
+    }
+
+    public async Task<List<PaymentInfo>> GetPendingPaymentsAsync(TimeSpan olderThan)
+    {
+        var thresholdTime = DateTime.UtcNow - olderThan;
+        return await _context.Bookings
+            .Where(b => b.Payment != null && b.Payment.Status == PaymentStatus.Pending.ToString() && b.Payment.CreatedAt < thresholdTime)
+            .Select(b => b.Payment)
+            .ToListAsync();
+    }
+
+    public async Task UpdatePaymentAsync(PaymentInfo payment)
+    {
+        var booking = await _context.Bookings
+            .Include(b => b.Payment)
+            .FirstOrDefaultAsync(b => b.Id == payment.BookingId);
+
+        if (booking == null || booking.Payment == null)
+        {
+            throw new BusinessException("Booking or payment not found");
+        }
+
+        booking.Payment.Status = payment.Status;
+        booking.Payment.ProcessedAt = payment.ProcessedAt;
+        booking.Payment.TapChargeId = payment.TapChargeId;
+        booking.Payment.TransactionId = payment.TransactionId;
+        booking.Payment.ErrorCode = payment.ErrorCode;
+        booking.Payment.ErrorMessage = payment.ErrorMessage;
+
+        _context.Update(booking);
+        await _context.SaveChangesAsync();
     }
 }

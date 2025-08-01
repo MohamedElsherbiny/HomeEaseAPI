@@ -1,6 +1,8 @@
-﻿using System;
+﻿using HomeEase.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 
 
@@ -9,6 +11,7 @@ namespace HomeEase.Application.DTOs
 public class BookingDto
 {
     public Guid Id { get; set; }
+    public int SerialNumber { get; set; }
     public Guid UserId { get; set; }
     public string UserFullName { get; set; }
     public Guid ProviderId { get; set; }
@@ -28,7 +31,6 @@ public class BookingDto
         "Confirmed" => "تم القبول",
         "Completed" => "مكتملة",
         "Cancelled" => "ملغاة",
-        "Rejected" => "مرفوضة",
         _ => "غير معروف"
     };
     public string SessionLocationType { get; set; }
@@ -40,7 +42,7 @@ public class BookingDto
     public string CancellationReason { get; set; }
     public PaymentInfoDto Payment { get; set; }
 
-}
+    }
 
     public class CreateBookingRequestDto
     {
@@ -67,7 +69,7 @@ public class BookingDto
     public class UpdateBookingRequestDto
     {
         public DateTime? AppointmentDateTime { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public AddressDto Address { get; set; }
     }
 
@@ -79,7 +81,6 @@ public class BookingDto
         [Required]
         public bool IsConfirmed { get; set; }
 
-        public string Notes { get; set; }
     }
 
     public class BookingCancellationDto
@@ -91,24 +92,16 @@ public class BookingDto
         public string CancellationReason { get; set; }
     }
 
-    public class PaymentInfoDto
-    {
-        public Guid? Id { get; set; }
-        public string Status { get; set; }
-        public decimal Amount { get; set; }
-        public string Currency { get; set; } = "USD";
-        public string PaymentMethod { get; set; }
-        public string TransactionId { get; set; }
-        public DateTime? ProcessedAt { get; set; }
-    }
-
     public class BookingStatisticsDto
     {
         public int TotalBookings { get; set; }
         public int CompletedBookings { get; set; }
         public int CancelledBookings { get; set; }
+        public int PendingBookings { get; set; }
         public decimal TotalRevenue { get; set; }
-        public Dictionary<string, int> BookingsByService { get; set; }
-        public Dictionary<string, int> BookingsByMonth { get; set; }
+
+        public Dictionary<string, int> BookingsByBasePlatformService { get; set; }
+        public Dictionary<string, Dictionary<string, int>> BookingsByStatusAndMonth { get; set; }
     }
+
 }

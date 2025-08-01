@@ -42,8 +42,13 @@ public class ProviderImagesController : ControllerBase
     public async Task<IActionResult> Create([FromForm] CreateProviderImageCommand command)
     {
         var result = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+
+        if (command.ImageType == ImageType.Gallery)
+            return Created("", result);
+        else
+            return CreatedAtAction(nameof(GetById), new { id = result.FirstOrDefault()?.Id }, result.FirstOrDefault());
     }
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProviderImageCommand command)
