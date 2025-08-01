@@ -28,10 +28,11 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
-
-    public async Task<int> GetMaxSerialNumberAsync()
+    public async Task<int> GetBookingCountByDateAsync(DateTime date)
     {
-        return await _context.Bookings.MaxAsync(b => (int?)b.SerialNumber) ?? 0;
+        return await _context.Bookings
+            .Where(b => b.CreatedAt.Date == date.Date)
+            .CountAsync();
     }
 
     public async Task<(List<Booking> items, int totalCount)> GetUserBookingsAsync(
@@ -110,6 +111,9 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             search = search.ToLower();
             query = query.Where(b =>
                 b.User.FirstName.ToLower().Contains(search) ||
+                b.User.LastName.ToLower().Contains(search) ||
+                b.User.Email.ToLower().Contains(search) ||
+                b.User.PhoneNumber.ToLower().Contains(search) ||
                 b.CustomerAddress.ToLower().Contains(search) ||
                 b.Service.Name.ToLower().Contains(search));
         }

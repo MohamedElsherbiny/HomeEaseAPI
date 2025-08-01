@@ -73,12 +73,14 @@ public class CreateBookingCommandHandler(
                 throw new BusinessException("Provider is not available at the selected time");
             }
 
-            // Create new booking
-            var maxSerialNumber = await _bookingRepository.GetMaxSerialNumberAsync();
+            var today = DateTime.UtcNow.Date;
+            var bookingCount = await _bookingRepository.GetBookingCountByDateAsync(today);
+        
+            var serialNumber = $"B{today:yyyyMMdd}{(bookingCount + 1):D4}"; //: B202508010001
             var booking = new Booking
             {
                 Id = Guid.NewGuid(),
-                SerialNumber = maxSerialNumber + 1,
+                SerialNumber = serialNumber,
                 UserId = request.UserId,
                 ProviderId = request.BookingRequest.ProviderId,
                 ServiceId = request.BookingRequest.ServiceId,

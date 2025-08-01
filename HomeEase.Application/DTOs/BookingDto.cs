@@ -11,7 +11,7 @@ namespace HomeEase.Application.DTOs
 public class BookingDto
 {
     public Guid Id { get; set; }
-    public int SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
     public Guid UserId { get; set; }
     public string UserFullName { get; set; }
     public Guid ProviderId { get; set; }

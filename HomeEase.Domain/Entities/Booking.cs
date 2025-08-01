@@ -6,7 +6,7 @@ namespace HomeEase.Domain.Entities;
 public class Booking
 {
     public Guid Id { get; set; }
-    public int SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
     public Guid UserId { get; set; }
     public Guid ProviderId { get; set; }
     public Guid ServiceId { get; set; }

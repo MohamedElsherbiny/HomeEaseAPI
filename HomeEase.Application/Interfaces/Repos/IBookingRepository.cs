@@ -12,7 +12,7 @@ namespace HomeEase.Application.Interfaces.Repos
     {
         Task<Booking?> GetByIdAsync(Guid id);
         Task<Booking> GetByIdWithDetailsAsync(Guid id);
-        Task<int> GetMaxSerialNumberAsync();
+        Task<int> GetBookingCountByDateAsync(DateTime date);
         Task<(List<Booking> items, int totalCount)> GetUserBookingsAsync(Guid userId, BookingStatus? status, DateTime? fromDate, DateTime? toDate, int page, int pageSize);        Task<(List<Booking> items, int totalCount)> GetProviderBookingsAsync(Guid providerId, BookingStatus? status, DateTime? fromDate, DateTime? toDate, int page, int pageSize, string? search);
 
         Task<BookingStatisticsDto> GetProviderBookingStatisticsAsync(Guid providerId, DateTime? fromDate, DateTime? toDate);
