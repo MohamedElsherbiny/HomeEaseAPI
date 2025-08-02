@@ -1,5 +1,6 @@
 ﻿using HomeEase.Application.Commands.ReviewCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.ReviewQueries;
 using HomeEase.Domain.Common;
 using MediatR;
@@ -14,34 +15,24 @@ namespace HomeEase.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class ReviewsController : ControllerBase
+    public class ReviewsController(IMediator mediator, ICurrentUserService currentUserService) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public ReviewsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         [HttpPost]
         [Authorize(Policy = "UserOnly")]
         public async Task<ActionResult<Guid>> CreateReview(CreateReviewDto reviewDto)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var command = new CreateReviewCommand
+            return Ok(await mediator.Send(new CreateReviewCommand
             {
-                UserId = userId,
+                UserId = currentUserService.UserId,
                 ReviewDto = reviewDto
-            };
-            var reviewId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetReviewById), new { id = reviewId }, reviewId);
+            }));
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<ReviewDto>> GetReviewById(Guid id)
         {
-            var review = await _mediator.Send(new GetReviewByIdQuery { Id = id });
+            var review = await mediator.Send(new GetReviewByIdQuery { Id = id });
             if (review == null)
                 return NotFound();
             return Ok(review);
@@ -51,7 +42,7 @@ namespace HomeEase.Api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<PaginatedList<ReviewDto>>> GetReviewsByProviderId(Guid providerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var reviews = await _mediator.Send(new GetReviewsByProviderIdQuery
+            var reviews = await mediator.Send(new GetReviewsByProviderIdQuery
             {
                 ProviderId = providerId,
                 PageNumber = pageNumber,
@@ -64,7 +55,7 @@ namespace HomeEase.Api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<PaginatedList<ReviewDto>>> GetAllReviews([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var reviews = await _mediator.Send(new GetAllReviewsQuery
+            var reviews = await mediator.Send(new GetAllReviewsQuery
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize
@@ -78,7 +69,7 @@ namespace HomeEase.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            return Ok(await _mediator.Send(new UpdateReviewCommand
+            return Ok(await mediator.Send(new UpdateReviewCommand
             {
                 Id = id,
                 UserId = userId,
@@ -93,7 +84,7 @@ namespace HomeEase.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var isAdmin = User.IsInRole("Admin");
 
-            return Ok(await _mediator.Send(new DeleteReviewCommand
+            return Ok(await mediator.Send(new DeleteReviewCommand
             {
                 Id = id,
                 UserId = userId,

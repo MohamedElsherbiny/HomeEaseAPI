@@ -1,10 +1,11 @@
 ﻿using HomeEase.Application.Interfaces;
 using MediatR;
 using HomeEase.Domain.Entities;
+using HomeEase.Application.DTOs;
 
 namespace HomeEase.Application.Commands.PlatformService
 {
-    public class CreatePlatformServiceCommand : IRequest<Guid>
+    public class CreatePlatformServiceCommand : IRequest<EntityResult>
     {
         public string Name { get; set; }
         public string NameAr { get; set; }
@@ -13,7 +14,7 @@ namespace HomeEase.Application.Commands.PlatformService
         public string ImageUrl { get; set; }
     }
 
-    public class CreatePlatformServiceHandler : IRequestHandler<CreatePlatformServiceCommand, Guid>
+    public class CreatePlatformServiceHandler : IRequestHandler<CreatePlatformServiceCommand, EntityResult>
     {
         private readonly IAppDbContext _context;
         public CreatePlatformServiceHandler(IAppDbContext context)
@@ -21,7 +22,7 @@ namespace HomeEase.Application.Commands.PlatformService
             _context = context;
         }
 
-        public async Task<Guid> Handle(CreatePlatformServiceCommand request, CancellationToken cancellationToken)
+        public async Task<EntityResult> Handle(CreatePlatformServiceCommand request, CancellationToken cancellationToken)
         {
             var service = new BasePlatformService
             {
@@ -35,7 +36,8 @@ namespace HomeEase.Application.Commands.PlatformService
 
             _context.BasePlatformService.Add(service);
             await _context.SaveChangesAsync(cancellationToken);
-            return service.Id;
+
+            return EntityResult.SuccessWithData(new { PlatformServiceId = service.Id.ToString() });
         }
     }
 }

@@ -29,9 +29,7 @@ public class AccountController(IMediator _mediator, ICurrentUserService _current
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateCurrentUser([FromBody] UpdateUserDto updateDto)
     {
-        var result = await _mediator.Send(new UpdateUserCommand(_currentUserService.UserId, updateDto));
-
-        return Ok(result);
+        return Ok(await _mediator.Send(new UpdateUserCommand(_currentUserService.UserId, updateDto)));
     }
 
     [HttpPost("change-password")]

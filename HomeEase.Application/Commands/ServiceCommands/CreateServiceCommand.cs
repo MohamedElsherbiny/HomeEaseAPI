@@ -3,59 +3,46 @@ using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
 
 namespace HomeEase.Application.Commands.ServiceCommands
 {
-    public class CreateServiceCommand : IRequest<Guid>
+    public class CreateServiceCommand : IRequest<EntityResult>
     {
         public Guid ProviderId { get; set; }
         public CreateServiceDto ServiceDto { get; set; }
     }
 
-    public class CreateServiceCommandHandler : IRequestHandler<CreateServiceCommand, Guid>
+    public class CreateServiceCommandHandler(
+        IProviderRepository providerRepository,
+        IServiceRepository serviceRepository,
+        IBasePlatformServiceRepository basePlatformServiceRepository,
+        IUnitOfWork unitOfWork) : IRequestHandler<CreateServiceCommand, EntityResult>
     {
-        private readonly IProviderRepository _providerRepository;
-        private readonly IServiceRepository _serviceRepository;
-        private readonly IBasePlatformServiceRepository _basePlatformServiceRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CreateServiceCommandHandler(
-            IProviderRepository providerRepository,
-            IServiceRepository serviceRepository,
-            IBasePlatformServiceRepository basePlatformServiceRepository,
-            IUnitOfWork unitOfWork)
+        public async Task<EntityResult> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
         {
-            _providerRepository = providerRepository;
-            _serviceRepository = serviceRepository;
-            _basePlatformServiceRepository = basePlatformServiceRepository;
-            _unitOfWork = unitOfWork;
-        }
+            var provider = await providerRepository.GetByIdAsync(request.ProviderId);
+            if (provider is null)
+            {
+                return EntityResult.Failed(new EntityError(nameof(Messages.ProviderNotFound), string.Format(Messages.ProviderNotFound, request.ProviderId)));
+            }
 
-        public async Task<Guid> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
-        {
-            // Validate provider exists
-            var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
-            if (provider == null)
-                throw new ApplicationException($"Provider with ID {request.ProviderId} not found");
-
-            // Validate BasePlatformService exists and is active
-            var basePlatformService = await _basePlatformServiceRepository.GetByIdAsync(request.ServiceDto.BasePlatformServiceId);
+            var basePlatformService = await basePlatformServiceRepository.GetByIdAsync(request.ServiceDto.BasePlatformServiceId);
             if (basePlatformService == null || !basePlatformService.IsActive)
-                throw new ApplicationException($"BasePlatformService with ID {request.ServiceDto.BasePlatformServiceId} not found or inactive");
+            {
+                return EntityResult.Failed(new EntityError(nameof(Messages.BasePlatformServiceNotFound), string.Format(Messages.BasePlatformServiceNotFound, request.ServiceDto.BasePlatformServiceId)));
+            }
 
-            // Check for existing service
-            var existingService = await _serviceRepository.FindAsync(s =>
+            var existingService = await serviceRepository.FindAsync(s =>
                 s.ProviderId == request.ProviderId &&
                 s.BasePlatformServiceId == request.ServiceDto.BasePlatformServiceId);
 
             if (existingService != null)
             {
-                // Skip creation and return existing ID
-                return existingService.Id;
+                return EntityResult.SuccessWithData(new { serviceId = existingService.Id });
             }
 
-            // Create new service
             var service = new Service
             {
                 Id = Guid.NewGuid(),
@@ -72,10 +59,10 @@ namespace HomeEase.Application.Commands.ServiceCommands
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _serviceRepository.AddAsync(service);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await serviceRepository.AddAsync(service);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return service.Id;
+            return EntityResult.SuccessWithData(new { serviceId = service.Id });
         }
     }
 }

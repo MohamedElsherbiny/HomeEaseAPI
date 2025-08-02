@@ -120,11 +120,23 @@
   <data name="AddressNotFoundOrUnauthorized" xml:space="preserve">
     <value>العنوان غير موجود أو لا يخص هذا المستخدم.</value>
   </data>
+  <data name="AppointmentTimeMustBeFuture" xml:space="preserve">
+    <value>يجب أن يكون وقت الموعد في المستقبل.</value>
+  </data>
+  <data name="BasePlatformServiceNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الخدمة الأساسية بالمعرف {0} أو أنها غير مفعلة.</value>
+  </data>
+  <data name="BasePlatformServiceNotFoundForService" xml:space="preserve">
+    <value>لم يتم العثور على الخدمة الأساسية بالمعرف {0} أو أنها غير مفعلة لأحد الخدمات.</value>
+  </data>
   <data name="BasePlatformServiceNotFoundOrInactive" xml:space="preserve">
     <value>لم يتم العثور على الخدمة الأساسية ذات المعرف {0} أو أنها غير مفعّلة.</value>
   </data>
   <data name="BookingCancellationNotAllowed" xml:space="preserve">
     <value>لا يمكن إلغاء الحجز المكتمل أو الملغى مسبقًا.</value>
+  </data>
+  <data name="BookingMustBeCompleted" xml:space="preserve">
+    <value>يجب أن يكتمل الحجز قبل ترك المراجعة.</value>
   </data>
   <data name="BookingMustBePending" xml:space="preserve">
     <value>يمكن فقط تأكيد الحجوزات التي في حالة الانتظار.</value>
@@ -132,8 +144,17 @@
   <data name="BookingNotFound" xml:space="preserve">
     <value>الحجز غير موجود.</value>
   </data>
+  <data name="BookingReviewAlreadyExists" xml:space="preserve">
+    <value>توجد مراجعة بالفعل لهذا الحجز.</value>
+  </data>
+  <data name="BookingUnauthorizedUser" xml:space="preserve">
+    <value>المستخدم غير مصرح له بمراجعة هذا الحجز.</value>
+  </data>
   <data name="BookingUpdateNotAllowed" xml:space="preserve">
     <value>لا يمكن تعديل الحجز المكتمل أو الملغى.</value>
+  </data>
+  <data name="CustomerAddressRequiredForHomeService" xml:space="preserve">
+    <value>العنوان مطلوب في حالة اختيار الخدمة المنزلية.</value>
   </data>
   <data name="DeleteAdminFailed" xml:space="preserve">
     <value>فشل في حذف المسؤول: {0}</value>
@@ -149,6 +170,9 @@
   </data>
   <data name="PlatformServiceNotFound" xml:space="preserve">
     <value>لم يتم العثور على الخدمة على المنصة.</value>
+  </data>
+  <data name="ProviderNotAvailableAtThisTime" xml:space="preserve">
+    <value>مقدم الخدمة غير متاح في الوقت المحدد.</value>
   </data>
   <data name="ProviderNotFound" xml:space="preserve">
     <value>مقدم الخدمة ذو المعرف {0} غير موجود.</value>

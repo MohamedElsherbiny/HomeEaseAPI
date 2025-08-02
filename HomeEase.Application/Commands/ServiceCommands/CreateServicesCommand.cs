@@ -3,11 +3,12 @@ using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
 
 namespace HomeEase.Application.Commands.ServiceCommands
 {
-    public class CreateServicesCommand : IRequest<List<Guid>>
+    public class CreateServicesCommand : IRequest<EntityResult>
     {
         public Guid ProviderId { get; set; }
         public CreateServicesDto ServicesDto { get; set; }
@@ -17,16 +18,19 @@ namespace HomeEase.Application.Commands.ServiceCommands
         IProviderRepository _providerRepository,
         IServiceRepository _serviceRepository,
         IBasePlatformServiceRepository _basePlatformServiceRepository,
-        IUnitOfWork _unitOfWork) : IRequestHandler<CreateServicesCommand, List<Guid>>
+        IUnitOfWork _unitOfWork) : IRequestHandler<CreateServicesCommand, EntityResult>
     {
-        public async Task<List<Guid>> Handle(CreateServicesCommand request, CancellationToken cancellationToken)
+        public async Task<EntityResult> Handle(CreateServicesCommand request, CancellationToken cancellationToken)
         {
-            var provider = await _providerRepository.GetByIdAsync(request.ProviderId)
-                ?? throw new ApplicationException($"Provider with ID {request.ProviderId} not found");
-
-            if (request.ServicesDto == null || !request.ServicesDto.Services.Any())
+            var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
+            if (provider == null)
             {
-                return [];
+                return EntityResult.Failed(new EntityError(nameof(Messages.ProviderNotFound), string.Format(Messages.ProviderNotFound, request.ProviderId)));
+            }
+
+            if (request.ServicesDto == null || request.ServicesDto.Services.Count == 0)
+            {
+                return EntityResult.Success;
             }
 
             var createdOrUpdatedServiceIds = new List<Guid>();
@@ -35,7 +39,10 @@ namespace HomeEase.Application.Commands.ServiceCommands
             {
                 var basePlatformService = await _basePlatformServiceRepository.GetByIdAsync(serviceDto.BasePlatformServiceId);
                 if (basePlatformService == null || !basePlatformService.IsActive)
-                    throw new ApplicationException($"BasePlatformService with ID {serviceDto.BasePlatformServiceId} not found or inactive for one of the services");
+                {
+                    return EntityResult.Failed(new EntityError(nameof(Messages.BasePlatformServiceNotFoundForService),
+                        string.Format(Messages.BasePlatformServiceNotFoundForService, serviceDto.BasePlatformServiceId)));
+                }
 
                 var existingService = await _serviceRepository.FindAsync(s =>
                  s.ProviderId == request.ProviderId &&
@@ -70,11 +77,11 @@ namespace HomeEase.Application.Commands.ServiceCommands
                     createdOrUpdatedServiceIds.Add(service.Id);
                 }
 
-               
+
             }
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return createdOrUpdatedServiceIds;
+            return EntityResult.SuccessWithData(new { createdOrUpdatedServiceIds });
         }
     }
 }

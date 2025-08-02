@@ -120,11 +120,23 @@
   <data name="AddressNotFoundOrUnauthorized" xml:space="preserve">
     <value>Address not found or does not belong to the user.</value>
   </data>
+  <data name="AppointmentTimeMustBeFuture" xml:space="preserve">
+    <value>Appointment time must be in the future.</value>
+  </data>
+  <data name="BasePlatformServiceNotFound" xml:space="preserve">
+    <value>BasePlatformService with ID {0} not found or inactive.</value>
+  </data>
+  <data name="BasePlatformServiceNotFoundForService" xml:space="preserve">
+    <value>BasePlatformService with ID {0} not found or inactive for one of the services.</value>
+  </data>
   <data name="BasePlatformServiceNotFoundOrInactive" xml:space="preserve">
     <value>Base platform service with ID {0} not found or inactive.</value>
   </data>
   <data name="BookingCancellationNotAllowed" xml:space="preserve">
     <value>Cannot cancel a completed or already cancelled booking.</value>
+  </data>
+  <data name="BookingMustBeCompleted" xml:space="preserve">
+    <value>Booking must be completed to leave a review.</value>
   </data>
   <data name="BookingMustBePending" xml:space="preserve">
     <value>Only pending bookings can be confirmed.</value>
@@ -132,8 +144,17 @@
   <data name="BookingNotFound" xml:space="preserve">
     <value>Booking not found.</value>
   </data>
+  <data name="BookingReviewAlreadyExists" xml:space="preserve">
+    <value>A review already exists for this booking.</value>
+  </data>
+  <data name="BookingUnauthorizedUser" xml:space="preserve">
+    <value>User is not authorized to review this booking.</value>
+  </data>
   <data name="BookingUpdateNotAllowed" xml:space="preserve">
     <value>Cannot update a completed or cancelled booking.</value>
+  </data>
+  <data name="CustomerAddressRequiredForHomeService" xml:space="preserve">
+    <value>Customer address is required for home service.</value>
   </data>
   <data name="DeleteAdminFailed" xml:space="preserve">
     <value>Failed to delete admin: {0}</value>
@@ -149,6 +170,9 @@
   </data>
   <data name="PlatformServiceNotFound" xml:space="preserve">
     <value>Service not found on the platform.</value>
+  </data>
+  <data name="ProviderNotAvailableAtThisTime" xml:space="preserve">
+    <value>Provider is not available at the selected time.</value>
   </data>
   <data name="ProviderNotFound" xml:space="preserve">
     <value>Provider with ID {0} not found.</value>

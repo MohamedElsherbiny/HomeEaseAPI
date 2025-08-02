@@ -92,14 +92,12 @@ public class BookingsController(IMediator _mediator) : ControllerBase
     public async Task<ActionResult<Guid>> CreateBooking([FromBody] CreateBookingRequestDto request)
     {
         var userId = GetCurrentUserId();
-        var command = new CreateBookingCommand
+
+        return Ok(await _mediator.Send(new CreateBookingCommand
         {
             BookingRequest = request,
             UserId = userId
-        };
-
-        var bookingId = await _mediator.Send(command);
-        return Ok(new { bookingId });
+        }));
     }
 
     [HttpPut("{id}")]

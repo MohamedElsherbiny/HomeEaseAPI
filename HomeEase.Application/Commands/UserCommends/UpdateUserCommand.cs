@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
-using HomeEase.Domain.Exceptions;
+using HomeEase.Resources;
 using MediatR;
 
 namespace HomeEase.Application.Commands.UserCommends;
 
-public class UpdateUserCommand(Guid userId, UpdateUserDto dto) : IRequest<UserDto>
+public class UpdateUserCommand(Guid userId, UpdateUserDto dto) : IRequest<EntityResult>
 {
     public Guid UserId { get; set; } = userId;
     public string? FirstName { get; set; } = dto.FirstName;
@@ -15,14 +15,14 @@ public class UpdateUserCommand(Guid userId, UpdateUserDto dto) : IRequest<UserDt
     public string? ProfileImageUrl { get; set; } = dto.ProfileImageUrl;
 }
 
-public class UpdateUserCommandHandler(IUserRepository _userRepository, IMapper _mapper, IUnitOfWork _unitOfWork) : IRequestHandler<UpdateUserCommand, UserDto>
+public class UpdateUserCommandHandler(IUserRepository _userRepository, IMapper _mapper, IUnitOfWork _unitOfWork) : IRequestHandler<UpdateUserCommand, EntityResult>
 {
-    public async Task<UserDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+    public async Task<EntityResult> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetUserByIdAsync(request.UserId);
         if (user is null)
         {
-            throw new BusinessException($"User with ID {request.UserId} not found.");
+            return EntityResult.Failed(new EntityError(nameof(Messages.UserNotFound), string.Format(Messages.UserNotFound, request.UserId)));
         }
 
         user.FirstName = request.FirstName ?? user.FirstName;
@@ -34,6 +34,6 @@ public class UpdateUserCommandHandler(IUserRepository _userRepository, IMapper _
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return _mapper.Map<UserDto>(user);
+        return EntityResult.SuccessWithData(new { user = _mapper.Map<UserDto>(user) });
     }
 }

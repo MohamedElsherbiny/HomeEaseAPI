@@ -70,6 +70,33 @@ namespace HomeEase.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Appointment time must be in the future..
+        /// </summary>
+        public static string AppointmentTimeMustBeFuture {
+            get {
+                return ResourceManager.GetString("AppointmentTimeMustBeFuture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BasePlatformService with ID {0} not found or inactive..
+        /// </summary>
+        public static string BasePlatformServiceNotFound {
+            get {
+                return ResourceManager.GetString("BasePlatformServiceNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BasePlatformService with ID {0} not found or inactive for one of the services..
+        /// </summary>
+        public static string BasePlatformServiceNotFoundForService {
+            get {
+                return ResourceManager.GetString("BasePlatformServiceNotFoundForService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Base platform service with ID {0} not found or inactive..
         /// </summary>
         public static string BasePlatformServiceNotFoundOrInactive {
@@ -84,6 +111,15 @@ namespace HomeEase.Resources {
         public static string BookingCancellationNotAllowed {
             get {
                 return ResourceManager.GetString("BookingCancellationNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Booking must be completed to leave a review..
+        /// </summary>
+        public static string BookingMustBeCompleted {
+            get {
+                return ResourceManager.GetString("BookingMustBeCompleted", resourceCulture);
             }
         }
         
@@ -106,11 +142,38 @@ namespace HomeEase.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A review already exists for this booking..
+        /// </summary>
+        public static string BookingReviewAlreadyExists {
+            get {
+                return ResourceManager.GetString("BookingReviewAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User is not authorized to review this booking..
+        /// </summary>
+        public static string BookingUnauthorizedUser {
+            get {
+                return ResourceManager.GetString("BookingUnauthorizedUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot update a completed or cancelled booking..
         /// </summary>
         public static string BookingUpdateNotAllowed {
             get {
                 return ResourceManager.GetString("BookingUpdateNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Customer address is required for home service..
+        /// </summary>
+        public static string CustomerAddressRequiredForHomeService {
+            get {
+                return ResourceManager.GetString("CustomerAddressRequiredForHomeService", resourceCulture);
             }
         }
         
@@ -156,6 +219,15 @@ namespace HomeEase.Resources {
         public static string PlatformServiceNotFound {
             get {
                 return ResourceManager.GetString("PlatformServiceNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provider is not available at the selected time..
+        /// </summary>
+        public static string ProviderNotAvailableAtThisTime {
+            get {
+                return ResourceManager.GetString("ProviderNotAvailableAtThisTime", resourceCulture);
             }
         }
         

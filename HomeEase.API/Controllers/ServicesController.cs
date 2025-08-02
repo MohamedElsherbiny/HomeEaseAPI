@@ -38,19 +38,14 @@ public class ProviderServicesController(IMediator _mediator) : ControllerBase
     [Authorize(Policy = "ProviderOnly")]
     public async Task<ActionResult<Guid>> CreateService(Guid providerId, CreateServiceDto serviceDto)
     {
-        var command = new CreateServiceCommand { ProviderId = providerId, ServiceDto = serviceDto };
-        var serviceId = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetServiceById), new { providerId, serviceId }, serviceId);
+        return Ok(await _mediator.Send(new CreateServiceCommand { ProviderId = providerId, ServiceDto = serviceDto }));
     }
 
     [HttpPost("bulk")]
     [Authorize(Policy = "ProviderOnly")]
     public async Task<ActionResult<List<Guid>>> CreateServices(Guid providerId, CreateServicesDto servicesDto)
     {
-        var command = new CreateServicesCommand { ProviderId = providerId, ServicesDto = servicesDto };
-        await _mediator.Send(command);
-
-        return Ok();
+        return Ok(await _mediator.Send(new CreateServicesCommand { ProviderId = providerId, ServicesDto = servicesDto }));
     }
 
     [HttpPut("{serviceId}")]
@@ -71,31 +66,19 @@ public class ProviderServicesController(IMediator _mediator) : ControllerBase
     [Authorize(Policy = "ProviderOnly")]
     public async Task<ActionResult<ServiceDto>> ActivateService(Guid providerId, Guid serviceId)
     {
-        try
-        {
-            var command = new ActivateServiceCommand { ProviderId = providerId, ServiceId = serviceId };
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+
+        var command = new ActivateServiceCommand { ProviderId = providerId, ServiceId = serviceId };
+        var result = await _mediator.Send(command);
+        return Ok(result);
+
     }
 
     [HttpPatch("deactivate/{serviceId}")]
     [Authorize(Policy = "ProviderOnly")]
     public async Task<ActionResult<ServiceDto>> DeactivateService(Guid providerId, Guid serviceId)
     {
-        try
-        {
-            var command = new DeactivateServiceCommand { ProviderId = providerId, ServiceId = serviceId };
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var command = new DeactivateServiceCommand { ProviderId = providerId, ServiceId = serviceId };
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
 }

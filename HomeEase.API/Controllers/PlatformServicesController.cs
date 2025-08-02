@@ -18,8 +18,7 @@ public class PlatformServicesController(IMediator _mediator, IWebHostEnvironment
     [HttpPost]
     public async Task<IActionResult> Create(CreatePlatformServiceCommand command)
     {
-        var id = await _mediator.Send(command);
-        return Ok(new { id });
+        return Ok(await _mediator.Send(command));
     }
 
     [HttpGet]
