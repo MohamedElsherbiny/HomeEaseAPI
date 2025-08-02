@@ -12,7 +12,7 @@ namespace HomeEase.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "AdminOnly")]
+[Authorize]
 public class UsersController(IMediator _mediator, IWebHostEnvironment _webHostEnvironment, IDataExportService _exportService) : ControllerBase
 {
     [HttpGet]
