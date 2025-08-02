@@ -189,7 +189,7 @@ public class BookingsController(IMediator _mediator) : ControllerBase
         return Guid.Parse(providerIdClaim.Value);
     }
 
-    private string GetArabicTranslation(BookingStatus status)
+    private static string GetArabicTranslation(BookingStatus status)
     {
         return status switch
         {

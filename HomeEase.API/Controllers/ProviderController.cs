@@ -15,7 +15,7 @@ namespace HomeEase.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHostEnvironment, IDataExportService _exportService) : ControllerBase
+public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHostEnvironment, IDataExportService _exportService, ICurrentUserService service) : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
@@ -42,45 +42,14 @@ public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHo
     [HttpGet("user")]
     public async Task<ActionResult<ProviderDto>> GetProviderByCurrentUser()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var guidUserId))
-            return BadRequest("Invalid user ID");
-
-        var query = new GetProviderByUserIdQuery { UserId = guidUserId };
-        var result = await _mediator.Send(query);
-
-        if (result == null)
-            return NotFound();
-
-        return Ok(result);
+        return Ok(await _mediator.Send(new GetProviderByUserIdQuery { UserId = service.UserId }));
     }
 
     [HttpGet("search")]
     [AllowAnonymous]
-    public async Task<ActionResult<List<ProviderSearchResultDto>>> SearchProviders(
-        [FromQuery] double? latitude,
-        [FromQuery] double? longitude,
-        [FromQuery] double? maxDistance,
-        [FromQuery] decimal? minRating,
-        [FromQuery] string city,
-        [FromQuery] string state,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<List<ProviderSearchResultDto>>> SearchProviders([FromQuery] SearchProvidersQuery query)
     {
-        var query = new SearchProvidersQuery
-        {
-            Latitude = latitude,
-            Longitude = longitude,
-            MaxDistance = maxDistance,
-            MinRating = minRating,
-            City = city,
-            State = state,
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        var result = await _mediator.Send(query);
-        return Ok(result);
+        return Ok(await _mediator.Send(query));
     }
 
     [HttpPut("{id}")]
@@ -109,13 +78,7 @@ public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHo
     [AllowAnonymous]
     public async Task<IActionResult> UpdateProviderSchedule(Guid id, ProviderScheduleDto scheduleDto)
     {
-        var command = new UpdateProviderScheduleCommand { ProviderId = id, ScheduleDto = scheduleDto };
-        var result = await _mediator.Send(command);
-
-        if (!result)
-            return NotFound();
-
-        return NoContent();
+        return Ok(await _mediator.Send(new UpdateProviderScheduleCommand { ProviderId = id, ScheduleDto = scheduleDto }));
     }
 
     [HttpPatch("activate/{id}")]

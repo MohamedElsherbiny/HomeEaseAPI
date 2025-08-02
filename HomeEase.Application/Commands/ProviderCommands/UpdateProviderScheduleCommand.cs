@@ -1,55 +1,33 @@
-﻿using HomeEase.Application.Commands.ProviderCommands;
-using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HomeEase.Application.Commands.ProviderCommands
+namespace HomeEase.Application.Commands.ProviderCommands;
+
+public class UpdateProviderScheduleCommand : IRequest<EntityResult>
 {
-    public class UpdateProviderScheduleCommand : IRequest<bool>
-    {
-        public Guid ProviderId { get; set; }
-        public ProviderScheduleDto ScheduleDto { get; set; }
-    }
+    public Guid ProviderId { get; set; }
+    public ProviderScheduleDto ScheduleDto { get; set; }
 }
 
 
-// Command Handler
-public class UpdateProviderScheduleCommandHandler : IRequestHandler<UpdateProviderScheduleCommand, bool>
+public class UpdateProviderScheduleCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork) : IRequestHandler<UpdateProviderScheduleCommand, EntityResult>
 {
-    private readonly IProviderRepository _providerRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UpdateProviderScheduleCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork)
+    public async Task<EntityResult> Handle(UpdateProviderScheduleCommand request, CancellationToken cancellationToken)
     {
-        _providerRepository = providerRepository;
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<bool> Handle(UpdateProviderScheduleCommand request, CancellationToken cancellationToken)
-    {
-        var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
-        if (provider == null)
-            return false;
-
-        if (provider.Schedule == null)
+        var provider = await providerRepository.GetByIdAsync(request.ProviderId);
+        if (provider is null)
         {
-            provider.Schedule = new ProviderSchedule
-            {
-                Id = Guid.NewGuid(),
-            };
+            return EntityResult.Failed(new EntityError(nameof(Messages.ProviderNotFound), string.Format(Messages.ProviderNotFound, request.ProviderId)));
         }
 
-        // Clear old data to avoid EF tracking conflicts
-        //provider.Schedule.RegularHours?.Clear();
-        //provider.Schedule.SpecialDates?.Clear();
-        //provider.Schedule.AvailableSlots?.Clear();
+        provider.Schedule ??= new ProviderSchedule
+        {
+            Id = Guid.NewGuid(),
+        };
 
         // Regular Hours
         if (request.ScheduleDto.RegularHours != null && request.ScheduleDto.RegularHours.Any())
@@ -90,9 +68,9 @@ public class UpdateProviderScheduleCommandHandler : IRequestHandler<UpdateProvid
             }).ToList();
         }
 
-        _providerRepository.Update(provider);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        providerRepository.Update(provider);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return EntityResult.Success;
     }
 }
