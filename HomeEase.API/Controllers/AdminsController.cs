@@ -25,30 +25,13 @@ public class AdminController(IMediator _mediator, IWebHostEnvironment _webHostEn
     [HttpDelete("{adminId}")]
     public async Task<IActionResult> DeleteAdmin(Guid adminId)
     {
-        var result = await _mediator.Send(new DeleteAdminCommand(adminId));
-        return result ? Ok("Admin deleted successfully.") : BadRequest("Failed to delete admin.");
+        return Ok(await _mediator.Send(new DeleteAdminCommand(adminId)));
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetAllAdmins(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10,
-        [FromQuery] string? searchTerm = null,
-        [FromQuery] string sortBy = "CreatedAt",
-        [FromQuery] bool sortDescending = true,
-        [FromQuery] bool? isActive = null)
+    public async Task<IActionResult> GetAllAdmins([FromQuery] GetAllAdminsQuery query)
     {
-        var query = new GetAllAdminsQuery
-        {
-            Page = page,
-            PageSize = pageSize,
-            SearchTerm = searchTerm,
-            SortBy = sortBy,
-            SortDescending = sortDescending,
-            IsActive = isActive
-        };
-        var result = await _mediator.Send(query);
-        return Ok(result);
+        return Ok(await _mediator.Send(query));
     }
 
     [HttpGet("Export")]

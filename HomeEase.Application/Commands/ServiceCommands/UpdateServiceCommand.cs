@@ -1,13 +1,13 @@
-﻿using HomeEase.Application.Commands.ServiceCommands;
-using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
 
 namespace HomeEase.Application.Commands.ServiceCommands;
 
-public class UpdateServiceCommand : IRequest<bool>
+public class UpdateServiceCommand : IRequest<EntityResult>
 {
     public Guid ServiceId { get; set; }
     public UpdateServiceDto ServiceDto { get; set; }
@@ -16,18 +16,23 @@ public class UpdateServiceCommand : IRequest<bool>
 public class UpdateServiceCommandHandler(
     IServiceRepository _serviceRepository,
     IBasePlatformServiceRepository _basePlatformServiceRepository,
-    IUnitOfWork _unitOfWork) : IRequestHandler<UpdateServiceCommand, bool>
+    IUnitOfWork _unitOfWork) : IRequestHandler<UpdateServiceCommand, EntityResult>
 {
-    public async Task<bool> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
+    public async Task<EntityResult> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
     {
         var service = await _serviceRepository.GetByIdAsync(request.ServiceId);
-        if (service == null)
-            return false;
+        if (service is null)
+        {
+            return EntityResult.Failed(new EntityError(nameof(Messages.ServiceNotFound), Messages.ServiceNotFound));
+        }
 
-        // Validate BasePlatformService exists and is active
         var basePlatformService = await _basePlatformServiceRepository.GetByIdAsync(request.ServiceDto.BasePlatformServiceId);
         if (basePlatformService == null || !basePlatformService.IsActive)
-            throw new ApplicationException($"BasePlatformService with ID {request.ServiceDto.BasePlatformServiceId} not found or inactive");
+        {
+            return EntityResult.Failed(new EntityError(
+                nameof(Messages.BasePlatformServiceNotFoundOrInactive),
+                string.Format(Messages.BasePlatformServiceNotFoundOrInactive, request.ServiceDto.BasePlatformServiceId)));
+        }
 
         service.BasePlatformServiceId = request.ServiceDto.BasePlatformServiceId;
 
@@ -42,6 +47,6 @@ public class UpdateServiceCommandHandler(
         _serviceRepository.Update(service);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return EntityResult.Success;
     }
 }

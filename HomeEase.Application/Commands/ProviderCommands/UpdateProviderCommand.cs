@@ -1,25 +1,27 @@
 ﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
-using HomeEase.Application.Interfaces;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
 
 namespace HomeEase.Application.Commands.ProviderCommands;
 
-public class UpdateProviderCommand : IRequest<bool>
+public class UpdateProviderCommand : IRequest<EntityResult>
 {
     public Guid ProviderId { get; set; }
     public UpdateProviderDto ProviderDto { get; set; }
 }
 
-public class UpdateProviderCommandHandler(IProviderRepository _providerRepository, IUnitOfWork _unitOfWork) : IRequestHandler<UpdateProviderCommand, bool>
+public class UpdateProviderCommandHandler(IProviderRepository _providerRepository, IUnitOfWork _unitOfWork) : IRequestHandler<UpdateProviderCommand, EntityResult>
 {
-    public async Task<bool> Handle(UpdateProviderCommand request, CancellationToken cancellationToken)
+    public async Task<EntityResult> Handle(UpdateProviderCommand request, CancellationToken cancellationToken)
     {
         var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
-        if (provider == null)
-            return false;
+        if (provider is null)
+        {
+            return EntityResult.Failed(new EntityError(nameof(Messages.ProviderNotFound), Messages.ProviderNotFound));
+        }
 
         if (!string.IsNullOrWhiteSpace(request.ProviderDto.BusinessName))
         {
@@ -99,6 +101,6 @@ public class UpdateProviderCommandHandler(IProviderRepository _providerRepositor
         _providerRepository.Update(provider);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return EntityResult.Success;
     }
 }

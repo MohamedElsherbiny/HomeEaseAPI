@@ -39,9 +39,7 @@ public class AccountController(IMediator _mediator, ICurrentUserService _current
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
     {
-        await _mediator.Send(new ChangePasswordCommand(_currentUserService.UserId, changePasswordDto));
-
-        return Ok(new { message = "Password changed successfully" });
+        return Ok(await _mediator.Send(new ChangePasswordCommand(_currentUserService.UserId, changePasswordDto)));
     }
 
 
@@ -82,11 +80,8 @@ public class AccountController(IMediator _mediator, ICurrentUserService _current
     public async Task<IActionResult> DeleteUserAddress(Guid addressId)
     {
         var userId = _currentUserService.UserId;
-        var command = new DeleteUserAddressCommand(userId, addressId);
 
-
-        await _mediator.Send(command);
-        return Ok(new { message = "Address deleted successfully" });
+        return Ok(await _mediator.Send(new DeleteUserAddressCommand(userId, addressId)));
     }
 
 

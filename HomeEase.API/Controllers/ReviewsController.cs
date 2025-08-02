@@ -77,16 +77,13 @@ namespace HomeEase.Api.Controllers
         public async Task<IActionResult> UpdateReview(Guid id, UpdateReviewDto reviewDto)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var command = new UpdateReviewCommand
+
+            return Ok(await _mediator.Send(new UpdateReviewCommand
             {
                 Id = id,
                 UserId = userId,
                 ReviewDto = reviewDto
-            };
-            var result = await _mediator.Send(command);
-            if (!result)
-                return NotFound();
-            return NoContent();
+            }));
         }
 
         [HttpDelete("{id}")]
@@ -95,16 +92,13 @@ namespace HomeEase.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var isAdmin = User.IsInRole("Admin");
-            var command = new DeleteReviewCommand
+
+            return Ok(await _mediator.Send(new DeleteReviewCommand
             {
                 Id = id,
                 UserId = userId,
                 IsAdmin = isAdmin
-            };
-            var result = await _mediator.Send(command);
-            if (!result)
-                return NotFound();
-            return NoContent();
+            }));
         }
     }
 }

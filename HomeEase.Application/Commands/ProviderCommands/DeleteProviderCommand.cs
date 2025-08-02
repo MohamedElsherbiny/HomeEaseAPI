@@ -1,43 +1,29 @@
-﻿using HomeEase.Application.Commands.ProviderCommands;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HomeEase.Application.Commands.ProviderCommands
+namespace HomeEase.Application.Commands.ProviderCommands;
+
+public class DeleteProviderCommand : IRequest<EntityResult>
 {
-    public class DeleteProviderCommand : IRequest<bool>
-    {
-        public Guid ProviderId { get; set; }
-    }
+    public Guid ProviderId { get; set; }
 }
 
-
-// Command Handler
-public class DeleteProviderCommandHandler : IRequestHandler<DeleteProviderCommand, bool>
+public class DeleteProviderCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork) : IRequestHandler<DeleteProviderCommand, EntityResult>
 {
-    private readonly IProviderRepository _providerRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteProviderCommandHandler(IProviderRepository providerRepository, IUnitOfWork unitOfWork)
+    public async Task<EntityResult> Handle(DeleteProviderCommand request, CancellationToken cancellationToken)
     {
-        _providerRepository = providerRepository;
-        _unitOfWork = unitOfWork;
-    }
+        var provider = await providerRepository.GetByIdAsync(request.ProviderId);
+        if (provider is null)
+        {
+            return EntityResult.Failed(new EntityError(nameof(Messages.ProviderNotFound), Messages.ProviderNotFound));
+        }
 
-    public async Task<bool> Handle(DeleteProviderCommand request, CancellationToken cancellationToken)
-    {
-        var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
-        if (provider == null)
-            return false;
+        providerRepository.Delete(provider);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _providerRepository.Delete(provider);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return true;
+        return EntityResult.Success;
     }
 }

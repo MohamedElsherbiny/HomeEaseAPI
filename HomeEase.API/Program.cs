@@ -4,6 +4,7 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using HomeEase.Application;
 using HomeEase.Application.Interfaces;
+using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Middlewares;
 using HomeEase.Domain.Entities;
@@ -15,6 +16,8 @@ using HomeEase.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
@@ -23,10 +26,9 @@ using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
-
-using HomeEase.Application.Interfaces.Repos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +52,22 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddLocalization();
+builder.Services.Configure<RequestLocalizationOptions>(
+    options =>
+    {
+        var supportedCultures = new List<CultureInfo>
+        {
+            new CultureInfo("en"),
+            new CultureInfo("ar"),
+
+        };
+
+        options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
+        options.SupportedCultures = supportedCultures;
+        options.SupportedUICultures = supportedCultures;
+
+    });
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -247,6 +265,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+
+var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(localizeOptions.Value);
 
 app.Run();
 

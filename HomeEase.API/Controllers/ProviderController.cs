@@ -87,39 +87,21 @@ public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHo
     [Authorize(Policy = "ProviderOnly")]
     public async Task<IActionResult> UpdateProvider(Guid id, UpdateProviderDto updateDto)
     {
-        var command = new UpdateProviderCommand { ProviderId = id, ProviderDto = updateDto };
-        var result = await _mediator.Send(command);
-
-        if (!result)
-            return NotFound();
-
-        return NoContent();
+        return Ok(await _mediator.Send(new UpdateProviderCommand { ProviderId = id, ProviderDto = updateDto }));
     }
 
     [HttpDelete("{id}")]
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> DeleteProvider(Guid id)
     {
-        var command = new DeleteProviderCommand { ProviderId = id };
-        var result = await _mediator.Send(command);
-
-        if (!result)
-            return NotFound();
-
-        return NoContent();
+        return Ok(await _mediator.Send(new DeleteProviderCommand { ProviderId = id }));
     }
 
     [HttpPost("verify/{id}")]
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> VerifyProvider(Guid id)
     {
-        var command = new VerifyProviderCommand { ProviderId = id };
-        var result = await _mediator.Send(command);
-
-        if (!result)
-            return NotFound();
-
-        return NoContent();
+        return Ok(await _mediator.Send(new VerifyProviderCommand { ProviderId = id }));
     }
 
     [HttpPut("schedule/{id}")]
@@ -139,18 +121,14 @@ public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHo
     [HttpPatch("activate/{id}")]
     public async Task<IActionResult> ActivateProvider(Guid id)
     {
-        var command = new ActivateProviderCommand(id);
-        var result = await _mediator.Send(command);
-        return result ? Ok("Provider activation successful.") : BadRequest("Failed to activate provider.");
+        return Ok(await _mediator.Send(new ActivateProviderCommand(id)));
     }
 
 
     [HttpPatch("deactivate/{id}")]
     public async Task<IActionResult> DeactivateProvider(Guid id)
     {
-        var command = new DeactivateProviderCommand(id);
-        var result = await _mediator.Send(command);
-        return result ? Ok("Provider deactivation successful.") : BadRequest("Failed to deactivate provider.");
+        return Ok(await _mediator.Send(new DeactivateProviderCommand(id)));
     }
 
     [HttpGet("Export")]

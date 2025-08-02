@@ -6,22 +6,24 @@ using Microsoft.AspNetCore.Identity;
 
 namespace HomeEase.Application.Commands.AuthCommands;
 
-public class RequestPasswordResetCommand(PasswordResetRequestDto dto) : IRequest<bool>
+public class RequestPasswordResetCommand(PasswordResetRequestDto dto) : IRequest<EntityResult>
 {
     public string Email { get; set; } = dto.Email;
 }
 
-public class RequestPasswordResetCommandHandler(UserManager<User> _userManager, IEmailService _emailService, ICurrentUserService _currentUserService) : IRequestHandler<RequestPasswordResetCommand, bool>
+public class RequestPasswordResetCommandHandler(UserManager<User> _userManager, IEmailService _emailService, ICurrentUserService _currentUserService) : IRequestHandler<RequestPasswordResetCommand, EntityResult>
 {
-    public async Task<bool> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
+    public async Task<EntityResult> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return true;
+        {
+            return EntityResult.Success;
+        }
 
         var otp = await _userManager.GenerateUserTokenAsync(user, "OtpProvider", "ResetPassword");
         await _emailService.SendPasswordResetEmailAsync(user.Email!, otp, _currentUserService.Language);
 
-        return true;
+        return EntityResult.Success;
     }
 }

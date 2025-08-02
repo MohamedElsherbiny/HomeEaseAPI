@@ -1,14 +1,12 @@
-﻿using HomeEase.Application.Interfaces;
+﻿using HomeEase.Application.DTOs;
+using HomeEase.Application.Interfaces;
+using HomeEase.Resources;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeEase.Application.Commands.PlatformService
 {
-    public class UpdatePlatformServiceCommand : IRequest<bool>
+    public class UpdatePlatformServiceCommand : IRequest<EntityResult>
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -18,28 +16,25 @@ namespace HomeEase.Application.Commands.PlatformService
         public string ImageUrl { get; set; }
     }
 
-
-    public class UpdatePlatformServiceHandler : IRequestHandler<UpdatePlatformServiceCommand, bool>
+    public class UpdatePlatformServiceHandler(IAppDbContext context) : IRequestHandler<UpdatePlatformServiceCommand, EntityResult>
     {
-        private readonly IAppDbContext _context;
-        public UpdatePlatformServiceHandler(IAppDbContext context)
+        public async Task<EntityResult> Handle(UpdatePlatformServiceCommand request, CancellationToken cancellationToken)
         {
-            _context = context;
-        }
-
-        public async Task<bool> Handle(UpdatePlatformServiceCommand request, CancellationToken cancellationToken)
-        {
-            var service = await _context.BasePlatformService.FindAsync(new object[] { request.Id }, cancellationToken);
-            if (service == null) return false;
+            var service = await context.BasePlatformService.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            if (service is null)
+            {
+                return EntityResult.Failed(new EntityError(nameof(Messages.PlatformServiceNotFound), Messages.PlatformServiceNotFound));
+            }
 
             service.Name = request.Name;
             service.NameAr = request.NameAr;
             service.Description = request.Description;
             service.DescriptionAr = request.DescriptionAr;
             service.ImageUrl = request.ImageUrl;
-            await _context.SaveChangesAsync(cancellationToken);
 
-            return true;
+            await context.SaveChangesAsync(cancellationToken);
+
+            return EntityResult.Success;
         }
     }
 }

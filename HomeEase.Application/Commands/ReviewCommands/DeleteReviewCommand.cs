@@ -1,61 +1,48 @@
-﻿using HomeEase.Application.Commands.ReviewCommands;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HomeEase.Application.Commands.ReviewCommands
+namespace HomeEase.Application.Commands.ReviewCommands;
+
+public class DeleteReviewCommand : IRequest<EntityResult>
 {
-    public class DeleteReviewCommand : IRequest<bool>
-    {
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-        public bool IsAdmin { get; set; }
-    }
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public bool IsAdmin { get; set; }
 }
 
-
-public class DeleteReviewCommandHandler : IRequestHandler<DeleteReviewCommand, bool>
+public class DeleteReviewCommandHandler(
+    IReviewRepository reviewRepository,
+    IProviderRepository providerRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<DeleteReviewCommand, EntityResult>
 {
-    private readonly IReviewRepository _reviewRepository;
-    private readonly IProviderRepository _providerRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteReviewCommandHandler(
-        IReviewRepository reviewRepository,
-        IProviderRepository providerRepository,
-        IUnitOfWork unitOfWork)
+    public async Task<EntityResult> Handle(DeleteReviewCommand request, CancellationToken cancellationToken)
     {
-        _reviewRepository = reviewRepository;
-        _providerRepository = providerRepository;
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<bool> Handle(DeleteReviewCommand request, CancellationToken cancellationToken)
-    {
-        var review = await _reviewRepository.GetByIdAsync(request.Id);
-        if (review == null)
-            return false;
+        var review = await reviewRepository.GetByIdAsync(request.Id);
+        if (review is null)
+        {
+            return EntityResult.Failed(new EntityError(nameof(Messages.ReviewNotFound), Messages.ReviewNotFound));
+        }
 
         if (!request.IsAdmin && review.UserId != request.UserId)
-            throw new ApplicationException("User is not authorized to delete this review.");
+        {
+            return EntityResult.Failed(new EntityError(nameof(Messages.UnauthorizedReviewDelete), Messages.UnauthorizedReviewDelete));
+        }
 
-        _reviewRepository.Delete(review);
+        reviewRepository.Delete(review);
 
-        // Update provider's rating and review count
-        var provider = await _providerRepository.GetByIdAsync(review.ProviderId);
-        var reviews = await _reviewRepository.GetByProviderIdAsync(provider.Id, 1, int.MaxValue);
+        var provider = await providerRepository.GetByIdAsync(review.ProviderId);
+        var reviews = await reviewRepository.GetByProviderIdAsync(provider.Id, 1, int.MaxValue);
         var validRatings = reviews.Where(r => r.Rating.HasValue).Select(r => r.Rating.Value).ToList();
         provider.ReviewCount = validRatings.Count;
-        provider.Rating = validRatings.Any() ? validRatings.Average() : 0;
-        _providerRepository.Update(provider);
+        provider.Rating = validRatings.Count != 0 ? validRatings.Average() : 0;
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return true;
+        providerRepository.Update(provider);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return EntityResult.Success;
     }
 }

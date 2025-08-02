@@ -1,36 +1,30 @@
-﻿using HomeEase.Application.Interfaces;
+﻿using HomeEase.Application.DTOs;
+using HomeEase.Application.Interfaces;
+using HomeEase.Resources;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeEase.Application.Commands.PlatformService
 {
-    public class DeletePlatformServiceCommand : IRequest<bool>
+    public class DeletePlatformServiceCommand : IRequest<EntityResult>
     {
         public Guid Id { get; set; }
     }
 
-
-    public class DeletePlatformServiceHandler : IRequestHandler<DeletePlatformServiceCommand, bool>
+    public class DeletePlatformServiceHandler(IAppDbContext context) : IRequestHandler<DeletePlatformServiceCommand, EntityResult>
     {
-        private readonly IAppDbContext _context;
-        public DeletePlatformServiceHandler(IAppDbContext context)
+        public async Task<EntityResult> Handle(DeletePlatformServiceCommand request, CancellationToken cancellationToken)
         {
-            _context = context;
-        }
+            var service = await context.BasePlatformService.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            if (service is null)
+            {
+                return EntityResult.Failed(new EntityError(nameof(Messages.PlatformServiceNotFound), Messages.PlatformServiceNotFound));
+            }
 
-        public async Task<bool> Handle(DeletePlatformServiceCommand request, CancellationToken cancellationToken)
-        {
-            var service = await _context.BasePlatformService.FindAsync(new object[] { request.Id }, cancellationToken);
-            if (service == null) return false;
+            context.BasePlatformService.Remove(service);
+            await context.SaveChangesAsync(cancellationToken);
 
-            _context.BasePlatformService.Remove(service);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return true;
+            return EntityResult.Success;
         }
     }
 }

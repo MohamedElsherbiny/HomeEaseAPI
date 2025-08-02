@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using HomeEase.Application.DTOs;
 using HomeEase.Domain.Entities;
+using HomeEase.Resources;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -9,49 +9,36 @@ using Microsoft.AspNetCore.Identity;
 
 namespace HomeEase.Application.Commands.AuthCommands;
 
-public class ResetPasswordCommand(PasswordResetDto dto) : IRequest<bool>
+public class ResetPasswordCommand(PasswordResetDto dto) : IRequest<EntityResult>
 {
     public string OtpCode { get; set; } = dto.OtpCode;
     public string Email { get; set; } = dto.Email;
     public string NewPassword { get; set; } = dto.NewPassword;
 }
 
-public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, bool>
+public class ResetPasswordCommandHandler(UserManager<User> userManager) : IRequestHandler<ResetPasswordCommand, EntityResult>
 {
-    private readonly UserManager<User> _userManager;
-
-    public ResetPasswordCommandHandler(UserManager<User> userManager)
+    public async Task<EntityResult> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
-        _userManager = userManager;
-    }
-
-    public async Task<bool> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
-    {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
-            throw new ValidationException(new[]
-            {
-                new ValidationFailure("Email", "User not found.")
-            });
+            return EntityResult.Failed(new EntityError(nameof(Messages.UserNotFoundByEmail), string.Format(Messages.UserNotFoundByEmail, request.Email)));
         }
 
-        var isValid = await _userManager.VerifyUserTokenAsync(user, "OtpProvider", "ResetPassword", request.OtpCode);
+        var isValid = await userManager.VerifyUserTokenAsync(user, "OtpProvider", "ResetPassword", request.OtpCode);
         if (!isValid)
         {
-            throw new ValidationException(new[]
-            {
-                new ValidationFailure("OtpCode", "Invalid or expired code.")
-            });
+            return EntityResult.Failed(new EntityError(nameof(Messages.InvalidOrExpiredOtp), Messages.InvalidOrExpiredOtp));
         }
 
-        var result = await _userManager.ResetPasswordAsync(user, await _userManager.GeneratePasswordResetTokenAsync(user), request.NewPassword);
+        var result = await userManager.ResetPasswordAsync(user, await userManager.GeneratePasswordResetTokenAsync(user), request.NewPassword);
         if (!result.Succeeded)
         {
-            throw new ValidationException(result.Errors.Select(e => new ValidationFailure("NewPassword", e.Description)));
+            return EntityResult.Failed(result.Errors.Select(e => new EntityError("NewPassword", e.Description)).ToArray());
         }
 
-        return true;
+        return EntityResult.Success;
     }
 }
 

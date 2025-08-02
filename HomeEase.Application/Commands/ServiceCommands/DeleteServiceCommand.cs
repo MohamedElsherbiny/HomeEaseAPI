@@ -1,42 +1,30 @@
 ﻿using HomeEase.Application.Commands.ServiceCommands;
+using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HomeEase.Application.Commands.ServiceCommands
+namespace HomeEase.Application.Commands.ServiceCommands;
+
+public class DeleteServiceCommand : IRequest<EntityResult>
 {
-    public class DeleteServiceCommand : IRequest<bool>
-    {
-        public Guid ServiceId { get; set; }
-    }
+    public Guid ServiceId { get; set; }
 }
 
-
-public class DeleteServiceCommandHandler : IRequestHandler<DeleteServiceCommand, bool>
+public class DeleteServiceCommandHandler(IServiceRepository serviceRepository, IUnitOfWork unitOfWork) : IRequestHandler<DeleteServiceCommand, EntityResult>
 {
-    private readonly IServiceRepository _serviceRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteServiceCommandHandler(IServiceRepository serviceRepository, IUnitOfWork unitOfWork)
+    public async Task<EntityResult> Handle(DeleteServiceCommand request, CancellationToken cancellationToken)
     {
-        _serviceRepository = serviceRepository;
-        _unitOfWork = unitOfWork;
-    }
+        var service = await serviceRepository.GetByIdAsync(request.ServiceId);
+        if (service is null)
+        {
+            return EntityResult.Failed(new EntityError(nameof(Messages.ServiceNotFound), Messages.ServiceNotFound));
+        }
 
-    public async Task<bool> Handle(DeleteServiceCommand request, CancellationToken cancellationToken)
-    {
-        var service = await _serviceRepository.GetByIdAsync(request.ServiceId);
-        if (service == null)
-            return false;
+        serviceRepository.Delete(service);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _serviceRepository.Delete(service);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return true;
+        return EntityResult.Success;
     }
 }

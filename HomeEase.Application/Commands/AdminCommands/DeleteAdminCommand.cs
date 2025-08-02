@@ -1,53 +1,45 @@
 ﻿using HomeEase.Application.DTOs;
-using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;
+using HomeEase.Resources;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeEase.Application.Commands.AdminCommands
 {
-    // Command to delete an Admin
-    public class DeleteAdminCommand : IRequest<bool>
+    public class DeleteAdminCommand(Guid adminId) : IRequest<EntityResult>
     {
-        public Guid AdminId { get; set; }
-
-        public DeleteAdminCommand(Guid adminId)
-        {
-            AdminId = adminId;
-        }
+        public Guid AdminId { get; set; } = adminId;
     }
 
-    public class DeleteAdminCommandHandler : IRequestHandler<DeleteAdminCommand, bool>
+    public class DeleteAdminCommandHandler(UserManager<User> userManager) : IRequestHandler<DeleteAdminCommand, EntityResult>
     {
-        private readonly UserManager<User> _userManager;
-
-        public DeleteAdminCommandHandler(UserManager<User> userManager)
+        public async Task<EntityResult> Handle(DeleteAdminCommand request, CancellationToken cancellationToken)
         {
-            _userManager = userManager;
-        }
-
-        public async Task<bool> Handle(DeleteAdminCommand request, CancellationToken cancellationToken)
-        {
-            var user = await _userManager.FindByIdAsync(request.AdminId.ToString());
+            var user = await userManager.FindByIdAsync(request.AdminId.ToString());
 
             if (user == null)
-                throw new Exception("User not found.");
+            {
+                return EntityResult.Failed(new EntityError(nameof(Messages.UserNotFound), string.Format(Messages.UserNotFound, request.AdminId.ToString())));
+            }
 
             if (user.Role != UserRole.Admin)
-                throw new Exception("User is not an admin.");
+            {
+                return EntityResult.Failed(new EntityError(nameof(Messages.UserNotAdmin), Messages.UserNotAdmin));
+            }
 
-            var result = await _userManager.DeleteAsync(user);
+            var result = await userManager.DeleteAsync(user);
 
             if (!result.Succeeded)
-                throw new Exception("Failed to delete admin: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            {
+                var errorDetails = string.Join(", ", result.Errors.Select(e => e.Description));
 
-            return true;
+                return EntityResult.Failed(new EntityError(
+                    nameof(Messages.DeleteAdminFailed),
+                    string.Format(Messages.DeleteAdminFailed, errorDetails)));
+            }
+
+            return EntityResult.Success;
         }
     }
 }

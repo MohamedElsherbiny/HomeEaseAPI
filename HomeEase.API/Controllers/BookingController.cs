@@ -154,8 +154,7 @@ public class BookingsController(IMediator _mediator) : ControllerBase
             IsProvider = isProvider
         };
 
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        return Ok(await _mediator.Send(command));
     }
 
     [HttpPost("payment/{id}")]

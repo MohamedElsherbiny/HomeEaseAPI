@@ -1,6 +1,8 @@
-﻿using HomeEase.Domain.Exceptions;
+﻿using HomeEase.Application.DTOs;
+using HomeEase.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace HomeEase.Application.Middlewares;
 
@@ -23,7 +25,7 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
     {
         context.Response.ContentType = "application/json";
 
-        var response = exception switch
+        var data = exception switch
         {
             BusinessException => new
             {
@@ -42,7 +44,10 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
             }
         };
 
-        context.Response.StatusCode = response.StatusCode;
-        return context.Response.WriteAsJsonAsync(response);
+        context.Response.StatusCode = data.StatusCode;
+        var response = EntityResult.Failed(data.Message);
+
+        var jsonResponse = JsonSerializer.Serialize(response);
+        return context.Response.WriteAsync(jsonResponse);
     }
 }

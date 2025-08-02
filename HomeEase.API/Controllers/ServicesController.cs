@@ -57,26 +57,14 @@ public class ProviderServicesController(IMediator _mediator) : ControllerBase
     [Authorize(Policy = "ProviderOnly")]
     public async Task<IActionResult> UpdateService(Guid providerId, Guid serviceId, UpdateServiceDto serviceDto)
     {
-        var command = new UpdateServiceCommand { ServiceId = serviceId, ServiceDto = serviceDto };
-        var result = await _mediator.Send(command);
-
-        if (!result)
-            return NotFound();
-
-        return NoContent();
+        return Ok(await _mediator.Send(new UpdateServiceCommand { ServiceId = serviceId, ServiceDto = serviceDto }));
     }
 
     [HttpDelete("{serviceId}")]
     [Authorize(Policy = "ProviderOnly")]
     public async Task<IActionResult> DeleteService(Guid providerId, Guid serviceId)
     {
-        var command = new DeleteServiceCommand { ServiceId = serviceId };
-        var result = await _mediator.Send(command);
-
-        if (!result)
-            return NotFound();
-
-        return NoContent();
+        return Ok(await _mediator.Send(new DeleteServiceCommand { ServiceId = serviceId }));
     }
 
     [HttpPatch("activate/{serviceId}")]

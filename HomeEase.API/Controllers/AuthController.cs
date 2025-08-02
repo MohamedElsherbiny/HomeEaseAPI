@@ -1,5 +1,6 @@
 ﻿using HomeEase.Application.Commands.AuthCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Resources;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -65,9 +66,7 @@ public class AuthController(IMediator _mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ForgotPassword([FromBody] PasswordResetRequestDto requestDto)
     {
-        var command = new RequestPasswordResetCommand(requestDto);
-        await _mediator.Send(command);
-        return Ok(new { message = "If your email exists in our system, you will receive a password reset link." });
+        return Ok(await _mediator.Send(new RequestPasswordResetCommand(requestDto)));
     }
 
     [HttpPost("reset-password")]
@@ -75,16 +74,7 @@ public class AuthController(IMediator _mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPassword([FromBody] PasswordResetDto resetDto)
     {
-        try
-        {
-            var command = new ResetPasswordCommand(resetDto);
-            await _mediator.Send(command);
-            return Ok(new { message = "Password has been reset successfully." });
-        }
-        catch (ApplicationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        return Ok(await _mediator.Send(new ResetPasswordCommand(resetDto)));
     }
 
     [HttpPost("verify-otp")]
@@ -94,33 +84,27 @@ public class AuthController(IMediator _mediator) : ControllerBase
     {
         var result = await _mediator.Send(command);
 
-        return result
-            ? Ok(new
-            {
-                IsValid = true,
-                Message = "OTP code is valid",
-            })
-            : BadRequest(new
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
             {
                 IsValid = false,
-                Message = "Invalid or expired OTP code",
+                Message = Messages.InvalidOrExpiredOtp,
             });
+        }
+
+        return Ok(new
+        {
+            IsValid = true,
+            Message = Messages.ValidOtp,
+        });
     }
 
-    //[HttpPost("refresh-token")]
-    //[ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
-    //{
-    //    try
-    //    {
-    //        var command = new RefreshTokenCommand(refreshTokenDto);
-    //        var result = await _mediator.Send(command);
-    //        return Ok(result);
-    //    }
-    //    catch (SecurityTokenException)
-    //    {
-    //        return Unauthorized(new { message = "Invalid token" });
-    //    }
-    //}
+    [HttpPost("v2/verify-otp")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> VerifyOtpV2([FromBody] VerifyOtpCommand command)
+    {
+        return Ok(await _mediator.Send(command));
+    }
 }

@@ -1,25 +1,23 @@
-﻿using HomeEase.Application.Commands.UserCommends;
+﻿using HomeEase.Application.DTOs;
 using HomeEase.Application.Interfaces.Services;
-using HomeEase.Domain.Exceptions;
+using HomeEase.Resources;
 using MediatR;
 
 namespace HomeEase.Application.Commands.UserCommends;
 
-public class ActivateUserCommand : IRequest<bool>
+public class ActivateUserCommand(Guid userId) : IRequest<EntityResult>
 {
-    public Guid UserId { get; }
-
-    public ActivateUserCommand(Guid userId) => UserId = userId;
+    public Guid UserId { get; } = userId;
 }
 
-public class ActivateUserCommandHandler(IUserRepository _userRepository, IUnitOfWork _unitOfWork) : IRequestHandler<ActivateUserCommand, bool>
+public class ActivateUserCommandHandler(IUserRepository _userRepository, IUnitOfWork _unitOfWork) : IRequestHandler<ActivateUserCommand, EntityResult>
 {
-    public async Task<bool> Handle(ActivateUserCommand request, CancellationToken cancellationToken)
+    public async Task<EntityResult> Handle(ActivateUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetUserByIdAsync(request.UserId);
-        if (user == null)
+        if (user is null)
         {
-            throw new BusinessException($"User with ID {request.UserId} not found.");
+            return EntityResult.Failed(new EntityError(nameof(Messages.UserNotFound), string.Format(Messages.UserNotFound, request.UserId)));
         }
 
         user.IsActive = true;
@@ -29,6 +27,6 @@ public class ActivateUserCommandHandler(IUserRepository _userRepository, IUnitOf
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return EntityResult.Success;
     }
 }

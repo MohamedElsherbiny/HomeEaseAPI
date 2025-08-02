@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HomeEase.Domain\HomeEase.Domain.csproj" />
+    <ProjectReference Include="..\HomeEase.Resources\HomeEase.Resources.csproj" />
   </ItemGroup>
 
 </Project>

@@ -35,17 +35,13 @@ public class UsersController(IMediator _mediator, IWebHostEnvironment _webHostEn
     [HttpPatch("activate/{id}")]
     public async Task<IActionResult> ActivateUser(Guid id)
     {
-        var command = new ActivateUserCommand(id);
-        var result = await _mediator.Send(command);
-        return result ? Ok("User activation successful.") : BadRequest("Failed to activate user.");
+        return Ok(await _mediator.Send(new ActivateUserCommand(id)));
     }
 
     [HttpPatch("deactivate/{id}")]
     public async Task<IActionResult> DeactivateUser(Guid id)
     {
-        var command = new DeactivateUserCommand(id);
-        var result = await _mediator.Send(command);
-        return result ? Ok("User deactivation successful.") : BadRequest("Failed to deactivate user.");
+        return Ok(await _mediator.Send(new DeactivateUserCommand(id)));
     }
 
     [HttpGet("Export")]

@@ -1,23 +1,26 @@
-﻿using HomeEase.Application.Interfaces.Services;
-using HomeEase.Domain.Exceptions;
+﻿using HomeEase.Application.DTOs;
+using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Repositories;
+using HomeEase.Resources;
 using MediatR;
 
 namespace HomeEase.Application.Commands.ProviderCommands;
 
-public class ActivateProviderCommand(Guid providerId) : IRequest<bool>
+public class ActivateProviderCommand(Guid providerId) : IRequest<EntityResult>
 {
     public Guid ProviderId { get; } = providerId;
 }
 
-public class ActivateProviderCommandHandler(IProviderRepository _providerRepository, IUnitOfWork _unitOfWork) : IRequestHandler<ActivateProviderCommand, bool>
+public class ActivateProviderCommandHandler(IProviderRepository _providerRepository, IUnitOfWork _unitOfWork) : IRequestHandler<ActivateProviderCommand, EntityResult>
 {
-    public async Task<bool> Handle(ActivateProviderCommand request, CancellationToken cancellationToken)
+    public async Task<EntityResult> Handle(ActivateProviderCommand request, CancellationToken cancellationToken)
     {
         var provider = await _providerRepository.GetByIdAsync(request.ProviderId);
         if (provider is null)
         {
-            throw new BusinessException($"Provider with ID {request.ProviderId} not found.");
+            return EntityResult.Failed(new EntityError(
+                    nameof(Messages.ProviderNotFound),
+                    string.Format(Messages.ProviderNotFound, request.ProviderId)));
         }
 
         provider.IsActive = true;
@@ -27,6 +30,6 @@ public class ActivateProviderCommandHandler(IProviderRepository _providerReposit
         _providerRepository.Update(provider);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return EntityResult.Success;
     }
 }
