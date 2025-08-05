@@ -1,19 +1,21 @@
 ﻿using HomeEase.Application.Commands.BookingCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Common;
+using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.BookingQueries;
 using HomeEase.Domain.Common;
 using HomeEase.Domain.Enums;
+using HomeEase.Domain.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace HomeEase.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class BookingsController(IMediator _mediator) : ControllerBase
+public class BookingsController(IMediator _mediator, ICurrentUserService _currentUserService) : ControllerBase
 {
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -29,8 +31,7 @@ public class BookingsController(IMediator _mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<PaginatedList<BookingDto>>> GetUserBookings([FromQuery] GetUserBookingsQuery query)
     {
-        var userId = GetCurrentUserId();
-        query.UserId = userId;
+        query.UserId = _currentUserService.UserId;
 
         var result = await _mediator.Send(query);
         return Ok(result);
@@ -78,25 +79,23 @@ public class BookingsController(IMediator _mediator) : ControllerBase
             .Select(status => new BookingStatusDto
             {
                 Id = (int)status,
-                Name = status.ToString(),
-                NameAr = GetArabicTranslation(status)
+                Name = EnumTranslations.TranslateBookingStatus(status, _currentUserService.Language)
             })
             .ToList();
 
         return Ok(statuses);
     }
 
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Guid>> CreateBooking([FromBody] CreateBookingRequestDto request)
     {
-        var userId = GetCurrentUserId();
-
         return Ok(await _mediator.Send(new CreateBookingCommand
         {
             BookingRequest = request,
-            UserId = userId
+            UserId = _currentUserService.UserId
         }));
     }
 
@@ -106,11 +105,10 @@ public class BookingsController(IMediator _mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> UpdateBooking(Guid id, [FromBody] UpdateBookingRequestDto request)
     {
-        var userId = GetCurrentUserId();
         var command = new UpdateBookingCommand
         {
             BookingId = id,
-            UserId = userId,
+            UserId = _currentUserService.UserId,
             UpdateRequest = request
         };
 
@@ -142,13 +140,12 @@ public class BookingsController(IMediator _mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> CancelBooking([FromBody] BookingCancellationDto request)
     {
-        var userId = GetCurrentUserId();
         var isProvider = User.IsInRole("Provider");
 
         var command = new CancelBookingCommand
         {
             CancellationRequest = request,
-            UserId = userId,
+            UserId = _currentUserService.UserId,
             IsProvider = isProvider
         };
 
@@ -171,15 +168,6 @@ public class BookingsController(IMediator _mediator) : ControllerBase
         return Ok(result);
     }
 
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-        if (userIdClaim == null)
-            throw new UnauthorizedAccessException("User not authenticated properly");
-
-        return Guid.Parse(userIdClaim.Value);
-    }
-
     private Guid GetCurrentProviderId()
     {
         var providerIdClaim = User.FindFirst("ProviderId");
@@ -187,24 +175,5 @@ public class BookingsController(IMediator _mediator) : ControllerBase
             throw new UnauthorizedAccessException("Provider ID not found in claims");
 
         return Guid.Parse(providerIdClaim.Value);
-    }
-
-    private static string GetArabicTranslation(BookingStatus status)
-    {
-        return status switch
-        {
-            BookingStatus.Pending => "قيد الانتظار",
-            BookingStatus.Confirmed => "تم القبول",
-            BookingStatus.Completed => "مكتملة",
-            BookingStatus.Cancelled => "ملغاة",
-            _ => "غير معروف"
-        };
-    }
-
-    public class BookingStatusDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string NameAr { get; set; } = string.Empty;
     }
 }

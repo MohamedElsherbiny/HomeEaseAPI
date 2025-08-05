@@ -14,7 +14,7 @@ public class GetProviderBookingsQuery : IRequest<PaginatedList<BookingDto>>
     public DateTime? ToDate { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
-    public string? search { get; set; }
+    public string? Search { get; set; }
 }
 
 public class GetProviderBookingsQueryHandler(
@@ -31,7 +31,7 @@ public class GetProviderBookingsQueryHandler(
             request.ToDate,
             request.PageNumber,
             request.PageSize,
-            request.search);
+            request.Search);
 
         return new PaginatedList<BookingDto>(_mapper.Map<List<BookingDto>>(bookings.items), bookings.totalCount, request.PageNumber, request.PageSize);
     }

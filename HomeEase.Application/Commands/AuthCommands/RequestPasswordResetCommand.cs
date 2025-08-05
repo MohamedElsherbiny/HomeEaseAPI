@@ -22,7 +22,7 @@ public class RequestPasswordResetCommandHandler(UserManager<User> _userManager, 
         }
 
         var otp = await _userManager.GenerateUserTokenAsync(user, "OtpProvider", "ResetPassword");
-        await _emailService.SendPasswordResetEmailAsync(user.Email!, otp, _currentUserService.Language);
+        await _emailService.SendPasswordResetEmailAsync(user.Email!, otp, _currentUserService.Language.ToString());
 
         return EntityResult.Success;
     }

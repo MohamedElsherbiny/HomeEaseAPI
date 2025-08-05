@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HomeEase.Domain.Enums;
 
-namespace HomeEase.Application.Interfaces.Services
+namespace HomeEase.Application.Interfaces.Services;
+
+public interface ICurrentUserService
 {
-    public interface ICurrentUserService
-    {
-        Guid UserId { get; }
-        string UserRole { get; }
-        string Language { get; }
-    }
+    Guid UserId { get; }
+    string UserRole { get; }
+    LanguageEnum Language { get; }
 }

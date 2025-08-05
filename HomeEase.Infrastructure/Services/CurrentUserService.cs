@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using HomeEase.Application.Interfaces.Services;
+using HomeEase.Domain.Enums;
 
 namespace HomeEase.Infrastructure.Services;
 
@@ -23,24 +24,24 @@ public class CurrentUserService(IHttpContextAccessor _httpContextAccessor) : ICu
         }
     }
 
-    public string Language
+    public LanguageEnum Language
     {
         get
         {
-            var acceptLanguage = _httpContextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString();
+            var acceptLanguage = _httpContextAccessor.HttpContext?.Request.Headers.AcceptLanguage.ToString();
 
             if (!string.IsNullOrWhiteSpace(acceptLanguage))
             {
                 // Extract primary language from header like "en-US,en;q=0.9"
                 var primary = acceptLanguage.Split(',').FirstOrDefault()?.Trim().ToLower();
                 if (primary?.StartsWith("en") == true)
-                    return "en";
+                    return LanguageEnum.En;
                 if (primary?.StartsWith("ar") == true)
-                    return "ar";
+                    return LanguageEnum.Ar;
             }
 
             // Default to "ar" if not found or invalid
-            return "ar";
+            return LanguageEnum.Ar;
         }
     }
 }

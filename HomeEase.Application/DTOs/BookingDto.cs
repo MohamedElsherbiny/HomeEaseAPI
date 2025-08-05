@@ -1,13 +1,8 @@
-﻿using HomeEase.Domain.Entities;
-using System;
-using System.Collections.Generic;
+﻿using HomeEase.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
+namespace HomeEase.Application.DTOs;
 
-
-namespace HomeEase.Application.DTOs
-{
 public class BookingDto
 {
     public Guid Id { get; set; }
@@ -24,15 +19,8 @@ public class BookingDto
     public int DurationMinutes { get; set; }
     public DateTime AppointmentDateTime { get; set; }
     public string FormattedAppointmentDateTime => AppointmentDateTime.ToString("dd MMMM yyyy - hh:mm tt", new System.Globalization.CultureInfo("ar-SA"));
-    public string Status { get; set; }
-    public string TranslatedStatus => Status switch
-    {
-        "Pending" => "قيد الانتظار",
-        "Confirmed" => "تم القبول",
-        "Completed" => "مكتملة",
-        "Cancelled" => "ملغاة",
-        _ => "غير معروف"
-    };
+    public BookingStatus Status { get; set; }
+    public string TranslatedStatus { get; set; }
     public string SessionLocationType { get; set; }
     public string Notes { get; set; }
     public AddressDto Address { get; set; }
@@ -42,66 +30,64 @@ public class BookingDto
     public string CancellationReason { get; set; }
     public PaymentInfoDto Payment { get; set; }
 
-    }
+}
 
-    public class CreateBookingRequestDto
-    {
-        [Required]
-        public Guid ProviderId { get; set; }
+public class CreateBookingRequestDto
+{
+    [Required]
+    public Guid ProviderId { get; set; }
 
-        [Required]
-        public Guid ServiceId { get; set; }
+    [Required]
+    public Guid ServiceId { get; set; }
 
-        [Required]
-        public DateTime AppointmentDate { get; set; }
+    [Required]
+    public DateTime AppointmentDate { get; set; }
 
-        [Required]
-        public TimeSpan AppointmentTime { get; set; }
+    [Required]
+    public TimeSpan AppointmentTime { get; set; }
 
-        public string? Notes { get; set; }
+    public string? Notes { get; set; }
 
-        public int DurationMinutes { get; set; }
-        public bool IsHomeService { get; set; }
-        public string? CustomerAddress { get; set; } // For home service bookings
+    public int DurationMinutes { get; set; }
+    public bool IsHomeService { get; set; }
+    public string? CustomerAddress { get; set; } // For home service bookings
 
-    }
+}
 
-    public class UpdateBookingRequestDto
-    {
-        public DateTime? AppointmentDateTime { get; set; }
-        public string? Notes { get; set; }
-        public AddressDto Address { get; set; }
-    }
+public class UpdateBookingRequestDto
+{
+    public DateTime? AppointmentDateTime { get; set; }
+    public string? Notes { get; set; }
+    public AddressDto Address { get; set; }
+}
 
-    public class BookingConfirmationDto
-    {
-        [Required]
-        public Guid BookingId { get; set; }
+public class BookingConfirmationDto
+{
+    [Required]
+    public Guid BookingId { get; set; }
 
-        [Required]
-        public bool IsConfirmed { get; set; }
+    [Required]
+    public bool IsConfirmed { get; set; }
 
-    }
+}
 
-    public class BookingCancellationDto
-    {
-        [Required]
-        public Guid BookingId { get; set; }
+public class BookingCancellationDto
+{
+    [Required]
+    public Guid BookingId { get; set; }
 
-        [Required]
-        public string CancellationReason { get; set; }
-    }
+    [Required]
+    public string CancellationReason { get; set; }
+}
 
-    public class BookingStatisticsDto
-    {
-        public int TotalBookings { get; set; }
-        public int CompletedBookings { get; set; }
-        public int CancelledBookings { get; set; }
-        public int PendingBookings { get; set; }
-        public decimal TotalRevenue { get; set; }
+public class BookingStatisticsDto
+{
+    public int TotalBookings { get; set; }
+    public int CompletedBookings { get; set; }
+    public int CancelledBookings { get; set; }
+    public int PendingBookings { get; set; }
+    public decimal TotalRevenue { get; set; }
 
-        public Dictionary<string, int> BookingsByBasePlatformService { get; set; }
-        public Dictionary<string, Dictionary<string, int>> BookingsByStatusAndMonth { get; set; }
-    }
-
+    public Dictionary<string, int> BookingsByBasePlatformService { get; set; }
+    public Dictionary<string, Dictionary<string, int>> BookingsByStatusAndMonth { get; set; }
 }
