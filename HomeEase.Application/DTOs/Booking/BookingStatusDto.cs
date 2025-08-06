@@ -1,4 +1,4 @@
-﻿namespace HomeEase.Application.DTOs.Common;
+﻿namespace HomeEase.Application.DTOs.Booking;
 
 public class BookingStatusDto
 {

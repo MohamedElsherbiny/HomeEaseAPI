@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.PlatformService;
 using HomeEase.Application.Interfaces;
 using HomeEase.Domain.Common;
 using HomeEase.Domain.Enums;

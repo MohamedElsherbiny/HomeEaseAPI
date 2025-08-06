@@ -1,5 +1,9 @@
 ﻿using AutoMapper;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.PlatformService;
+using HomeEase.Application.DTOs.Provider;
+using HomeEase.Application.DTOs.ProviderSchedule;
+using HomeEase.Application.DTOs.ProviderService;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;
@@ -11,11 +15,8 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         // Provider mapping
+        CreateMap<Provider, ProviderForUpdateDto>();
         CreateMap<Provider, ProviderDto>()
-            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-            .ForMember(dest => dest.Schedule, opt => opt.MapFrom(src => src.Schedule))
-            .ForMember(dest => dest.Services, opt => opt.MapFrom(src => src.Services))
-            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
             .ForMember(dest => dest.StartingPrice, opt =>
                 opt.MapFrom(src => src.Services != null && src.Services.Any()
                     ? src.Services.Min(s => s.Price)

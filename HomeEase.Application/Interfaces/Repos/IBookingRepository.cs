@@ -1,4 +1,4 @@
-﻿using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs.Booking;
 using HomeEase.Domain.Common;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;

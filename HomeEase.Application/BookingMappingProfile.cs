@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Booking;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Enums;

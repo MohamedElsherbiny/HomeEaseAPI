@@ -1,4 +1,4 @@
-﻿using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs.Common;
 
 namespace HomeEase.Application.Interfaces.Services
 {

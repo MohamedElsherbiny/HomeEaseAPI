@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.ProviderService;
 using HomeEase.Application.Queries;
 using HomeEase.Application.Queries.ServiceQueries;
 using HomeEase.Domain.Repositories;

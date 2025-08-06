@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using HomeEase.Application.Commands.ServiceCommands;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.ProviderService;
 using HomeEase.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,7 @@
 ﻿using HomeEase.Application.Commands.ProviderCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Common;
+using HomeEase.Application.DTOs.Provider;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.ProviderQueries;
 using HomeEase.Domain.Common;
@@ -31,6 +33,18 @@ public class ProvidersController(IMediator _mediator, IWebHostEnvironment _webHo
     public async Task<ActionResult<ProviderDto>> GetProviderById(Guid id)
     {
         var query = new GetProviderByIdQuery { ProviderId = id };
+        var result = await _mediator.Send(query);
+
+        if (result == null)
+            return NotFound();
+
+        return Ok(result);
+    }
+    [HttpGet("{id}/ForUpdate")]
+    [Authorize]
+    public async Task<ActionResult<ProviderForUpdateDto>> GetProviderByIdForUpdate(Guid id)
+    {
+        var query = new GetProviderByIdForUpdateQuery { ProviderId = id };
         var result = await _mediator.Send(query);
 
         if (result == null)

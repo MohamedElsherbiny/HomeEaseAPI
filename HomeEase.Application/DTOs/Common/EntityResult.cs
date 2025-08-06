@@ -1,4 +1,4 @@
-﻿namespace HomeEase.Application.DTOs
+﻿namespace HomeEase.Application.DTOs.Common
 {
     public class EntityResult
     {

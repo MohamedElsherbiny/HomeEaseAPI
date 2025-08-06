@@ -1,4 +1,4 @@
-﻿using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs.Common;
 using HomeEase.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

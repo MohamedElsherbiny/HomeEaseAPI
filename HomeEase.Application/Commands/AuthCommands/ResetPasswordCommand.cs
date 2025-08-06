@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Auth;
+using HomeEase.Application.DTOs.Common;
 using HomeEase.Domain.Entities;
 using HomeEase.Resources;
 using MediatR;

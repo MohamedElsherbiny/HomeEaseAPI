@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace HomeEase.Application.DTOs
+namespace HomeEase.Application.DTOs.Common
 {
     public class EntityError
     {

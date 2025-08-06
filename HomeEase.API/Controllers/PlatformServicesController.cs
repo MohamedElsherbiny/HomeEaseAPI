@@ -1,5 +1,7 @@
 ﻿using HomeEase.Application.Commands.PlatformService;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Common;
+using HomeEase.Application.DTOs.PlatformService;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.PlatformService;
 using HomeEase.Domain.Enums;

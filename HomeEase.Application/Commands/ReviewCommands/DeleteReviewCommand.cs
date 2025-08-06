@@ -1,4 +1,4 @@
-﻿using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs.Common;
 using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Repositories;

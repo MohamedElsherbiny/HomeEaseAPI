@@ -1,5 +1,5 @@
 ﻿using HomeEase.Application.Commands.AuthCommands;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Auth;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using MediatR;

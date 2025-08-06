@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Booking;
 using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Domain.Exceptions;
 using MediatR;

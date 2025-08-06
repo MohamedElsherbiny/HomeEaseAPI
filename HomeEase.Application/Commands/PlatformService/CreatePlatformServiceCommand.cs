@@ -1,7 +1,7 @@
 ﻿using HomeEase.Application.Interfaces;
 using MediatR;
 using HomeEase.Domain.Entities;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Common;
 
 namespace HomeEase.Application.Commands.PlatformService
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeEase.Application.DTOs
+namespace HomeEase.Application.DTOs.PlatformService
 {
     public class BasePlatformServiceDto
     {

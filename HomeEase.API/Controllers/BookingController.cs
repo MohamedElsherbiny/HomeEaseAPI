@@ -1,6 +1,6 @@
 ﻿using HomeEase.Application.Commands.BookingCommands;
 using HomeEase.Application.DTOs;
-using HomeEase.Application.DTOs.Common;
+using HomeEase.Application.DTOs.Booking;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.BookingQueries;
 using HomeEase.Domain.Common;

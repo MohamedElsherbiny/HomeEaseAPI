@@ -1,4 +1,4 @@
-﻿using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs.Common;
 using HomeEase.Application.Interfaces;
 using HomeEase.Resources;
 using MediatR;

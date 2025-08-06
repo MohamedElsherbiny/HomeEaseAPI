@@ -1,11 +1,11 @@
-﻿using HomeEase.Application.DTOs;
-using HomeEase.Application.Interfaces.Services;
+﻿using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
 using HomeEase.Domain.Repositories;
 using MediatR;
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Identity;
 using HomeEase.Domain.Enums;
+using HomeEase.Application.DTOs.Auth;
 
 namespace HomeEase.Application.Commands.AuthCommands
 {

@@ -1,7 +1,7 @@
 ﻿using HomeEase.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace HomeEase.Application.DTOs;
+namespace HomeEase.Application.DTOs.Booking;
 
 public class BookingDto
 {

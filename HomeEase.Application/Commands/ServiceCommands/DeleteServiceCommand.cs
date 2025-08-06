@@ -1,5 +1,5 @@
 ﻿using HomeEase.Application.Commands.ServiceCommands;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Common;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Repositories;
 using HomeEase.Resources;

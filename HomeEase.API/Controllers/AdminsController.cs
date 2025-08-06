@@ -1,5 +1,6 @@
 ﻿using HomeEase.Application.Commands.AdminCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Common;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.AdminQueries;
 using HomeEase.Domain.Enums;

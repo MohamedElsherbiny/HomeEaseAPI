@@ -1,5 +1,6 @@
 ﻿using HomeEase.Application.Commands.AuthCommands;
 using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.Auth;
 using HomeEase.Resources;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

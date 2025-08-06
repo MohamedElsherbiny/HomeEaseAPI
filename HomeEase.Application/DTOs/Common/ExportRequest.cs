@@ -1,6 +1,6 @@
 ﻿using HomeEase.Domain.Enums;
 
-namespace HomeEase.Application.DTOs
+namespace HomeEase.Application.DTOs.Common
 {
     public class ExportRequest<T> where T : class
     {

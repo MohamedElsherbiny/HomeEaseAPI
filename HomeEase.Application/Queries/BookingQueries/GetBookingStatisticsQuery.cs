@@ -1,4 +1,4 @@
-﻿using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs.Booking;
 using HomeEase.Application.Interfaces.Repos;
 using MediatR;
 using Microsoft.Extensions.Logging;

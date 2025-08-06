@@ -1,4 +1,5 @@
-﻿using HomeEase.Application.DTOs;
+﻿using HomeEase.Application.DTOs.Common;
+using HomeEase.Application.DTOs.ProviderService;
 using HomeEase.Application.Interfaces.Repos;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Domain.Entities;
@@ -11,7 +12,7 @@ namespace HomeEase.Application.Commands.ServiceCommands
     public class CreateServicesCommand : IRequest<EntityResult>
     {
         public Guid ProviderId { get; set; }
-        public CreateServicesDto ServicesDto { get; set; }
+        public BlukUpdateServicesDto ServicesDto { get; set; }
     }
 
     public class CreateServicesCommandHandler(

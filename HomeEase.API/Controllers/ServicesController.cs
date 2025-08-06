@@ -1,5 +1,5 @@
 ﻿using HomeEase.Application.Commands.ServiceCommands;
-using HomeEase.Application.DTOs;
+using HomeEase.Application.DTOs.ProviderService;
 using HomeEase.Application.Queries.ServiceQueries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -43,7 +43,7 @@ public class ProviderServicesController(IMediator _mediator) : ControllerBase
 
     [HttpPost("bulk")]
     [Authorize(Policy = "ProviderOnly")]
-    public async Task<ActionResult<List<Guid>>> CreateServices(Guid providerId, CreateServicesDto servicesDto)
+    public async Task<ActionResult<List<Guid>>> CreateServices(Guid providerId, BlukUpdateServicesDto servicesDto)
     {
         return Ok(await _mediator.Send(new CreateServicesCommand { ProviderId = providerId, ServicesDto = servicesDto }));
     }
