@@ -16,6 +16,7 @@ namespace HomeEase.Application.Queries.PlatformService
         public string SortBy { get; set; } = "CreatedAt";
         public bool SortDescending { get; set; } = true;
         public EnumExportFormat ExportFormat { get; set; } = EnumExportFormat.Excel;
+        public List<Guid> ExcludedIds { get; set; } = new();
     }
 
     public class GetAllPlatformServicesHandler(IAppDbContext _context, IMapper _mapper) : IRequestHandler<GetAllPlatformServicesQuery, PaginatedList<BasePlatformServiceDto>>
@@ -24,7 +25,11 @@ namespace HomeEase.Application.Queries.PlatformService
         {
             var query = _context.BasePlatformService.AsQueryable().Where(s => s.IsActive);
 
-            // Apply search term filter
+            if (request.ExcludedIds?.Any() == true)
+            {
+                query = query.Where(s => !request.ExcludedIds.Contains(s.Id));
+            }
+
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 query = query.Where(s => s.Name.Contains(request.SearchTerm));
