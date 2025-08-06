@@ -12,11 +12,11 @@ public class ProviderForUpdateDto
     public string Description { get; set; }
     public string DescriptionAr { get; set; }
     public string ProfileImageUrl { get; set; }
-    public AddressDto Address { get; set; }
+    public string? BusinessAddress { get; set; }
+    public string? Street { get; set; }
     public decimal Rating { get; set; }
     public int ReviewCount { get; set; }
     public string Status { get; set; }
-    public string? Street { get; set; }
     public string? PhoneNumber { get; set; }
     public List<ProviderImageDto> Gallery { get; set; }
     public ProviderImageDto? Logo { get; set; }
