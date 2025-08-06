@@ -1,6 +1,7 @@
 ﻿using HomeEase.Application.Commands.BookingCommands;
 using HomeEase.Application.DTOs;
 using HomeEase.Application.DTOs.Booking;
+using HomeEase.Application.DTOs.Common;
 using HomeEase.Application.Interfaces.Services;
 using HomeEase.Application.Queries.BookingQueries;
 using HomeEase.Domain.Common;
@@ -63,6 +64,21 @@ public class BookingsController(IMediator _mediator, ICurrentUserService _curren
             ProviderId = providerId,
             FromDate = fromDate,
             ToDate = toDate
+        };
+
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpGet("provider/GetBookingStatusCounts")]
+    [Authorize(Roles = "Provider")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<EntityResult>> GetBookingStatusCounts()
+    {
+        var providerId = GetCurrentProviderId();
+        var query = new GetBookingStatusCountsQuery
+        {
+            ProviderId = providerId
         };
 
         var result = await _mediator.Send(query);

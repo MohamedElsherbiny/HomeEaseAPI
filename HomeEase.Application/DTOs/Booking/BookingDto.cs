@@ -1,5 +1,4 @@
 ﻿using HomeEase.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace HomeEase.Application.DTOs.Booking;
 
@@ -30,64 +29,4 @@ public class BookingDto
     public string CancellationReason { get; set; }
     public PaymentInfoDto Payment { get; set; }
 
-}
-
-public class CreateBookingRequestDto
-{
-    [Required]
-    public Guid ProviderId { get; set; }
-
-    [Required]
-    public Guid ServiceId { get; set; }
-
-    [Required]
-    public DateTime AppointmentDate { get; set; }
-
-    [Required]
-    public TimeSpan AppointmentTime { get; set; }
-
-    public string? Notes { get; set; }
-
-    public int DurationMinutes { get; set; }
-    public bool IsHomeService { get; set; }
-    public string? CustomerAddress { get; set; } // For home service bookings
-
-}
-
-public class UpdateBookingRequestDto
-{
-    public DateTime? AppointmentDateTime { get; set; }
-    public string? Notes { get; set; }
-    public AddressDto Address { get; set; }
-}
-
-public class BookingConfirmationDto
-{
-    [Required]
-    public Guid BookingId { get; set; }
-
-    [Required]
-    public bool IsConfirmed { get; set; }
-
-}
-
-public class BookingCancellationDto
-{
-    [Required]
-    public Guid BookingId { get; set; }
-
-    [Required]
-    public string CancellationReason { get; set; }
-}
-
-public class BookingStatisticsDto
-{
-    public int TotalBookings { get; set; }
-    public int CompletedBookings { get; set; }
-    public int CancelledBookings { get; set; }
-    public int PendingBookings { get; set; }
-    public decimal TotalRevenue { get; set; }
-
-    public Dictionary<string, int> BookingsByBasePlatformService { get; set; }
-    public Dictionary<string, Dictionary<string, int>> BookingsByStatusAndMonth { get; set; }
 }
