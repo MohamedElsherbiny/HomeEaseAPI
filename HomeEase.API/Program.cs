@@ -32,26 +32,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-        policy =>
-        {
-            policy
-            .WithOrigins(
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "https://salmon-desert-09cf3c000.6.azurestaticapps.net")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-            .WithExposedHeaders("Content-Disposition");
-        });
-});
-
 builder.Services.AddLocalization();
 builder.Services.Configure<RequestLocalizationOptions>(
     options =>
@@ -238,9 +218,20 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("UserOnly", policy =>
         policy.RequireRole("User"));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
 
-app.UseCors(MyAllowSpecificOrigins);
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -248,7 +239,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
+app.UseCors("AllowAll");
 
 using (var scope = app.Services.CreateScope())
 {
