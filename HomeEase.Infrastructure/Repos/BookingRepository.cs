@@ -90,6 +90,7 @@ public class BookingRepository(AppDbContext _context) : IBookingRepository
             .Include(b => b.Service)
             .Include(b => b.Payment)
             .Include(x => x.Provider)
+            .Where(x => x.Service.BasePlatformService != null)
             .Where(b => b.ProviderId == providerId);
 
         if (status.HasValue)
